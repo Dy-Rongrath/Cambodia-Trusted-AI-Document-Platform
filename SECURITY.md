@@ -45,14 +45,14 @@ Only synthetic, anonymised, pseudonymised, or explicitly approved datasets may b
 
 | Boundary | Between | Control |
 |---|---|---|
-| **External ↔ Reverse Proxy** | Public internet and the platform | TLS termination, rate limiting, WAF (Phase 14). |
+| **External ↔ Reverse Proxy** | Public internet and the platform | TLS termination, rate limiting, WAF (Phase 16). |
 | **Reverse Proxy ↔ Backend** | DMZ and internal network | Internal HTTP only. No direct external access to backend. |
 | **Backend ↔ AI Service** | Backend and AI inference | Private Docker network. Internal API key authentication. |
 | **Backend ↔ Database** | Application and data layer | TLS database connection. Least-privilege database role. RLS. |
 | **Backend ↔ Object Storage** | Application and file storage | TLS. Short-lived pre-signed URLs for file access. |
 | **Backend ↔ Keycloak** | Application and identity provider | OIDC. JWKS-based JWT validation (no shared secrets). |
 | **User ↔ Application** | User browser and the application | TLS. HTTPS enforced. HSTS. |
-| **Tenant ↔ Tenant** | Organisation A and Organisation B | `organisation_id` filter in every query. PostgreSQL RLS. Separate encryption keys per tenant (Phase 14). |
+| **Tenant ↔ Tenant** | Organisation A and Organisation B | `organisation_id` filter in every query. PostgreSQL RLS. Separate encryption keys per tenant (Phase 16). |
 
 ---
 
@@ -122,15 +122,15 @@ File uploads are a high-risk attack surface. All of the following controls are m
 
 | Control | Implementation | Phase |
 |---|---|---|
-| File size limit | Reject files exceeding the limit before reading content. Applied at the reverse proxy and NestJS middleware. | Phase 3 |
-| Content-Type validation | Reject unexpected Content-Type headers. | Phase 3 |
-| Magic byte verification | Read file magic bytes (file signature) and verify against the declared type. Reject mismatches. | Phase 3 |
-| Allowed file types | Allowlist: PDF, JPEG, PNG, TIFF (document images). All other types rejected. | Phase 3 |
-| Quarantine storage | Store uploaded files in a quarantine bucket before processing. | Phase 3 |
-| Malware scanning | Scan with ClamAV before moving to permanent storage. Integration point defined in Phase 1. | Phase 3 |
-| No execution | Uploaded files are never executed, imported, or included in any code path. | Phase 3 |
-| Secure URLs | Files served via short-lived pre-signed URLs — never exposed directly from storage. | Phase 3 |
-| Content-Disposition | File downloads served with `Content-Disposition: attachment` to prevent browser execution. | Phase 3 |
+| File size limit | Reject files exceeding the limit before reading content. Applied at the reverse proxy and NestJS middleware. | Phase 4 |
+| Content-Type validation | Reject unexpected Content-Type headers. | Phase 4 |
+| Magic byte verification | Read file magic bytes (file signature) and verify against the declared type. Reject mismatches. | Phase 4 |
+| Allowed file types | Allowlist: PDF, JPEG, PNG, TIFF (document images). All other types rejected. | Phase 4 |
+| Quarantine storage | Store uploaded files in a quarantine bucket before processing. | Phase 4 |
+| Malware scanning | Scan with ClamAV before moving to permanent storage. Integration point defined in Phase 1. | Phase 4 |
+| No execution | Uploaded files are never executed, imported, or included in any code path. | Phase 4 |
+| Secure URLs | Files served via short-lived pre-signed URLs — never exposed directly from storage. | Phase 4 |
+| Content-Disposition | File downloads served with `Content-Disposition: attachment` to prevent browser execution. | Phase 4 |
 
 ---
 
@@ -149,7 +149,7 @@ File uploads are a high-risk attack surface. All of the following controls are m
 - CI logs must not echo secret values.
 
 ### Production
-- Production secrets management solution to be decided in Phase 14.
+- Production secrets management solution to be decided in Phase 16.
 - Candidates: HashiCorp Vault (self-hosted), AWS Secrets Manager, Azure Key Vault.
 - Rotation: All secrets must be rotatable without service downtime.
 
@@ -162,7 +162,7 @@ File uploads are a high-risk attack surface. All of the following controls are m
 | `INTERNAL_AI_API_KEY` | Backend + AI service | Shared key for internal service-to-service authentication |
 | `OBJECT_STORAGE_ACCESS_KEY` | Backend | Object storage access key |
 | `OBJECT_STORAGE_SECRET_KEY` | Backend | Object storage secret key |
-| `CREDENTIAL_SIGNING_PRIVATE_KEY` | Backend | Private key for credential issuance (Phase 10+) |
+| `CREDENTIAL_SIGNING_PRIVATE_KEY` | Backend | Private key for credential issuance (Phase 11+) |
 
 ---
 
@@ -239,7 +239,7 @@ Additional security-specific logging requirements:
 - Read-only filesystem where possible. Only explicitly required write paths mounted.
 - No unnecessary tools installed in production images (no shell, curl, wget in production).
 - Trivy scans all images for known CVEs.
-- Cosign signs all production images (Phase 14).
+- Cosign signs all production images (Phase 16).
 - All base image versions are pinned (e.g., `node:24.15.0-alpine3.20` — not `node:24-alpine`).
 
 ---
@@ -269,7 +269,7 @@ Additional security-specific logging requirements:
 | Dependency update review | Weekly | Developer |
 | OWASP ZAP API scan | Every release | Phase 4+ |
 | Manual security review | Each phase milestone | Developer + specialist reviewer |
-| Full penetration test | Before Phase 14 (production) | External specialist (requires approval) |
+| Full penetration test | Before Phase 16 (production) | External specialist (requires approval) |
 
 ---
 
@@ -284,7 +284,7 @@ Additional security-specific logging requirements:
 | 5. Document | Record the incident, timeline, impact, and remediation. |
 | 6. Review | Post-incident review. Update threat model and controls. |
 
-A formal incident response plan is required before Phase 14 (production deployment).
+A formal incident response plan is required before Phase 16 (production deployment).
 
 ---
 

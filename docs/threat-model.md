@@ -5,7 +5,7 @@
 > **Last updated:** 2026-08-01
 > **Classification:** Public project policy — must not contain secrets or restricted operational details.
 >
-> **Specialist review required** before Phase 14 (production deployment).
+> **Specialist review required** before Phase 16 (production deployment).
 
 ---
 
@@ -21,13 +21,13 @@ This threat model covers the platform as it will exist at the end of Phase 3 (se
 - AI model weights.
 - Training datasets.
 - Audit logs.
-- Signing keys (Phase 10+).
-- Verifiable credentials (Phase 10+).
+- Signing keys (Phase 11+).
+- Verifiable credentials (Phase 11+).
 
 **Out of scope (will be added in later phases):**
-- Inter-organisation data exchange threats (Phase 12).
-- European data-space threats (Phase 13).
-- Flutter mobile wallet threats (Phase 11).
+- Inter-organisation data exchange threats (Phase 13).
+- European data-space threats (Phase 14).
+- Flutter mobile wallet threats (Phase 12).
 
 ---
 
@@ -233,7 +233,7 @@ This threat model covers the platform as it will exist at the end of Phase 3 (se
 | **Threat** | An attacker with database access modifies or deletes audit records to hide evidence of malicious actions. |
 | **Impact** | Loss of audit trail. Unable to detect or investigate incidents. Repudiation of actions. |
 | **Likelihood** | Low (requires database access), but high impact |
-| **Prevention** | Application database role has INSERT only on `audit_events` — no UPDATE or DELETE. Database-level audit logging (pg_audit) for audit table access. Separate privileged role for audit queries. Tamper-evident log (hash chaining or write-once storage) is a Phase 14 requirement. |
+| **Prevention** | Application database role has INSERT only on `audit_events` — no UPDATE or DELETE. Database-level audit logging (pg_audit) for audit table access. Separate privileged role for audit queries. Tamper-evident log (hash chaining or write-once storage) is a Phase 16 requirement. |
 | **Detection** | pg_audit logs for any UPDATE or DELETE on audit_events. Alert on such events. |
 | **Remaining risk** | Medium (a database superuser can bypass RLS and role restrictions). Tamper-evident storage reduces residual risk. |
 | **Owner** | Platform administrator |
@@ -660,13 +660,13 @@ This threat model covers the platform as it will exist at the end of Phase 3 (se
 | T-AC-001 | Cross-tenant access | **Medium** (critical if exploited) | Dual-layer control required — **must be tested** |
 | T-INJ-002 | Prompt injection | Medium | Phase 8+ — mitigations reduce but don't eliminate |
 | T-INJ-003 | Indirect prompt injection | Medium | Phase 8+ |
-| T-FILE-001 | Malicious upload | Low-medium | ClamAV integration in Phase 3 |
-| T-INT-001 | Audit log tampering | Medium | Tamper-evident log deferred to Phase 14 |
+| T-FILE-001 | Malicious upload | Low-medium | ClamAV integration in Phase 4 |
+| T-INT-001 | Audit log tampering | Medium | Tamper-evident log deferred to Phase 16 |
 | T-AI-001 | Malicious model file | Low | Hash verification mandatory |
 | T-AI-003 | AI as authority for credentials | Low | Architectural rule — enforced by design |
 | T-DATA-001 | Sensitive data in logs | Medium | Requires developer discipline |
 | T-DATA-002 | Secret leakage | Low | Gitleaks + comprehensive .gitignore |
-| T-CRED-002 | Credential replay | Medium | Revocation required in Phase 10 |
+| T-CRED-002 | Credential replay | Medium | Revocation required in Phase 11 |
 | T-MCP-001 | Untrusted MCP server | Low | 16-point review + stdio/Docker isolation |
 | T-MCP-005 | MCP tool-output prompt injection | Medium | Tool output treated as untrusted data |
 | T-MCP-006 | MCP credential leak | Low | Gitignore `.codex/config.toml` + Gitleaks |
@@ -687,8 +687,9 @@ This threat model covers the platform as it will exist at the end of Phase 3 (se
 | Start of each new phase | Review threats relevant to new capabilities introduced |
 | Security incident | Immediate review and update |
 | New external integration / MCP server | Complete security review and update threat model |
-| Phase 10 (credential issuance) | Full review of credential threat categories |
-| Phase 14 (production) | Specialist penetration test. Full threat model review. |
+| Phase 11 (credential issuance) | Full review of credential threat categories |
+| Phase 15 (product-facing MCP) | Full security review of product-facing MCP tools |
+| Phase 16 (production) | Specialist penetration test. Full threat model review. |
 
 ---
 

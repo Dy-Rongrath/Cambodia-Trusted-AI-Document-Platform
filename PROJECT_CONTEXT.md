@@ -59,27 +59,31 @@ The platform is designed to support Cambodia's digital transformation while resp
 | 5 | Structured information extraction | Phase 8 |
 | 6 | Digitally signed certificate issuance | Phase 11 |
 | 7 | Verifiable credential issuance (OpenID4VCI / SD-JWT VC) | Phase 11 |
-| 8 | Credential verification and QR-code scanning | Phase 10 |
-| 9 | Mobile credential wallet (Flutter) | Phase 11 |
-| 10 | Organisation-to-organisation verified data exchange | Phase 12 |
-| 11 | European data-space connector integration | Phase 13 |
-| 12 | MLOps pipeline and model governance | Phase 9 |
-| 13 | Full observability, security monitoring, and Kubernetes deployment | Phase 14 |
+| 8 | Credential verification and QR-code scanning | Phase 11 |
+| 9 | Mobile credential wallet (Flutter) | Phase 12 |
+| 10 | Organisation-to-organisation verified data exchange | Phase 13 |
+| 11 | European data-space connector integration | Phase 14 |
+| 12 | MLOps pipeline and model governance | Phase 10 |
+| 13 | Product-facing MCP capabilities | Phase 15 |
+| 14 | Full observability, security monitoring, and Kubernetes deployment | Phase 16 |
 
 ---
 
 ## 4. Current Phase
 
-**Phase 0 — Engineering Foundation**
+**Phase 0 — Documentation and Governance Foundation: Complete**
 
-Objectives:
-- Establish the monorepo structure.
-- Initialise all foundation documents (this file and its siblings).
-- Define architecture, security policy, and governance before any code is written.
-- Set up local developer toolchain.
-- Create the first vertical-slice specification.
+Phase 0 established the platform's foundation documentation and governance rules:
+- Foundation documentation (`AGENTS.md`, `PROJECT_CONTEXT.md`, `ARCHITECTURE.md`, `SECURITY.md`, `MCP_SECURITY.md`, `DEVELOPMENT.md`, `TESTING.md`, `DATA_GOVERNANCE.md`, `AI_GOVERNANCE.md`, `ROADMAP.md`, `CONTRIBUTING.md`, `README.md`).
+- Architecture documentation and initial ADR set (ADR-0001 through ADR-0007).
+- Security policy and STRIDE threat model (including 15 MCP threat categories).
+- Development standards and testing standards.
+- Data governance and AI governance policies.
+- Repository-level AI-agent instructions (`AGENTS.md`).
+- Task templates and specialist AI-agent role instructions.
+- Repository configuration files (`.gitignore`, `.gitattributes`, `.nvmrc`).
 
-No feature code exists yet.
+Phase 0 defined the planned monorepo architecture but did not create the application scaffold. No application code, databases, health endpoints, CI workflows, or Docker services exist yet.
 
 ---
 
@@ -88,21 +92,27 @@ No feature code exists yet.
 ### In scope for Phase 0
 
 - Foundation documentation (architecture, security, governance, development standards).
-- Repository structure and tooling configuration.
-- Local Docker Compose environment definition.
+- Repository structure definition and tooling configuration files (`.gitignore`, `.gitattributes`, `.nvmrc`).
+- Local Docker Compose environment specifications.
 - Initial ADR set.
 
-### In scope for Phase 1 (Engineering Foundation — code)
+### In scope for Phase 1 (Engineering Scaffold and Tooling — Next)
 
-- Monorepo scaffold with npm workspaces.
-- NestJS backend application skeleton.
-- FastAPI AI service skeleton.
-- Angular frontend skeleton.
-- PostgreSQL database with initial schema and Prisma setup.
-- Keycloak authentication integration.
-- Docker Compose local development environment.
-- CI/CD pipeline basics.
+- Root `package.json` with npm workspaces initialisation.
+- `apps/backend`: NestJS application skeleton (health endpoint only).
+- `apps/ai-service`: FastAPI application skeleton (health endpoint only).
+- `apps/frontend`: Angular application skeleton (placeholder page).
+- `packages/shared-types`: TypeScript types package skeleton.
+- `infra/docker/docker-compose.yml` with PostgreSQL 17, Keycloak 26, MinIO local-development configuration.
+- PostgreSQL connection setup and Prisma initialisation & connection verification.
+- Keycloak local-development configuration.
+- MinIO local-development configuration.
+- Health endpoints for backend and AI service.
 - Code-quality tooling (ESLint, Prettier, Ruff, mypy).
+- Basic GitHub Actions CI workflow execution.
+- `.env.example` files for all services.
+
+Phase 1 does not implement authentication business flows, full database schemas, document upload, AI models, or human review.
 
 ---
 
@@ -112,15 +122,15 @@ The following are explicitly out of scope until a later phase:
 
 | Item | Reason |
 |---|---|
-| Kubernetes deployment | Not justified until the platform works reliably in Docker Compose. |
+| Kubernetes deployment | Phase 16 target. Not justified until the platform works reliably in Docker Compose. |
 | Service mesh (Istio, Linkerd) | Premature for current scale. |
 | Event broker (Kafka, RabbitMQ) | Not yet justified; direct HTTP communication is sufficient. |
 | Open Policy Agent | Not yet justified; application-layer authorisation is sufficient for initial phases. |
 | Production LLM fine-tuning on paid compute | Requires formal data governance approval and budget authorisation. |
 | Real government or personal data | Prohibited during development. Synthetic data only. |
-| Eclipse Dataspace Components connector | Phase 13 target. |
-| European Digital Identity Wallet interoperability | Phase 10–11 target. |
-| Multi-cloud or hybrid-cloud infrastructure | Phase 14 target. |
+| Eclipse Dataspace Components connector | Phase 14 target. |
+| European Digital Identity Wallet interoperability | Phases 11–12 target. |
+| Multi-cloud or hybrid-cloud infrastructure | Phase 16 target. |
 
 ---
 

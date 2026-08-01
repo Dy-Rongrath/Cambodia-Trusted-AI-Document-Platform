@@ -2,7 +2,7 @@
 
 > **Status:** Living document — updated as architecture evolves.
 > **Last updated:** 2026-08-01
-> **Phase:** Phase 0 — Engineering Foundation
+> **Phase:** Phase 0 — Documentation and Governance Foundation: Complete
 
 ---
 
@@ -46,6 +46,8 @@ C4Context
 
 ## 2. Application Boundaries
 
+The following application boundaries describe the approved target architecture. The application directories will be created during Phase 1 and are not present in the Phase 0 repository.
+
 The platform is structured as a **monorepo** containing three applications and one shared package:
 
 | Application | Technology | Responsibility |
@@ -75,7 +77,7 @@ See [ADR-0001](docs/adr/ADR-0001-monorepo-strategy.md). A modular monolith keeps
 | `DocumentModule` | `documents`, `document_files` tables | Document upload, metadata storage, file-lifecycle management. |
 | `ClassificationModule` | `classification_results` table | Communicates with AI service, stores predictions, evaluates confidence, sets `REVIEW_REQUIRED` status. (Phase 6) |
 | `ReviewModule` | `review_tasks`, `review_decisions` tables | Human-review workflow management: queue, reviewer UI, decision submission, override metrics. (Phase 7) |
-| `CredentialModule` | `credentials`, `credential_revocations` tables | Credential issuance (SD-JWT VC), signing, revocation. |
+| `CredentialModule` | `credentials`, `credential_revocations` tables | Credential issuance (SD-JWT VC), signing, revocation. (Phase 11) |
 | `AuditModule` | `audit_events` table | Append-only audit event recording. Shared service used by all other modules. |
 | `HealthModule` | — | `/health` endpoint for Docker and Kubernetes health checks. |
 
@@ -327,7 +329,7 @@ sequenceDiagram
 
 ---
 
-## 12. Credential Issuance Flow (Phase 10+)
+## 12. Credential Issuance Flow (Phase 11+)
 
 ```mermaid
 sequenceDiagram
@@ -389,7 +391,7 @@ interface AuditEvent {
 **Integrity rules:**
 - The application role has INSERT only on `audit_events` — no UPDATE or DELETE.
 - A separate privileged role is required to query audit logs for compliance purposes.
-- Tamper-evident enhancement (hash chaining or write-once storage) is a Phase 14 requirement.
+- Tamper-evident enhancement (hash chaining or write-once storage) is a Phase 16 requirement.
 
 ---
 
@@ -402,7 +404,7 @@ Introduced incrementally. See `ROADMAP.md` for phase targets.
 | Phase 1 | Structured JSON logging (Pino/Winston in NestJS, Python logging in FastAPI) |
 | Phase 4 | OpenTelemetry SDK integration. Prometheus metrics endpoint. |
 | Phase 4 | Grafana + Loki + Tempo stack in Docker Compose. |
-| Phase 14 | Production observability in Kubernetes. |
+| Phase 16 | Production observability in Kubernetes. |
 
 **Logging standards:**
 - All log entries are JSON.
@@ -417,14 +419,14 @@ Introduced incrementally. See `ROADMAP.md` for phase targets.
 | Integration | Purpose | Phase | Notes |
 |---|---|---|---|
 | Keycloak | Authentication and authorisation | Phase 1 | Self-hosted |
-| Object storage (MinIO locally, S3-compatible in production) | Document storage | Phase 3 | Encrypted at rest |
-| ClamAV | Malware scanning of uploaded files | Phase 3 | Integration point defined in Phase 1 |
-| MLflow | ML experiment tracking and model registry | Phase 5 | Self-hosted |
-| Label Studio | Data annotation | Phase 5 | Self-hosted |
-| DVC + remote storage | Dataset versioning | Phase 5 | Remote: S3-compatible |
-| Prometheus + Grafana + Loki + Tempo | Observability | Phase 4 | Self-hosted |
+| Object storage (MinIO locally, S3-compatible in production) | Document storage | Phase 4 | Encrypted at rest |
+| ClamAV | Malware scanning of uploaded files | Phase 4 | Integration point defined in Phase 1 |
+| MLflow | ML experiment tracking and model registry | Phase 6 | Self-hosted |
+| Label Studio | Data annotation | Phase 10 | Self-hosted |
+| DVC + remote storage | Dataset versioning | Phase 6 | Remote: S3-compatible |
+| Prometheus + Grafana + Loki + Tempo | Observability | Phase 5 | Self-hosted |
 | vLLM | Production model serving (if required) | Phase 8+ | Only if latency justifies it |
-| Eclipse Dataspace Components | Inter-organisation data sharing | Phase 13 | Not yet adopted |
+| Eclipse Dataspace Components | Inter-organisation data sharing | Phase 14 | Not yet adopted |
 
 ---
 
@@ -446,10 +448,10 @@ Introduced incrementally. See `ROADMAP.md` for phase targets.
 
 | Phase | Deployment model |
 |---|---|
-| Phase 0–1 | Single Docker Compose file. All services on one machine. |
-| Phase 2–9 | Docker Compose with multiple services. Separate Compose files for dev and CI. |
-| Phase 10–13 | Docker Compose (development) + initial Kubernetes manifests (staging). |
-| Phase 14 | Kubernetes (production). Helm charts. Argo CD GitOps. OpenTofu for infrastructure. |
+| Phase 0 | Pure documentation foundation. |
+| Phase 1 | Monorepo scaffold and local Docker Compose infrastructure. |
+| Phase 2–15 | Docker Compose development environment across feature phases. |
+| Phase 16 | Kubernetes (production). Helm charts. Argo CD GitOps. OpenTofu for infrastructure. |
 
 ---
 

@@ -3,6 +3,11 @@
 > **Status:** Living document — updated as the project evolves.
 > **Last updated:** 2026-08-01
 
+> [!NOTE]
+> **Current repository state:** Phase 0 documentation only.
+>
+> No application source code, test suites, CI workflows, Docker services, or coverage reports currently exist. Unless explicitly marked as applicable to Phase 0 documentation validation, the testing requirements below are planned controls for future phases.
+
 ---
 
 ## 1. Testing Philosophy
@@ -138,7 +143,7 @@ Every feature must be verifiable without a production environment. Tests are not
 - Upload a file exceeding the size limit → expect 413 before the file is read into memory.
 - Upload a file with a disallowed extension → expect 422.
 - Upload a file with a valid extension but wrong magic bytes (e.g., a JPEG renamed to `.pdf`) → expect 422.
-- Upload a file with a valid extension and valid magic bytes but malicious content → verify ClamAV scan is triggered (Phase 3+).
+- Upload a file with a valid extension and valid magic bytes but malicious content → verify ClamAV scan is triggered (Phase 4+).
 - Upload with a missing Content-Type header → expect 415.
 - Upload with a valid file → expect 202 Accepted.
 
@@ -198,14 +203,14 @@ Every feature must be verifiable without a production environment. Tests are not
 
 **Framework:** [Playwright](https://playwright.dev/).
 
-**What to test (Phase 1 vertical slice):**
-- User logs in via Keycloak and is redirected to the dashboard.
-- User uploads a valid synthetic document.
+**Future cross-phase vertical-slice E2E scenario — available after Phases 3–7:**
+- User logs in via Keycloak (Phase 3).
+- User uploads a valid synthetic document (Phase 4).
 - Document appears in the document list with status `processing`.
-- Document classification result appears with a confidence score.
-- If confidence is below threshold, a human-review task is created.
-- Reviewer logs in and completes the review task.
-- Audit log contains all expected events.
+- Document classification result appears with a confidence score (Phase 6).
+- If confidence is below threshold, a human-review task is created (Phase 6–7).
+- Reviewer logs in and completes the review task (Phase 7).
+- Audit log contains all expected events (Phase 5).
 
 **Rules:**
 - End-to-end tests use synthetic data only.
@@ -295,29 +300,31 @@ Coverage is measured in CI on every push. PRs that reduce coverage by more than 
 
 ---
 
-## 4. Quality Gates
+## 4. Planned Quality Gates
 
-The following checks must pass before a pull request can be merged:
+The following quality gates are planned controls to be implemented incrementally beginning in Phase 1:
 
-| Check | Tool | When |
-|---|---|---|
-| TypeScript compilation | `tsc --noEmit` | Every push |
-| TypeScript linting | ESLint | Every push |
-| TypeScript formatting | Prettier | Every push |
-| Python type checking | mypy | Every push |
-| Python linting + formatting | Ruff | Every push |
-| Backend unit tests | Jest | Every push |
-| AI service unit tests | pytest | Every push |
-| Frontend unit tests | Jest / Karma | Every push |
-| Integration tests | Jest + test database | Every push |
-| Coverage thresholds | Jest + coverage-reporter | Every push |
-| OpenAPI spec validation | Spectral | Every push |
-| Secret scanning | Gitleaks | Every push |
-| Dependency audit | npm audit + uv audit | Every push |
-| SAST | Semgrep | Every push (Phase 2) |
-| Container scanning | Trivy | Every image build (Phase 2) |
-| End-to-end tests | Playwright | Every PR to main |
-| AI evaluation | pytest + MLflow | Every model change |
+| Check | Tool | When | Intended phase |
+|---|---|---|---|
+| TypeScript compilation | `tsc --noEmit` | Every push | Phase 1 |
+| TypeScript linting | ESLint | Every push | Phase 1 |
+| TypeScript formatting | Prettier | Every push | Phase 1 |
+| Python type checking | mypy | Every push | Phase 1 |
+| Python linting + formatting | Ruff | Every push | Phase 1 |
+| Backend unit tests | Jest | Every push | Phase 1 |
+| AI service unit tests | pytest | Every push | Phase 1 |
+| Frontend unit tests | Jest / Karma | Every push | Phase 1 |
+| Integration tests | Jest + test database | Every push | Phase 1 |
+| Coverage thresholds | Jest + coverage-reporter | Every push | Phase 1 |
+| OpenAPI spec validation | Spectral | Every push | Phase 1 |
+| Secret scanning | Gitleaks | Every push | Phase 1 |
+| Dependency audit | npm audit + uv audit | Every push | Phase 1 or Phase 2 |
+| SAST | Semgrep | Every push | Phase 2 or later |
+| Container scanning | Trivy | Every image build | Phase 2 or later |
+| End-to-end tests | Playwright | Every PR to main | Phase 3–7 onward |
+| AI evaluation | pytest + MLflow | Every model change | Phase 6 onward |
+| Product-facing MCP tests | OpenAPI / custom | Every release | Phase 15 |
+| Kubernetes validation | Helm / kube-linter | Every release | Phase 16 |
 
 ---
 
@@ -332,6 +339,8 @@ The following checks must pass before a pull request can be merged:
 ---
 
 ## 6. Test File Organisation
+
+Planned Phase 1 structure — these directories do not exist in Phase 0.
 
 ### Backend (NestJS)
 
@@ -363,6 +372,8 @@ apps/ai-service/
 ---
 
 ## 7. Running Tests Locally
+
+The following commands become valid only after Phase 1 scaffolding is merged.
 
 ```bash
 # Backend unit tests

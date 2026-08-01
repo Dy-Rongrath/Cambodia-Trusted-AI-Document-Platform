@@ -30,19 +30,19 @@ This document defines the security rules for all MCP integrations on this projec
 | Item | Value |
 |---|---|
 | **Client** | OpenAI Codex CLI |
-| **Configuration (per-project)** | `.codex/config.toml` in the repository root |
+| **Configuration (per-project)** | `.codex/config.toml` in the repository root (gitignored) |
 | **Configuration (global)** | `~/.codex/config.toml` |
-| **Security status** | `.codex/config.toml` is **gitignored** — this file may contain credentials and must never be committed |
+| **Security status** | `.codex/config.toml` contains server definitions, command arguments, allowed environment-variable names, timeouts, and non-secret configuration. It must NOT contain secret values. Secrets are provided via environment variables. |
 
-> **Warning:** The per-project config file `.codex/config.toml` is the file most at risk of accidental commit. Verify the `.gitignore` entry is in place before creating this file.
+> **Warning:** `.codex/config.toml` must remain gitignored. Verify the `.gitignore` entry is in place before creating this file.
 
 ---
 
 ## 3. Approved MCP Servers
 
-### Stage 1 — Read-only context (approved)
+### Stage 1 — Read-only context (approved for Phase 2 adoption)
 
-The following servers are approved for immediate use by individual developers. They provide read-only context that improves AI assistant accuracy without enabling any state changes.
+The following servers are approved for Phase 2 adoption after version verification, security review, and local configuration validation. They provide read-only context that improves AI assistant accuracy without enabling any state changes. Phase 0 defines the governance policy; Phase 2 installs and validates the MCP servers.
 
 | Server | Package / Image | Purpose | Network access | Credentials required | Authentication method |
 |---|---|---|---|---|---|
@@ -118,7 +118,7 @@ Developer (highest trust)
 |---|---|
 | **Scope** | Repository read-only (`read:repo` or equivalent). No write scopes. No admin scopes. |
 | **Single-repository** | Token scoped to `Dy-Rongrath/Cambodia-Trusted-AI-Document-Platform` only |
-| **Storage** | `.codex/config.toml` (gitignored). Never in `.env`, source code, or documentation. |
+| **Storage** | A secure developer-local credential store or shell environment variable. The token is forwarded to Codex through `env_vars` and must not be written inside `.codex/config.toml`. |
 | **Rotation** | Every 90 days, or immediately if compromised |
 | **Revocation** | GitHub → Settings → Developer Settings → Personal Access Tokens → Revoke |
 | **Sharing** | Never shared. Each developer creates their own token. |
@@ -310,7 +310,7 @@ The review must cover:
 
 | Rule | Detail |
 |---|---|
-| MCP is a **development tool only** for Phases 1–14 | No MCP server is connected to, or aware of, production infrastructure during development phases. |
+| MCP is a **development tool only** for Phases 1–14 | No MCP server is connected to, or aware of, production infrastructure during development phases. Product-facing MCP capabilities are introduced in Phase 15. |
 | Separate credentials for development and production | If an MCP server is ever used in production (Phase 15+), it must use credentials that are completely separate from development credentials. |
 | Production MCP requires separate approval | Enabling any MCP capability that touches production requires explicit approval, a security review, and a separate ADR amendment. |
 

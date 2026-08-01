@@ -19,12 +19,12 @@ This rule is architectural and non-negotiable. It applies to every AI feature on
 
 | # | Use | Description | Phase |
 |---|---|---|---|
-| 1 | **Document classification** | Classify uploaded documents into predefined categories (e.g., birth certificate, employment contract, identity card). | Phase 5 |
-| 2 | **Human-review assistance** | Present AI classification results to human reviewers to assist — not replace — their decision. | Phase 6 |
-| 3 | **Structured information extraction** | Extract structured fields from documents (e.g., name, date of birth, document number) under human supervision. | Phase 7 |
-| 4 | **AI-assisted document explanation** | Generate natural-language explanations of document content to assist users who may not understand the document language or format. | Phase 8 |
+| 1 | **Document classification** | Classify uploaded documents into predefined categories (e.g., birth certificate, employment contract, identity card). | Phase 6 |
+| 2 | **Human-review assistance** | Present AI classification results to human reviewers to assist — not replace — their decision. | Phase 7 |
+| 3 | **Structured information extraction** | Extract structured fields from documents (e.g., name, date of birth, document number) under human supervision. | Phase 8 |
+| 4 | **AI-assisted document explanation** | Generate natural-language explanations of document content to assist users who may not understand the document language or format. | Phase 9 |
 | 5 | **Semantic document search** | Use document embeddings for similarity search (pgvector). No personal data stored in vectors. | Phase 9 |
-| 6 | **Model monitoring and drift detection** | Automated comparison of live prediction distributions against training distributions to detect model drift. | Phase 9 |
+| 6 | **Model monitoring and drift detection** | Automated comparison of live prediction distributions against training distributions to detect model drift. | Phase 10 |
 
 ---
 
@@ -303,7 +303,7 @@ When the platform uses LLMs to generate explanations or process document content
 | Malicious model file (pickle) | Use `safetensors` format. Never use `pickle.loads()` on untrusted model files. |
 | Poisoned training data | Dataset lineage and versioning (DVC). Dataset review process. |
 | Compromised Python packages | `uv.lock` pins all dependencies. `uv audit` in CI. |
-| Compromised Docker image | Trivy scan. Pin base image versions. Cosign verification (Phase 14). |
+| Compromised Docker image | Trivy scan. Pin base image versions. Cosign verification or equivalent image-signing controls are planned for Phase 16 production hardening, unless introduced earlier through an approved ADR. |
 
 ---
 
@@ -329,11 +329,11 @@ This platform is being built with European AI standards in mind. As the platform
 
 | Standard | Relevance |
 |---|---|
-| **EU AI Act** | Document classification and information extraction may qualify as limited-risk AI systems under the EU AI Act. Credential issuance AI components may qualify as high-risk. Compliance obligations must be assessed before Phase 10. |
+| **EU AI Act** | The applicable EU AI Act classification depends on the concrete intended purpose, deployment context, affected persons, and use of each AI capability. A specialist assessment is required before deployment to relevant European markets or organisations. |
 | **GDPR Article 22** | Automated decision-making that significantly affects individuals requires explicit consent or another legal basis. Human oversight is the primary mitigation. |
-| **ALTAI** | The Assessment List for Trustworthy AI (ALTAI) provides a checklist for self-assessment. To be completed before production deployment. |
+| **ALTAI** | The Assessment List for Trustworthy AI (ALTAI) provides a checklist for self-assessment. To be completed before Phase 16 production deployment. |
 
-A formal EU AI Act compliance assessment is required before Phase 14 (production deployment) if the platform is intended to serve European organisations.
+A formal regulatory and responsible-AI assessment is required before Phase 16 production deployment when applicable.
 
 ---
 
