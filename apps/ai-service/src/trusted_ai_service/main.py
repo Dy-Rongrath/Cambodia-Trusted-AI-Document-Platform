@@ -1,4 +1,5 @@
-from typing import Any, Dict
+from typing import Any
+
 from fastapi import FastAPI
 from pydantic import BaseModel
 
@@ -15,5 +16,5 @@ class HealthResponse(BaseModel):
 
 
 @app.get("/health", response_model=HealthResponse)
-def get_health() -> Dict[str, Any]:
+def get_health() -> dict[str, Any]:
     return {"status": "ok", "service": "ai-service"}
