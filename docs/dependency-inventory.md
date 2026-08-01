@@ -19,7 +19,7 @@ All dependencies adhere to [docs/open-source-dependency-policy.md](docs/open-sou
 | ----- | ------------- | ------------------- | ------- | ----------- | ------------- | --------------------- |
 | `node` | `24-alpine3.21` | Backend / Frontend build stage | MIT / Alpine BSD | Active LTS | Native (`linux/arm64`) | Pinned Node.js 24 LTS runtime base image |
 | `python` | `3.12.9-slim-bookworm` | AI Service base image | PSF / Debian | Active | Native (`linux/arm64`) | Python 3.12 target runtime for FastAPI |
-| `ghcr.io/astral-sh/uv` | `0.5-python3.12-alpine` | AI Service dependency manager | Apache-2.0 / MIT | Active | Native (`linux/arm64`) | Fast Python package management inside Docker |
+| `ghcr.io/astral-sh/uv` | `0.5` | AI Service dependency manager | Apache-2.0 / MIT | Active | Native (`linux/arm64`) | Fast Python package management inside Docker |
 | `nginx` | `1.27-alpine` | Frontend runtime stage | BSD-2-Clause | Active | Native (`linux/arm64`) | Lightweight static asset web server |
 | `postgres` | `17.4-alpine` | Database infrastructure service | PostgreSQL License | Active | Native (`linux/arm64`) | Primary relational database engine |
 | `quay.io/keycloak/keycloak` | `26.1.3` | Identity infrastructure service | Apache-2.0 | Active | Native (`linux/arm64`) | OAuth 2.1 / OIDC identity provider container |
