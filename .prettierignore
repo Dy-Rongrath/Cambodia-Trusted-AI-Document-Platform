@@ -1,0 +1,11 @@
+dist
+node_modules
+coverage
+.angular
+.venv
+__pycache__
+.pytest_cache
+.mypy_cache
+.ruff_cache
+package-lock.json
+uv.lock
