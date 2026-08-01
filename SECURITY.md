@@ -257,34 +257,41 @@ Additional security-specific logging requirements:
 
 ---
 
-## 16. Vulnerability Management
+## 16. Vulnerability Management & Open-Source Security Disclosure
 
-| Activity | Frequency | Owner |
+### Reporting Vulnerabilities Privately
+- **Public Repository Notice:** This repository is public. Vulnerabilities must **never** be reported via public GitHub issues or public discussions.
+- **Private Disclosure:** Report security vulnerabilities via private maintainer contact channels or GitHub private vulnerability reporting.
+- **Responsible Disclosure:** Real exploit details should remain confidential until a patch or mitigation is available.
+- **Response Timeline:** As an open-source project maintained by a solo developer, vulnerability reports are reviewed on a **best-effort basis**. Acknowledgement is targeted within 72 hours where feasible.
+
+### Vulnerability & Dependency Scanning Schedule
+| Activity | Planned Frequency | Target Phase / Owner |
 |---|---|---|
-| `npm audit` in CI | Every push | CI pipeline |
-| `uv audit` in CI | Every push | CI pipeline |
-| Trivy container scan | Every image build | CI pipeline |
-| Gitleaks scan | Every push | CI pipeline |
-| Semgrep SAST | Every push | CI pipeline |
+| `npm audit` / `uv audit` | Every push (in CI) | Phase 1 / Phase 2 (Developer) |
+| Open-source licence check | Every dependency addition | Phase 1+ ([docs/open-source-dependency-policy.md](docs/open-source-dependency-policy.md)) |
+| Trivy container scan | Every image build (in CI) | Phase 2+ (DevSecOps) |
+| Gitleaks secret scan | Every push (in CI) | Phase 1+ (Developer) |
+| Semgrep SAST | Every push (in CI) | Phase 2+ (DevSecOps) |
 | Dependency update review | Weekly | Developer |
-| OWASP ZAP API scan | Every release | Phase 4+ |
+| OWASP ZAP API scan | Every major release | Phase 4+ |
 | Manual security review | Each phase milestone | Developer + specialist reviewer |
-| Full penetration test | Before Phase 16 (production) | External specialist (requires approval) |
+| Full penetration test | Before Phase 16 (production) | External specialist (Phase 16) |
 
 ---
 
-## 17. Incident Response (Initial — pre-production)
+## 17. Incident Response (Pre-Production)
 
 | Step | Action |
 |---|---|
-| 1. Detect | Automated scan, audit log alert, or developer report. |
+| 1. Detect | Automated scan alert, audit log alert, or private security report. |
 | 2. Contain | Rotate affected secrets. Revoke affected tokens in Keycloak. Block affected accounts. |
 | 3. Assess | Determine scope. Identify affected tenants, data, and systems. |
 | 4. Remediate | Apply patches. Deploy fix. Verify fix. |
 | 5. Document | Record the incident, timeline, impact, and remediation. |
-| 6. Review | Post-incident review. Update threat model and controls. |
+| 6. Review | Post-incident review. Update threat model and security controls. |
 
-A formal incident response plan is required before Phase 16 (production deployment).
+A formal enterprise incident response plan is required before Phase 16 (production deployment).
 
 ---
 

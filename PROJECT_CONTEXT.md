@@ -154,11 +154,14 @@ The following are explicitly out of scope until a later phase:
 | C-1 | **No real personal, government, NSSF, or confidential data** during development. | Security and privacy policy. |
 | C-2 | **No secrets in source code**, logs, tests, or documentation. | Security policy. |
 | C-3 | **No model is the final authority for credential authenticity.** Cryptographic verification is the source of truth. | AI governance policy. |
-| C-4 | **All major dependencies must be open-source or have a clear open-source path.** Avoid unnecessary vendor lock-in. | Technology selection principles. |
+| C-4 | **Open-Source Licensing:** Application code, infrastructure code, and documentation are licensed under the Apache License 2.0 (`SPDX-License-Identifier: Apache-2.0`). All major dependencies must have permissive open-source licences to avoid vendor lock-in. | Open-source policy. |
 | C-5 | **No Kubernetes until the platform works reliably in Docker Compose.** | Architecture principle. |
 | C-6 | **All security-sensitive changes require manual human review.** AI agents may not self-approve such changes. | AI-agent permission policy. |
 | C-7 | **TypeScript strict mode is mandatory** in all TypeScript code. | Coding standards. |
 | C-8 | **Python must use a declared virtual environment.** The system Python must never be used for project code. | Development standards. |
+| C-9 | **Local-First & Zero Paid Cloud:** Core development must remain usable locally without requiring paid cloud API keys or cloud subscriptions during early phases. | Development principle. |
+| C-10 | **Apple Silicon Native Execution:** Local infrastructure containers and development tools must support Apple Silicon M5 (ARM64) natively without forced AMD64 emulation. | Infrastructure principle. |
+| C-11 | **Maintainable Governance:** Initial contributor workflow must remain simple and maintainable by one project owner (Dy Rongrath) without premature enterprise-team complexity. | Governance policy. |
 
 ---
 

@@ -1,37 +1,106 @@
 # Cambodia Trusted AI Document Platform
 
-> **A production-grade, privacy-first platform for secure Khmer and English document processing, AI-assisted classification, digital identity, and verifiable credentials.**
+> **An open-source, privacy-first platform for trusted Khmer and English document processing, human-reviewed AI assistance, and verifiable digital credentials.**
 
 ---
 
-## Project status
+## Pre-Release Maturity Warning
+
+> **Notice:** This project is under active pre-release development.
+>
+> Phase 1 creates the engineering scaffold and local development tooling. It is **not yet suitable for processing real personal, government, NSSF, client, or production data**. Synthetic test data must be used for all development and testing.
+
+---
+
+## Production Readiness Definition
+
+Phase 1 establishes production-quality software engineering foundations, but it is **not the production-ready platform**.
+
+The platform becomes production-ready incrementally as the security, functional, observability, AI evaluation, testing, verifiable credential, data-space, deployment, and governance requirements from later roadmap phases are completed and validated.
+
+```text
+Phase 0 — Documentation, governance, architecture, security, and open-source foundation (Complete)
+Phase 1 — Engineering scaffold and tooling (Next)
+Phases 2–15 — Incremental security, product, AI, credential, integration, and operational capabilities
+Phase 16 — Production hardening, deployment, Kubernetes, signed releases, and final security review
+```
+
+The project may be called production-ready only after evidence exists for all 16 roadmap phases, comprehensive security audit completion, ALTAI evaluation, and formal legal review.
+
+---
+
+## Project Status
 
 - **Phase 0 — Documentation and Governance Foundation:** Complete
 - **Phase 1 — Engineering Scaffold and Tooling:** Next (Scaffolding NestJS, FastAPI, Angular, Docker Compose, CI)
+- **Maintainer:** Dy Rongrath (Solo project owner & maintainer)
 
-*Note: The repository currently contains pure documentation and governance rules. No application source code, Docker Compose files, or database schemas exist in Phase 0.*
+---
 
-## Documentation
+## Key Capabilities & Roadmap
+
+| # | Capability | Target Phase |
+|---|---|---|
+| 1 | Engineering scaffold, local Docker Compose, & CI tooling | Phase 1 |
+| 2 | Development MCP adoption & read-only tools | Phase 2 |
+| 3 | Authentication & multi-tenant organisation management | Phase 3 |
+| 4 | Secure document upload & quarantine malware validation | Phase 4 |
+| 5 | Audit logging, OpenTelemetry & Prometheus observability | Phase 5 |
+| 6 | Khmer & English document classification model | Phase 6 |
+| 7 | Human review workflow for uncertain AI predictions | Phase 7 |
+| 8 | Structured information extraction | Phase 8 |
+| 9 | Multilingual AI assistant & LLM prompt-injection defenses | Phase 9 |
+| 10 | MLOps pipeline, drift detection, & model cards | Phase 10 |
+| 11 | Verifiable credential issuance & QR verification (SD-JWT VC) | Phase 11 |
+| 12 | Flutter mobile credential wallet | Phase 12 |
+| 13 | Secure inter-organisation data exchange | Phase 13 |
+| 14 | European data-space integration (EDC connector) | Phase 14 |
+| 15 | Product-facing MCP capabilities | Phase 15 |
+| 16 | Production hardening, Kubernetes, & Cosign signed releases | Phase 16 |
+
+---
+
+## Local-First & Low-Cost Principles
+
+The platform is designed to support local-first engineering and low-cost accessibility:
+
+- **Single Developer & Community Friendly:** Maintained by Dy Rongrath with simple, maintainable governance for open-source contributors.
+- **Zero Paid Cloud Requirement:** Early development runs entirely on a single machine without requiring paid cloud API subscriptions or proprietary vendor lock-in.
+- **Apple Silicon M5 Optimization:** Local infrastructure and container targets execute natively on Apple Silicon (ARM64) without forced x86 emulation.
+- **Minimal Resource Footprint:** Modular monorepo design ensures lightweight memory and CPU usage during local execution.
+
+---
+
+## Documentation Hierarchy
 
 | Document | Purpose |
 |---|---|
-| [PROJECT_CONTEXT.md](PROJECT_CONTEXT.md) | Product purpose, users, scope, glossary, and success criteria |
+| [AGENTS.md](AGENTS.md) | Primary AI-agent guardrails, open-source rules, and approval boundaries |
+| [PROJECT_CONTEXT.md](PROJECT_CONTEXT.md) | Product purpose, target users, business capabilities, glossary, and open-source constraints |
 | [ARCHITECTURE.md](ARCHITECTURE.md) | System design, module responsibilities, trust boundaries, data flows, and MCP boundary |
-| [SECURITY.md](SECURITY.md) | Security policy, controls, and incident response |
-| [MCP_SECURITY.md](MCP_SECURITY.md) | Model Context Protocol security rules, tool governance, and client setup |
-| [DEVELOPMENT.md](DEVELOPMENT.md) | Local setup, coding standards, MCP dev workflow, definition of done |
-| [TESTING.md](TESTING.md) | Testing strategy, quality gates, coverage thresholds, MCP security testing |
-| [DATA_GOVERNANCE.md](DATA_GOVERNANCE.md) | Data sourcing rules, lineage, retention, and governance |
-| [AI_GOVERNANCE.md](AI_GOVERNANCE.md) | Permitted AI uses, human oversight, model governance, responsible-AI commitments |
-| [CONTRIBUTING.md](CONTRIBUTING.md) | Contribution guidelines, PR requirements, and security rules |
-| [ROADMAP.md](ROADMAP.md) | 16-phase implementation plan |
+| [SECURITY.md](SECURITY.md) | Security policy, file upload security, secrets management, and disclosure guidelines |
+| [MCP_SECURITY.md](MCP_SECURITY.md) | Model Context Protocol security rules, tool allowlisting, and versioning policy |
+| [DEVELOPMENT.md](DEVELOPMENT.md) | Technical standards, coding guidelines, commit rules, and definition of done |
+| [TESTING.md](TESTING.md) | Testing strategy, planned quality gates, coverage thresholds, and security testing |
+| [DATA_GOVERNANCE.md](DATA_GOVERNANCE.md) | Data sourcing rules, anonymisation, dataset lineage (DVC), and retention policy |
+| [AI_GOVERNANCE.md](AI_GOVERNANCE.md) | Permitted AI uses, mandatory human oversight, model cards, and responsible-AI policy |
+| [ROADMAP.md](ROADMAP.md) | 16-phase implementation roadmap |
+| [LICENSE](LICENSE) | Apache License 2.0 legal text |
+| [DCO.md](DCO.md) | Developer Certificate of Origin 1.1 sign-off guidelines |
+| [GOVERNANCE.md](GOVERNANCE.md) | Maintainer governance model, commercial neutrality, and trademark policy |
+| [CODE_OF_CONDUCT.md](CODE_OF_CONDUCT.md) | Contributor Covenant 2.1 community standards |
+| [SUPPORT.md](SUPPORT.md) | Best-effort community support policy |
+| [CHANGELOG.md](CHANGELOG.md) | Project release changelog and semver policy |
+| [CONTRIBUTING.md](CONTRIBUTING.md) | Contribution workflow, PR rules, and DCO sign-off requirements |
+| [docs/open-source-dependency-policy.md](docs/open-source-dependency-policy.md) | Open-source dependency evaluation and licensing rules |
 | [docs/adr/](docs/adr/) | Architecture Decision Records (ADR-0001 through ADR-0007) |
 | [docs/threat-model.md](docs/threat-model.md) | STRIDE threat model (including 15 MCP threat categories) |
-| [docs/templates/](docs/templates/) | Reusable task templates (feature, bug-fix, mcp-integration, mcp-review, etc.) |
+| [docs/templates/](docs/templates/) | Reusable task templates (feature, bug-fix, mcp-integration, etc.) |
 | [docs/roles/](docs/roles/) | Specialist AI agent role instructions |
-| [AGENTS.md](AGENTS.md) | Primary AI-agent guardrails, navigation pointers, and approval boundaries |
 
-## Technology stack
+---
+
+## Technology Stack
 
 | Layer | Technology |
 |---|---|
@@ -43,32 +112,45 @@
 | Authentication | Keycloak 26 · OAuth 2.1 · OIDC · WebAuthn / Passkeys |
 | Infrastructure | Docker · Docker Compose · (Kubernetes in Phase 16) |
 
+---
 
-## Current Repository Structure (Phase 0)
+## Repository Structure (Phase 0 Foundation)
 
 ```
 trusted-ai-platform/
-├── AGENTS.md                 # Primary AI agent instructions & entry point
-├── PROJECT_CONTEXT.md        # Product purpose, scope, glossary
-├── ARCHITECTURE.md           # System design & MCP integration boundary
+├── .github/
+│   ├── ISSUE_TEMPLATE/       # Structured GitHub issue forms
+│   └── PULL_REQUEST_TEMPLATE.md # Pull request checklist & DCO verification
+├── docs/
+│   ├── adr/                  # ADR-0001 through ADR-0007
+│   ├── threat-model.md       # STRIDE threat model (including 15 MCP threats)
+│   ├── open-source-dependency-policy.md # Dependency licensing rules
+│   ├── templates/            # Task templates
+│   └── roles/                # Specialist AI agent role instructions
+├── AGENTS.md                 # Primary AI agent instructions & open-source guardrails
+├── PROJECT_CONTEXT.md        # Product context, open-source scope, constraints
+├── ARCHITECTURE.md           # System architecture & MCP boundary
 ├── SECURITY.md               # Security policy & data classification
 ├── MCP_SECURITY.md           # Model Context Protocol security policy
 ├── DEVELOPMENT.md            # Technical standards & local setup
-├── TESTING.md                # Testing strategy & quality gates
+├── TESTING.md                # Testing strategy & planned quality gates
 ├── DATA_GOVERNANCE.md        # Data sourcing, lineage & retention
-├── AI_GOVERNANCE.md          # Permitted/prohibited AI uses & oversight
+├── AI_GOVERNANCE.md          # Permitted/prohibited AI uses & human oversight
 ├── ROADMAP.md                # 16-phase implementation roadmap
-├── CONTRIBUTING.md           # Contribution guidelines & PR rules
+├── LICENSE                   # Apache License 2.0 legal text
+├── DCO.md                    # Developer Certificate of Origin 1.1 rules
+├── GOVERNANCE.md             # Maintainer governance & trademark policy
+├── CODE_OF_CONDUCT.md        # Contributor Covenant 2.1 standards
+├── SUPPORT.md                # Best-effort community support policy
+├── CHANGELOG.md              # Project changelog (semver pre-release)
+├── CONTRIBUTING.md           # Contribution guidelines & PR checklist
 ├── README.md                 # Repository overview
-├── .gitignore                # Ignore rules (including secrets & MCP config)
+├── .gitignore                # Git ignore rules (secrets & MCP config)
 ├── .gitattributes           # Line-ending normalisation
-├── .nvmrc                    # Pinned Node.js 24.15.0 version
-└── docs/
-    ├── adr/                  # ADR-0000 through ADR-0007
-    ├── threat-model.md       # STRIDE threat model (including MCP threats)
-    ├── templates/            # Task templates
-    └── roles/                # Specialist AI agent role instructions
+└── .nvmrc                    # Pinned Node.js 24.15.0 version
 ```
+
+---
 
 ## Planned Application Structure (Target Phase 1 Scaffolding)
 
@@ -79,36 +161,36 @@ trusted-ai-platform/
 │   ├── ai-service/       # FastAPI AI inference service
 │   └── frontend/         # Angular web application
 ├── packages/
-│   └── shared-types/     # Shared TypeScript types & OpenAPI client
+│   └── shared-types/     # Shared TypeScript types & OpenAPI schema client
 ├── infra/
-│   └── docker/           # Docker Compose infrastructure
-└── [Foundation documents]
+│   └── docker/           # Docker Compose local development environment
+└── [Foundation & Open-Source documents]
 ```
 
-## Developer setup
+---
 
-See [DEVELOPMENT.md](DEVELOPMENT.md) for complete setup instructions.
+## Contributing & Developer Setup
 
-> **Notice:** Application setup commands below apply after the Phase 1 engineering scaffold has been merged. Currently, no application source code exists in Phase 0.
+We welcome community contributions! Please review our contribution guides before submitting a pull request:
 
-**Future Phase 1 Quick Reference:**
-```bash
-nvm use                          # Activate Node 24.15.0
-npm install                      # Install workspace dependencies
-cd apps/ai-service && uv sync    # Set up Python environment
-docker compose -f infra/docker/docker-compose.yml up -d  # Start infrastructure
-```
+1. Read [AGENTS.md](AGENTS.md) and [CONTRIBUTING.md](CONTRIBUTING.md).
+2. Check open issues or create a new issue using our [GitHub Issue Templates](.github/ISSUE_TEMPLATE/).
+3. Sign off all commits using Developer Certificate of Origin (`git commit -s`, see [DCO.md](DCO.md)).
+4. Follow the [Code of Conduct](CODE_OF_CONDUCT.md).
 
+See [DEVELOPMENT.md](DEVELOPMENT.md) for detailed technical setup instructions.
 
-## Security
+---
 
-This platform processes sensitive documents. All contributors must read [SECURITY.md](SECURITY.md) and [AGENTS.md](AGENTS.md) before contributing.
+## Security Reporting
 
-**Critical rules:**
-- Never use real personal, government, or production data in development.
-- Never commit `.env` files.
-- All security-sensitive changes require human review before merging.
+This platform processes sensitive documents and credentials. If you discover a security vulnerability, please follow our disclosure policy in [SECURITY.md](SECURITY.md). **Do not report security vulnerabilities in public GitHub issues.**
 
-## Licence
+---
 
-To be determined.
+## Open-Source Licence
+
+This project is licensed under the **Apache License 2.0**.
+See [LICENSE](LICENSE) for details.
+
+The Apache License 2.0 applies to the application source code, infrastructure configurations, and documentation. Third-party datasets, model weights, fonts, icons, and user-uploaded data are subject to their respective upstream licences and usage terms (see [docs/open-source-dependency-policy.md](docs/open-source-dependency-policy.md)).

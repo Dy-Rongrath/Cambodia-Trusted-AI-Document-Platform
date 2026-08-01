@@ -37,6 +37,12 @@ This file (`AGENTS.md`) is the primary entry point and source of navigation for 
 - [DATA_GOVERNANCE.md](DATA_GOVERNANCE.md) — Data sourcing rules, anonymisation, dataset lineage (DVC), retention, deletion, and data minimisation.
 - [AI_GOVERNANCE.md](AI_GOVERNANCE.md) — Permitted/prohibited AI uses, mandatory human oversight, confidence thresholds, model cards, drift detection, and responsible-AI commitments.
 - [ROADMAP.md](ROADMAP.md) — 16-phase implementation roadmap.
+- [LICENSE](LICENSE) — Apache License 2.0 terms and conditions.
+- [DCO.md](DCO.md) — Developer Certificate of Origin 1.1 sign-off rules.
+- [GOVERNANCE.md](GOVERNANCE.md) — Maintainer-led governance model, commercial neutrality, and trademark policy.
+- [CODE_OF_CONDUCT.md](CODE_OF_CONDUCT.md) — Contributor Covenant 2.1 standards and enforcement guidelines.
+- [SUPPORT.md](SUPPORT.md) — Best-effort community support policy.
+- [docs/open-source-dependency-policy.md](docs/open-source-dependency-policy.md) — Open-source dependency licensing and approval rules.
 - [docs/adr/](docs/adr/) — Architecture Decision Records (ADR-0001 through ADR-0007).
 - [docs/threat-model.md](docs/threat-model.md) — STRIDE threat model including MCP threat categories.
 - [docs/templates/](docs/templates/) — Reusable task templates for features, bug fixes, security reviews, database migrations, AI experiments, and MCP integrations.
@@ -120,7 +126,20 @@ This file (`AGENTS.md`) is the primary entry point and source of navigation for 
 
 ---
 
-## 6. AI-Agent Permissions & Approval Boundaries
+## 6. Open-Source & Licensing Rules
+
+- **Preserve Apache-2.0 Notices:** Maintain copyright and licence headers in all project files ([LICENSE](LICENSE)).
+- **Incompatible Licences Prohibited:** Do not copy or introduce code, libraries, or assets with un-cleared, custom, or copyleft licences without maintainer review ([docs/open-source-dependency-policy.md](docs/open-source-dependency-policy.md)).
+- **Licence Verification Mandatory:** Every new dependency must have a documented permissive licence (Apache-2.0, MIT, BSD, ISC, PostgreSQL, PSF).
+- **No Paid-Cloud Requirements:** Early-phase code and setup must run locally on Apple Silicon M5 without requiring paid cloud API keys or cloud subscriptions.
+- **No Unapproved Vendor Lock-In:** Prefer standard protocols (REST, OpenAPI, OIDC, S3 API) and open-source tools over proprietary vendor lock-in without an approved ADR.
+- **No Un-Reviewed Asset Licensing:** Third-party datasets, model weights, fonts, icons, or media must be documented with explicit licence review before inclusion.
+- **Preserve Contributor Attribution:** Maintain author attribution and sign off all commits using DCO (`git commit -s`, [DCO.md](DCO.md)).
+- **No Fabricated Evidence:** Never fabricate contributor names, legal approvals, test outputs, or compliance evidence.
+
+---
+
+## 7. AI-Agent Permissions & Approval Boundaries
 
 ### Allowed without additional approval
 
@@ -156,7 +175,7 @@ This file (`AGENTS.md`) is the primary entry point and source of navigation for 
 
 ---
 
-## 7. Prohibited Actions
+## 8. Prohibited Actions
 
 You must never, under any circumstances:
 
@@ -177,7 +196,7 @@ You must never, under any circumstances:
 
 ---
 
-## 8. Required Engineering Workflow
+## 9. Required Engineering Workflow
 
 For every task:
 
@@ -195,7 +214,7 @@ For every task:
 
 ---
 
-## 9. Required Completion Report Format
+## 10. Required Completion Report Format
 
 After every approved task, produce a report containing:
 

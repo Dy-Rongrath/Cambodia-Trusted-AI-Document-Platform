@@ -23,6 +23,8 @@ Establish all foundation documents, repository structure, and governance rules b
 
 ### Scope
 - All foundation documents (`AGENTS.md`, `PROJECT_CONTEXT.md`, `ARCHITECTURE.md`, `SECURITY.md`, `MCP_SECURITY.md`, `DEVELOPMENT.md`, `TESTING.md`, `DATA_GOVERNANCE.md`, `AI_GOVERNANCE.md`, `ROADMAP.md`, `CONTRIBUTING.md`, `README.md`).
+- Open-source legal and community health files (`LICENSE` Apache-2.0, `DCO.md` DCO 1.1, `CODE_OF_CONDUCT.md` v2.1, `GOVERNANCE.md`, `SUPPORT.md`, `CHANGELOG.md`, `docs/open-source-dependency-policy.md`).
+- GitHub community templates (`.github/ISSUE_TEMPLATE/` issue forms, `.github/PULL_REQUEST_TEMPLATE.md`).
 - Repository configuration files (`.gitignore`, `.gitattributes`, `.nvmrc`).
 - Architecture documentation and initial ADRs (ADR-0001 through ADR-0007).
 - STRIDE threat model including 15 MCP threat categories.
@@ -70,7 +72,8 @@ Create the monorepo scaffold, application skeletons, local Docker Compose enviro
 - Ruff + mypy configured for the AI service.
 - Basic GitHub Actions CI: lint, type-check, unit test on every push.
 - Prisma initialised in the backend with a connection test.
-- Basic `README.md`.
+- Open-source dependency and licence inventory verification.
+- Updated `README.md` and repository setup documentation.
 
 ### Out of scope
 - Authentication implementation (Phase 3).
@@ -515,10 +518,12 @@ Deploy the platform to a production environment with full observability, securit
 - Production secrets management (Vault or cloud secrets manager).
 - Wazuh security monitoring.
 - Falco runtime security.
-- Cosign container image signing.
-- Full SBOM pipeline.
-- Penetration test.
-- ALTAI self-assessment.
+- Cosign container image signing and release artefact signing.
+- Software Bill of Materials (SBOM) generation (SPDX/CycloneDX).
+- Provenance attestations (SLSA level 3 alignment).
+- Formal security review and penetration test.
+- Production support policy and release-management policy.
+- ALTAI self-assessment and AI release documentation.
 - Backup and disaster recovery testing.
 - SLA and incident response plan.
 
