@@ -1,98 +1,57 @@
-> **Phase Status:** Phase 0 — Documentation and Governance Foundation: Complete
-> **Next Phase:** Phase 1 — Engineering Scaffold and Tooling: Next
+> **Phase Status:** Phase 1 — Engineering Scaffold and Tooling: In Progress (Local implementation complete — remote CI pending)
+> **Next Phase:** Phase 2 — Development MCP Adoption
 
 ---
 
-## 1. Local Setup
+## 1. Local Setup (Docker-First Workflow)
 
-> **Notice:** Setup commands involving `npm install`, `apps/backend`, `apps/frontend`, `apps/ai-service`, `uv sync`, `docker compose`, and `.env.example` apply after the Phase 1 engineering scaffold has been merged. The current Phase 0 repository contains documentation only.
+The developer environment is **Docker-first**. Language runtimes (Node.js 24, Python 3.12, PostgreSQL 17, Keycloak 26) and generator CLIs run entirely inside Docker containers.
 
-### Current Phase 0 Setup (Documentation Only)
+### Required Host Machine Tooling
 
-1. Clone the repository:
-   ```bash
-   git clone git@github.com:Dy-Rongrath/Cambodia-Trusted-AI-Document-Platform.git
-   cd Cambodia-Trusted-AI-Document-Platform
-   ```
-2. Activate pinned Node version (optional for doc verification):
-   ```bash
-   nvm use                    # activates Node 24.15.0 from .nvmrc
-   ```
-3. Read project governance and architecture policies starting from [AGENTS.md](AGENTS.md) and [README.md](README.md).
-4. Verify local developer tools (see Prerequisites below).
+| Tool | Version | Install link | Required on Host |
+|---|---|---|---|
+| **Docker Desktop** | Latest (Docker Engine 29+ / Compose v5+) | https://www.docker.com/products/docker-desktop/ | **Yes** |
+| **Git** | Recent | https://git-scm.com/ | **Yes** |
+| **Codex CLI** | Pinned config | OpenAI Codex CLI (when using AI assistance) | Optional |
+
+> **Note:** Node.js, npm, Python, `uv`, NestJS CLI, Angular CLI, and Prisma CLI are **not required on the host**. Host-installed runtimes are documented only as an optional advanced fallback.
 
 ---
 
-### Prerequisites (Host Machine Tooling)
-
-Install the following tools on your machine before commencing Phase 1 scaffolding:
-
-| Tool | Version | Install command |
-|---|---|---|
-| Homebrew | Latest | `curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh` |
-| Git | Latest | `brew install git` |
-| nvm (Node Version Manager) | Latest | `brew install nvm` then follow shell config instructions |
-| Node.js | 24.15.0 (from `.nvmrc`) | `nvm install` (inside the repo root) |
-| pyenv | Latest | `brew install pyenv` then follow shell config instructions |
-| Python | 3.12.x | `pyenv install 3.12` then `pyenv local 3.12.x` |
-| uv | Latest stable | `curl -LsSf https://astral.sh/uv/install.sh \| sh` |
-| Docker Desktop | Latest | https://www.docker.com/products/docker-desktop/ |
-| Docker Compose | v5 (bundled with Docker Desktop) | — |
-
-Verify your local prerequisites:
+### Primary Developer Workflow (Docker-Only Scripts)
 
 ```bash
-node --version       # should print 24.15.0
-npm --version        # should print 11.x.x
-python3 --version    # should print 3.12.x (not 3.9.x)
-uv --version         # should print 0.7.x or later
-docker info          # should succeed without permission errors
-docker compose version  # should print v5.x.x
-git --version        # any recent version
-```
+# 1. Clone the repository
+git clone git@github.com:Dy-Rongrath/Cambodia-Trusted-AI-Document-Platform.git
+cd Cambodia-Trusted-AI-Document-Platform
 
----
-
-### Future Phase 1 Application Setup (After Scaffold Merge)
-
-> These commands apply once Phase 1 code scaffolding is created.
-
-```bash
-# Clone and setup workspaces
-nvm use                    # activates Node 24.15.0 from .nvmrc
-npm install                # installs root workspace dependencies
-
-# Set up backend
-cd apps/backend
-cp .env.example .env       # fill in your local values
-cd ../..
-
-# Set up AI service
-cd apps/ai-service
-uv sync                    # creates .venv and installs all Python dependencies
+# 2. Copy environment template
 cp .env.example .env
-cd ../..
 
-# Set up frontend
-cd apps/frontend
-cp .env.example .env
-cd ../..
-```
+# 3. Build container stack
+./scripts/docker/build.sh
 
-### Future Phase 1 Local Infrastructure Services
+# 4. Start default services (postgres, backend, ai-service, frontend)
+./scripts/docker/start.sh
 
-```bash
-# Start all infrastructure (database, Keycloak, MinIO, etc.)
-docker compose -f infra/docker/docker-compose.yml up -d
+# 5. Live development watch mode
+./scripts/docker/watch.sh
 
-# Start backend (in a separate terminal)
-cd apps/backend && npm run dev
+# 6. Run quality gates (lint, typecheck, unit tests)
+./scripts/docker/lint.sh
+./scripts/docker/typecheck.sh
+./scripts/docker/test.sh
 
-# Start AI service (in a separate terminal)
-cd apps/ai-service && uv run uvicorn main:app --reload
+# 7. Check database connectivity
+./scripts/docker/db-check.sh
 
-# Start frontend (in a separate terminal)
-cd apps/frontend && npm run start
+# 8. (Optional) Keycloak auth profile management
+./scripts/docker/keycloak.sh start
+./scripts/docker/keycloak.sh stop
+
+# 9. Stop stack
+./scripts/docker/stop.sh
 ```
 
 

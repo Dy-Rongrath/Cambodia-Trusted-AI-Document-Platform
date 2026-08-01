@@ -270,8 +270,7 @@ Additional security-specific logging requirements:
 ### Reporting Vulnerabilities Privately
 - **Public Repository Notice:** This repository is public. Vulnerabilities must **never** be reported via public GitHub issues, pull requests, or public discussions.
 - **Documented Reporting Route:** Use the repository’s **"Report a vulnerability"** option under the **Security** tab (`Security -> Advisories -> Report a vulnerability` / `/security/advisories/new`) to submit a private security advisory directly to project maintainers.
-- **Verified Enabled Repository Feature Status:** Documented reporting route is prepared. The repository is ready for GitHub Private Vulnerability Reporting; the project owner must verify that the “Report a vulnerability” button is visible under the Security tab before this route is considered operational.
-- **Owner Action:** Verify or enable GitHub Private Vulnerability Reporting and test the advisory submission page using a non-maintainer account or private browser session.
+- **Verified Enabled Repository Feature Status:** GitHub Private Vulnerability Reporting is enabled at the repository level. The non-maintainer reporter flow has not yet been independently tested from a separate GitHub account.
 - **Responsible Disclosure:** Real exploit details should remain confidential until a patch or mitigation is verified and released.
 - **Response Timeline:** Vulnerability reports are reviewed on a **best-effort basis**. Acknowledgement is targeted within 72 hours where feasible.
 

@@ -32,10 +32,36 @@ The project may be called production-ready only after evidence exists for all 16
 ## Project Status
 
 - **Phase 0 — Documentation and Governance Foundation:** Complete
-- **Phase 1 — Engineering Scaffold and Tooling:** Next (Scaffolding NestJS, FastAPI, Angular, Docker Compose, CI)
+- **Phase 1 — Engineering Scaffold and Tooling:** In Progress (NestJS backend, FastAPI AI service, Angular frontend, shared-types, Docker Compose, CI)
 - **Maintainer:** Dy Rongrath (Solo project owner & maintainer)
 
 > **Independence Notice:** This is an independent open-source project. It is not affiliated with, endorsed by, commissioned by, or operated by any Cambodian government institution or public agency.
+
+---
+
+## Quick Start (Docker-First Workflow)
+
+The developer environment requires only **Docker Desktop**, **Git**, and **Codex CLI**. Runtimes (Node 24, Python 3.12, PostgreSQL 17, Keycloak 26) run entirely inside Docker containers.
+
+```bash
+# 1. Copy environment template
+cp .env.example .env
+
+# 2. Build container stack
+./scripts/docker/build.sh
+
+# 3. Start default services (postgres, backend, ai-service, frontend)
+./scripts/docker/start.sh
+
+# 4. (Optional) Development watch mode
+./scripts/docker/watch.sh
+
+# 5. Run test suite inside Docker
+./scripts/docker/test.sh
+
+# 6. Stop stack
+./scripts/docker/stop.sh
+```
 
 ---
 
