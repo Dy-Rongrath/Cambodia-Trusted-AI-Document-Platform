@@ -33,7 +33,7 @@ jobs:
 
       - name: Node Workspaces Quality Gates (Docker)
         run: |
-          docker run --rm -v ${{ github.workspace }}:/app -w /app node:24.15.0-alpine3.21 sh -c "
+          docker run --rm -v ${{ github.workspace }}:/app -w /app node:24-alpine3.21 sh -c "
             npm ci &&
             npm run format:check &&
             npm run lint &&
