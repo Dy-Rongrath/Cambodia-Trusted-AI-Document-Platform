@@ -6,3 +6,9 @@ datasource db {
 generator client {
   provider = "prisma-client-js"
 }
+
+/// Phase 1 scaffold model for Prisma Client generation without business logic.
+model PlatformScaffold {
+  id        Int      @id @default(autoincrement())
+  createdAt DateTime @default(now())
+}
