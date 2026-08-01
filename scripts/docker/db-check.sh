@@ -9,6 +9,6 @@ echo "Ensuring database service is running and healthy..."
 docker compose up -d postgres backend
 
 echo "Running backend database connectivity check inside container..."
-docker compose exec backend npm run db:check
+docker compose exec backend npm run db:check --workspace=apps/backend
 
 echo "Database check complete."

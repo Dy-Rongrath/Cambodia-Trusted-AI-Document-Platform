@@ -80,7 +80,7 @@ jobs:
 
       - name: Run Backend Database Connectivity Check
         run: |
-          docker compose exec -T backend npm run db:check
+          docker compose exec -T backend npm run db:check --workspace=apps/backend
 
       - name: Confirm Keycloak absent from default stack
         run: |
