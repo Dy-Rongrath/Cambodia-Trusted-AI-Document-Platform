@@ -252,18 +252,19 @@ Additional security-specific logging requirements:
 - Model weights stored in object storage — not in the repository.
 - Model files downloaded only from trusted registries (Hugging Face with pinned commit hashes).
 - The AI service must not accept model file uploads via its API.
-- Prompt injection mitigations applied when using LLMs (Phase 8+).
-- Indirect prompt injection mitigation applied when processing document content (Phase 8+).
+- Prompt injection mitigations applied when using LLMs (Phase 9+).
+- Indirect prompt injection mitigation applied when processing document content (Phase 9+).
 
 ---
 
 ## 16. Vulnerability Management & Open-Source Security Disclosure
 
 ### Reporting Vulnerabilities Privately
-- **Public Repository Notice:** This repository is public. Vulnerabilities must **never** be reported via public GitHub issues or public discussions.
-- **Private Disclosure:** Report security vulnerabilities via private maintainer contact channels or GitHub private vulnerability reporting.
-- **Responsible Disclosure:** Real exploit details should remain confidential until a patch or mitigation is available.
-- **Response Timeline:** As an open-source project maintained by a solo developer, vulnerability reports are reviewed on a **best-effort basis**. Acknowledgement is targeted within 72 hours where feasible.
+- **Public Repository Notice:** This repository is public. Vulnerabilities must **never** be reported via public GitHub issues, pull requests, or public discussions.
+- **Actionable Reporting Path:** Use the repository’s **"Report a vulnerability"** option under the **Security** tab (`Security -> Advisories -> Report a vulnerability`) to submit a private security advisory directly to project maintainers.
+- **Repository Configuration Notice:** GitHub Private Vulnerability Reporting requires enabling the "Private vulnerability reporting" feature under repository settings by the project owner. If the button is not yet visible, the feature awaits repository-owner configuration in GitHub settings.
+- **Responsible Disclosure:** Real exploit details should remain confidential until a patch or mitigation is verified and released.
+- **Response Timeline:** Vulnerability reports are reviewed on a **best-effort basis**. Acknowledgement is targeted within 72 hours where feasible.
 
 ### Vulnerability & Dependency Scanning Schedule
 | Activity | Planned Frequency | Target Phase / Owner |
