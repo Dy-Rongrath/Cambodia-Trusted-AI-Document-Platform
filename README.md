@@ -32,7 +32,7 @@ The project may be called production-ready only after evidence exists for all 16
 ## Project Status
 
 - **Phase 0 — Documentation and Governance Foundation:** Complete
-- **Phase 1 — Engineering Scaffold and Tooling:** In Progress (NestJS backend, FastAPI AI service, Angular frontend, shared-types, Docker Compose, CI)
+- **Phase 1 — Engineering Scaffold and Tooling:** Phase 1 implementation validated locally — remote CI validation pending
 - **Maintainer:** Dy Rongrath (Solo project owner & maintainer)
 
 > **Independence Notice:** This is an independent open-source project. It is not affiliated with, endorsed by, commissioned by, or operated by any Cambodian government institution or public agency.
