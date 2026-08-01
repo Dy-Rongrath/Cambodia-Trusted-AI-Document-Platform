@@ -110,7 +110,7 @@ Tenant isolation is a critical security requirement. See `ARCHITECTURE.md` Secti
 - **Output encoding:** JSON responses only. No HTML output from the API. No reflected user input in error messages.
 - **Rate limiting:** General production reverse-proxy controls (Phase 16); authentication endpoint rate-limiting protections (Phase 3); document upload endpoint rate-limiting protections (Phase 4).
 - **CORS:** Configured to allow only the known Angular frontend origin. No wildcard origins.
-- **Content Security Policy:** Applied to any HTML responses (Phase 2 — Angular frontend).
+- **Content Security Policy:** Application-level frontend CSP preparation begins with authenticated frontend integration in Phase 3. Final reverse-proxy CSP enforcement and production hardening are completed in Phase 16.
 - **Error handling:** All errors return structured JSON. Stack traces are never exposed in production responses.
 - **API versioning:** `/api/v1/` prefix. Breaking changes require a new version path.
 
@@ -127,7 +127,7 @@ File uploads are a high-risk attack surface. All of the following controls are m
 | Magic byte verification | Read file magic bytes (file signature) and verify against the declared type. Reject mismatches. | Phase 4 |
 | Allowed file types | Allowlist: PDF, JPEG, PNG, TIFF (document images). All other types rejected. | Phase 4 |
 | Quarantine storage | Store uploaded files in a quarantine bucket before processing. | Phase 4 |
-| Malware scanning | Scan with ClamAV before moving to permanent storage. Integration point defined in Phase 1. | Phase 4 |
+| Malware scanning | Scan with ClamAV before moving to permanent storage. Malware-scanning integration is implemented with secure document upload in Phase 4. | Phase 4 |
 | No execution | Uploaded files are never executed, imported, or included in any code path. | Phase 4 |
 | Secure URLs | Files served via short-lived pre-signed URLs — never exposed directly from storage. | Phase 4 |
 | Content-Disposition | File downloads served with `Content-Disposition: attachment` to prevent browser execution. | Phase 4 |
@@ -190,7 +190,7 @@ File uploads are a high-risk attack surface. All of the following controls are m
 
 ## 11. Key Management
 
-- Credential signing keys (Phase 10+) are separate from all other keys.
+- Credential signing keys (Phase 11+) are separate from all other keys.
 - Keys are stored in a secrets manager — never in the application database.
 - Key rotation must be possible without service downtime.
 - Old keys must be retained for credential verification until all credentials signed with them have expired.
@@ -246,8 +246,8 @@ Additional security-specific logging requirements:
 - No running containers as root. Use `USER nonroot` in Dockerfiles.
 - Read-only filesystem where possible. Only explicitly required write paths mounted.
 - No unnecessary tools installed in production images (no shell, curl, wget in production).
-- Trivy scans all images for known CVEs.
-- Cosign signs all production images (Phase 16).
+- Trivy container-image scanning is planned after application container images are introduced in Phase 2 or later.
+- Cosign signing, release provenance, and production image verification are planned for Phase 16 production hardening.
 - All base image versions are pinned (e.g., `node:24.15.0-alpine3.20` — not `node:24-alpine`).
 
 ---

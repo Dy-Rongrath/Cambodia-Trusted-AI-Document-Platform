@@ -51,20 +51,20 @@ We need an architectural decision framework to evaluate object-storage options f
 - **Pros:** Permissive Apache 2.0 licence, fast file handling, native ARM64 support, active open-source maintenance.
 - **Cons:** Multi-component architecture (Master, Volume, S3 Gateway) introduces slight configuration complexity for local development.
 
-### Option 5: MinIO Object Storage
+### Option 5: MinIO / MinIO AIStor Offerings
 - **Description:** [MinIO](https://min.io/) is an S3-compatible object storage server.
-- **Licensing & Upstream Status:** The open-source `minio/minio` AGPLv3 repository was placed in maintenance mode and archived by MinIO Inc., leaving the community source code frozen without official new releases, binary distributions, or security patches provided by upstream. MinIO Inc. shifted focus to commercial `MinIO AIStor` offerings under a separate commercial subscription licence.
+- **Licensing & Upstream Status:** The open-source `minio/minio` repository is archived and is no longer an actively maintained open-source option for new platform adoption. MinIO AIStor Free may be available at no monetary cost for eligible single-node deployments. However, it is governed by proprietary licence terms and is not an open-source replacement for the archived `minio/minio` community repository. Its modification, redistribution, activation, deployment, and support terms must be reviewed before it can be considered for this project.
 - **Pros:** High S3 API compatibility, widely known tooling and documentation.
-- **Cons:** Upstream community repository is archived/unmaintained; commercial AIStor requires a paid subscription; no active zero-cost upstream release channel exists without building from frozen AGPLv3 source.
+- **Cons:** Upstream community repository is archived/unmaintained; AIStor Free remains proprietary with restrictions on modification/redistribution; commercial subscription terms apply for enterprise features.
 
 ---
 
 ## Evaluation Matrix
 
-| Criterion | Option 1 (Defer to Ph 4) | Option 2 (LocalFS) | Option 3 (Garage) | Option 4 (SeaweedFS) | Option 5 (MinIO) |
+| Criterion | Option 1 (Defer to Ph 4) | Option 2 (LocalFS) | Option 3 (Garage) | Option 4 (SeaweedFS) | Option 5 (MinIO / AIStor) |
 |---|---|---|---|---|---|
 | **Phase 1 Dependency** | None | None | Docker container | Docker container | Docker container |
-| **Licence** | N/A | Apache-2.0 | AGPLv3 | Apache-2.0 | AGPLv3 (Archived) / Commercial |
+| **Licence** | N/A | Apache-2.0 | AGPLv3 | Apache-2.0 | Archived AGPLv3 source / proprietary AIStor Free or commercial terms |
 | **S3 API Fidelity** | N/A | Simulated | High | High | Very High |
 | **Resource Footprint** | Zero | Near Zero | Very Low | Low | Moderate |
 | **ARM64 / Apple Silicon** | Native | Native | Native | Native | Native |

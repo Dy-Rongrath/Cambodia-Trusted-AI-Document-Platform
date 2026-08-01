@@ -186,9 +186,9 @@ Every feature must be verifiable without a production environment. Tests are not
 
 ---
 
-### 2.10 Prompt Injection Tests (Phase 8+)
+### 2.10 Prompt Injection Tests (Phase 9+)
 
-**Scope:** Verify that the AI explanation service resists prompt injection attempts.
+**Scope:** Verify that the AI explanation service resists prompt injection attempts. (*Exception:* If Phase 8 introduces a generative or prompt-driven extraction component, prompt-injection testing must be introduced earlier through an approved architecture decision.)
 
 **What to test:**
 - Submit documents containing known prompt injection payloads (e.g., "Ignore previous instructions and...").
