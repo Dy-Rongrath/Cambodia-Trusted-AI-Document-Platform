@@ -46,7 +46,7 @@ jobs:
 
       - name: AI Service Quality Gates (Docker)
         run: |
-          docker run --rm -v ${{ github.workspace }}/apps/ai-service:/app -w /app ghcr.io/astral-sh/uv:0.5-python3.12-alpine sh -c "
+          docker run --rm -v ${{ github.workspace }}/apps/ai-service:/app -w /app ghcr.io/astral-sh/uv:0.5-python3.12-bookworm-slim sh -c "
             uv sync --frozen --extra dev &&
             uv run ruff check . &&
             uv run ruff format --check . &&
