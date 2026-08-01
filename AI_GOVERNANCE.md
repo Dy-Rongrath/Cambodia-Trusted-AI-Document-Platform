@@ -8,7 +8,8 @@
 
 ## 1. Foundational Rule
 
-> **The AI must never be the final authority for digital credential authenticity.** > **Cryptographic verification is the source of truth.**
+> **The AI must never be the final authority for digital credential authenticity.**
+> **Cryptographic verification is the source of truth.**
 
 This rule is architectural and non-negotiable. It applies to every AI feature on this platform without exception. AI may assist, classify, explain, and support human decision-making — but the final authority for whether a credential is authentic rests with cryptographic signature verification, not with any AI model's output.
 

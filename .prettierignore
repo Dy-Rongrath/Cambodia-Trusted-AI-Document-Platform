@@ -1,3 +1,4 @@
+# Build outputs and generated files
 dist
 node_modules
 coverage
@@ -9,3 +10,21 @@ __pycache__
 .ruff_cache
 package-lock.json
 uv.lock
+
+# Legal documents — exact upstream text must be preserved without reformatting
+LICENSE
+NOTICE
+THIRD_PARTY_NOTICES.md
+
+# Governance and standards documents — semantic structure must not be altered
+DCO.md
+CODE_OF_CONDUCT.md
+
+# Architecture and threat model — Mermaid diagrams, numbered lists, and tables
+# must not be reformatted by Prettier prose wrapping
+docs/threat-model.md
+docs/adr/**
+
+# GitHub community templates — form YAML and PR template structure is sensitive
+.github/ISSUE_TEMPLATE/**
+.github/PULL_REQUEST_TEMPLATE.md
