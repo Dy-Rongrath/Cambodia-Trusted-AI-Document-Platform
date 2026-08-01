@@ -50,12 +50,12 @@ The following application boundaries describe the approved target architecture. 
 
 The platform is structured as a **monorepo** containing three applications and one shared package:
 
-| Application | Technology | Responsibility |
-|---|---|---|
-| `apps/backend` | NestJS (TypeScript) | Main API server. Handles authentication, business logic, document management, credential issuance, audit logging. |
-| `apps/ai-service` | FastAPI (Python) | AI inference and training. Document classification, information extraction, explanation generation. Communicates with backend via HTTP only. |
-| `apps/frontend` | Angular (TypeScript) | Web application. Document upload, prediction display, human-review workflow, credential management. |
-| `packages/shared-types` | TypeScript | Shared TypeScript types, OpenAPI schemas, and constants. Used by backend and frontend. |
+| Application             | Technology           | Responsibility                                                                                                                               |
+| ----------------------- | -------------------- | -------------------------------------------------------------------------------------------------------------------------------------------- |
+| `apps/backend`          | NestJS (TypeScript)  | Main API server. Handles authentication, business logic, document management, credential issuance, audit logging.                            |
+| `apps/ai-service`       | FastAPI (Python)     | AI inference and training. Document classification, information extraction, explanation generation. Communicates with backend via HTTP only. |
+| `apps/frontend`         | Angular (TypeScript) | Web application. Document upload, prediction display, human-review workflow, credential management.                                          |
+| `packages/shared-types` | TypeScript           | Shared TypeScript types, OpenAPI schemas, and constants. Used by backend and frontend.                                                       |
 
 ### Why a separate AI service?
 
@@ -69,17 +69,17 @@ See [ADR-0001](docs/adr/ADR-0001-monorepo-strategy.md). A modular monolith keeps
 
 ## 3. Module Responsibilities (NestJS Backend)
 
-| Module | Owns | Responsibilities |
-|---|---|---|
-| `AuthModule` | JWT validation, session | Token verification, user context extraction, Keycloak integration. |
-| `OrganisationModule` | `organisations` table | Tenant management, organisation CRUD, tenant-context middleware. |
-| `UserModule` | `users` table | User profile management, role assignments within a tenant. |
-| `DocumentModule` | `documents`, `document_files` tables | Document upload, metadata storage, file-lifecycle management. |
-| `ClassificationModule` | `classification_results` table | Communicates with AI service, stores predictions, evaluates confidence, sets `REVIEW_REQUIRED` status. (Phase 6) |
-| `ReviewModule` | `review_tasks`, `review_decisions` tables | Human-review workflow management: queue, reviewer UI, decision submission, override metrics. (Phase 7) |
-| `CredentialModule` | `credentials`, `credential_revocations` tables | Credential issuance (SD-JWT VC), signing, revocation. (Phase 11) |
-| `AuditModule` | `audit_events` table | Append-only audit event recording. Shared service used by all other modules. |
-| `HealthModule` | — | `/health` endpoint for Docker and Kubernetes health checks. |
+| Module                 | Owns                                           | Responsibilities                                                                                                 |
+| ---------------------- | ---------------------------------------------- | ---------------------------------------------------------------------------------------------------------------- |
+| `AuthModule`           | JWT validation, session                        | Token verification, user context extraction, Keycloak integration.                                               |
+| `OrganisationModule`   | `organisations` table                          | Tenant management, organisation CRUD, tenant-context middleware.                                                 |
+| `UserModule`           | `users` table                                  | User profile management, role assignments within a tenant.                                                       |
+| `DocumentModule`       | `documents`, `document_files` tables           | Document upload, metadata storage, file-lifecycle management.                                                    |
+| `ClassificationModule` | `classification_results` table                 | Communicates with AI service, stores predictions, evaluates confidence, sets `REVIEW_REQUIRED` status. (Phase 6) |
+| `ReviewModule`         | `review_tasks`, `review_decisions` tables      | Human-review workflow management: queue, reviewer UI, decision submission, override metrics. (Phase 7)           |
+| `CredentialModule`     | `credentials`, `credential_revocations` tables | Credential issuance (SD-JWT VC), signing, revocation. (Phase 11)                                                 |
+| `AuditModule`          | `audit_events` table                           | Append-only audit event recording. Shared service used by all other modules.                                     |
+| `HealthModule`         | —                                              | `/health` endpoint for Docker and Kubernetes health checks.                                                      |
 
 ### Module isolation rules
 
@@ -91,18 +91,18 @@ See [ADR-0001](docs/adr/ADR-0001-monorepo-strategy.md). A modular monolith keeps
 
 ## 4. Data Ownership
 
-| Data entity | Owner module | Table | Tenant-scoped? |
-|---|---|---|---|
-| Organisations | OrganisationModule | `organisations` | No (root entity) |
-| Users | UserModule | `users` | Yes |
-| Documents | DocumentModule | `documents` | Yes |
-| Document files | DocumentModule | `document_files` | Yes |
-| Classification results | ClassificationModule | `classification_results` | Yes |
-| Review tasks | ReviewModule | `review_tasks` | Yes |
-| Review decisions | ReviewModule | `review_decisions` | Yes |
-| Credentials | CredentialModule | `credentials` | Yes |
-| Credential revocations | CredentialModule | `credential_revocations` | Yes |
-| Audit events | AuditModule | `audit_events` | Yes |
+| Data entity            | Owner module         | Table                    | Tenant-scoped?   |
+| ---------------------- | -------------------- | ------------------------ | ---------------- |
+| Organisations          | OrganisationModule   | `organisations`          | No (root entity) |
+| Users                  | UserModule           | `users`                  | Yes              |
+| Documents              | DocumentModule       | `documents`              | Yes              |
+| Document files         | DocumentModule       | `document_files`         | Yes              |
+| Classification results | ClassificationModule | `classification_results` | Yes              |
+| Review tasks           | ReviewModule         | `review_tasks`           | Yes              |
+| Review decisions       | ReviewModule         | `review_decisions`       | Yes              |
+| Credentials            | CredentialModule     | `credentials`            | Yes              |
+| Credential revocations | CredentialModule     | `credential_revocations` | Yes              |
+| Audit events           | AuditModule          | `audit_events`           | Yes              |
 
 ---
 
@@ -150,8 +150,8 @@ graph TB
 - **Local Development:** Keycloak is accessible to the user's browser via `http://localhost:<keycloak-port>` to enable the OpenID Connect (OIDC) Authorization Code with PKCE login redirect flow. Other infrastructure services (PostgreSQL, MinIO admin, AI service) remain bound to the internal Docker network.
 - **Staging & Production:** The user browser communicates exclusively via the HTTPS Reverse Proxy (`https://<domain>/auth` routing to internal Keycloak). Keycloak is never exposed directly to the public internet without TLS reverse-proxy termination. Administrative endpoints (`/admin`) are restricted. Internal service-to-service communication stays within the private network.
 
-
 **Trust rules:**
+
 - The reverse proxy terminates TLS. All internal traffic is on a private Docker network.
 - The AI service is not exposed externally. It is reachable only by the backend.
 - The AI service has no database credentials. All data access goes through the backend API.
@@ -182,6 +182,7 @@ sequenceDiagram
 ```
 
 **Implementation notes:**
+
 - The Angular frontend uses the Keycloak JavaScript adapter or a compatible OIDC library.
 - PKCE is mandatory (OAuth 2.1 requirement).
 - The backend validates the JWT signature using Keycloak's JWKS endpoint.
@@ -213,6 +214,7 @@ sequenceDiagram
 ```
 
 **Implementation notes:**
+
 - Guards are applied in order: `AuthGuard` → `TenantGuard` → `RolesGuard`.
 - The `organisation_id` from the token is injected into every database query as a mandatory filter.
 - PostgreSQL row-level security provides a second enforcement layer.
@@ -224,13 +226,14 @@ sequenceDiagram
 
 Tenant isolation is enforced at three layers:
 
-| Layer | Mechanism | Strength |
-|---|---|---|
-| Application layer | `organisation_id` mandatory filter in every repository method | High — enforced in code |
-| Database layer | PostgreSQL row-level security policies | High — enforced in DBMS |
-| Network layer | Internal services not exposed externally | Medium — network segmentation |
+| Layer             | Mechanism                                                     | Strength                      |
+| ----------------- | ------------------------------------------------------------- | ----------------------------- |
+| Application layer | `organisation_id` mandatory filter in every repository method | High — enforced in code       |
+| Database layer    | PostgreSQL row-level security policies                        | High — enforced in DBMS       |
+| Network layer     | Internal services not exposed externally                      | Medium — network segmentation |
 
 **Rules:**
+
 - Every database table that contains tenant data has an `organisation_id` column.
 - Every query against tenant data includes `WHERE organisation_id = :tenantId`.
 - The `organisation_id` is always taken from the JWT token, never from request query parameters or body.
@@ -275,6 +278,7 @@ sequenceDiagram
 ```
 
 **Security notes:**
+
 - Uploaded files are stored in a quarantine bucket before classification.
 - Files are moved to the permanent bucket only after passing all validation and classification steps.
 - The malware scanning integration point (ClamAV) is inserted between storage and classification.
@@ -360,35 +364,36 @@ All important actions are recorded in the `audit_events` table.
 
 **Mandatory audit events:**
 
-| Category | Events |
-|---|---|
-| Authentication | `auth.login`, `auth.logout`, `auth.login.failed`, `auth.token.refresh` |
-| Document | `document.upload`, `document.classified`, `document.reviewed`, `document.deleted` |
-| Review | `review.task.created`, `review.decision.submitted` |
-| Credential | `credential.issued`, `credential.revoked`, `credential.verified` |
-| Administration | `user.created`, `user.role.changed`, `user.deleted`, `organisation.created` |
-| AI | `ai.prediction`, `ai.model.deployed`, `ai.model.rollback` |
-| Security | `auth.login.failed`, `permission.denied`, `file.rejected`, `tenant.isolation.violation` |
+| Category       | Events                                                                                  |
+| -------------- | --------------------------------------------------------------------------------------- |
+| Authentication | `auth.login`, `auth.logout`, `auth.login.failed`, `auth.token.refresh`                  |
+| Document       | `document.upload`, `document.classified`, `document.reviewed`, `document.deleted`       |
+| Review         | `review.task.created`, `review.decision.submitted`                                      |
+| Credential     | `credential.issued`, `credential.revoked`, `credential.verified`                        |
+| Administration | `user.created`, `user.role.changed`, `user.deleted`, `organisation.created`             |
+| AI             | `ai.prediction`, `ai.model.deployed`, `ai.model.rollback`                               |
+| Security       | `auth.login.failed`, `permission.denied`, `file.rejected`, `tenant.isolation.violation` |
 
 **Audit event structure:**
 
 ```typescript
 interface AuditEvent {
-  id: string;             // UUID
-  eventType: string;      // e.g., 'document.upload'
-  actorId: string;        // User ID (from JWT)
-  actorType: string;      // 'user' | 'service' | 'system'
+  id: string; // UUID
+  eventType: string; // e.g., 'document.upload'
+  actorId: string; // User ID (from JWT)
+  actorType: string; // 'user' | 'service' | 'system'
   organisationId: string; // Tenant ID
-  resourceType: string;   // e.g., 'document'
-  resourceId: string;     // ID of the affected resource
+  resourceType: string; // e.g., 'document'
+  resourceId: string; // ID of the affected resource
   outcome: 'success' | 'failure';
   metadata: Record<string, unknown>; // Additional context (no personal data)
-  ipAddress: string;      // Anonymised (last octet zeroed for privacy)
-  timestamp: Date;        // UTC, server-generated
+  ipAddress: string; // Anonymised (last octet zeroed for privacy)
+  timestamp: Date; // UTC, server-generated
 }
 ```
 
 **Integrity rules:**
+
 - The application role has INSERT only on `audit_events` — no UPDATE or DELETE.
 - A separate privileged role is required to query audit logs for compliance purposes.
 - Tamper-evident enhancement (hash chaining or write-once storage) is a Phase 16 requirement.
@@ -399,14 +404,15 @@ interface AuditEvent {
 
 Introduced incrementally. See `ROADMAP.md` for phase targets.
 
-| Phase | Capability |
-|---|---|
-| Phase 1 | Structured JSON logging foundations (Pino/Winston in NestJS, Python logging in FastAPI) |
-| Phase 5 | OpenTelemetry SDK integration and Prometheus metrics endpoint. |
-| Phase 5 | Grafana + Loki + Tempo stack in Docker Compose. |
-| Phase 16 | Production observability in Kubernetes. |
+| Phase    | Capability                                                                              |
+| -------- | --------------------------------------------------------------------------------------- |
+| Phase 1  | Structured JSON logging foundations (Pino/Winston in NestJS, Python logging in FastAPI) |
+| Phase 5  | OpenTelemetry SDK integration and Prometheus metrics endpoint.                          |
+| Phase 5  | Grafana + Loki + Tempo stack in Docker Compose.                                         |
+| Phase 16 | Production observability in Kubernetes.                                                 |
 
 **Logging standards:**
+
 - All log entries are JSON.
 - All entries include: `timestamp`, `level`, `service`, `traceId`, `message`.
 - No personal data, document content, or secrets in log entries.
@@ -416,43 +422,43 @@ Introduced incrementally. See `ROADMAP.md` for phase targets.
 
 ## 15. External Integrations
 
-| Integration | Purpose | Phase | Notes |
-|---|---|---|---|
-| Keycloak | Keycloak infrastructure and local-development configuration | Phase 1 | Self-hosted Docker container, realm bootstrap configuration placeholder |
-| Authentication and authorisation | User login flow, JWT validation, roles, tenant-context middleware | Phase 3 | Keycloak JWKS, AuthModule, OrganisationModule |
-| Object storage (S3-compatible API locally and in production) | Document storage | Phase 4 | Encrypted at rest; local container strategy subject to ADR-0008 |
-| ClamAV | Malware scanning of uploaded files | Phase 4 | Implemented as part of the secure upload and quarantine workflow |
-| MLflow | ML experiment tracking and model registry | Phase 6 | Self-hosted |
-| Label Studio | Data annotation | Phase 10 | Self-hosted |
-| DVC + remote storage | Dataset versioning | Phase 6 | Remote: S3-compatible |
-| Prometheus + Grafana + Loki + Tempo | Observability | Phase 5 | Self-hosted |
-| vLLM | Production model serving (if required) | Phase 8+ | Only if latency justifies it |
-| Eclipse Dataspace Components | Inter-organisation data sharing | Phase 14 | Not yet adopted |
+| Integration                                                  | Purpose                                                           | Phase    | Notes                                                                   |
+| ------------------------------------------------------------ | ----------------------------------------------------------------- | -------- | ----------------------------------------------------------------------- |
+| Keycloak                                                     | Keycloak infrastructure and local-development configuration       | Phase 1  | Self-hosted Docker container, realm bootstrap configuration placeholder |
+| Authentication and authorisation                             | User login flow, JWT validation, roles, tenant-context middleware | Phase 3  | Keycloak JWKS, AuthModule, OrganisationModule                           |
+| Object storage (S3-compatible API locally and in production) | Document storage                                                  | Phase 4  | Encrypted at rest; local container strategy subject to ADR-0008         |
+| ClamAV                                                       | Malware scanning of uploaded files                                | Phase 4  | Implemented as part of the secure upload and quarantine workflow        |
+| MLflow                                                       | ML experiment tracking and model registry                         | Phase 6  | Self-hosted                                                             |
+| Label Studio                                                 | Data annotation                                                   | Phase 10 | Self-hosted                                                             |
+| DVC + remote storage                                         | Dataset versioning                                                | Phase 6  | Remote: S3-compatible                                                   |
+| Prometheus + Grafana + Loki + Tempo                          | Observability                                                     | Phase 5  | Self-hosted                                                             |
+| vLLM                                                         | Production model serving (if required)                            | Phase 8+ | Only if latency justifies it                                            |
+| Eclipse Dataspace Components                                 | Inter-organisation data sharing                                   | Phase 14 | Not yet adopted                                                         |
 
 ---
 
 ## 16. Failure Handling
 
-| Scenario | Behaviour |
-|---|---|
-| AI service unavailable | Backend returns 503 to the client. Document is stored with status `classification_pending`. Background job retries with exponential backoff. |
-| Classification confidence below threshold | Create a human-review task. Document status is `awaiting_review`. Do not auto-accept. |
-| Database write failure | Transaction rolled back. Error logged. Structured error response returned. Audit event recorded if possible. |
-| File upload exceeds size limit | Request rejected with 413 before file is read into memory. |
-| Invalid file type detected | Request rejected with 422. Audit event `file.rejected` logged. |
-| JWT expired or invalid | Request rejected with 401. No further processing. |
-| Tenant isolation violation detected | Request rejected with 403. Security alert logged as `tenant.isolation.violation`. |
+| Scenario                                  | Behaviour                                                                                                                                    |
+| ----------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------- |
+| AI service unavailable                    | Backend returns 503 to the client. Document is stored with status `classification_pending`. Background job retries with exponential backoff. |
+| Classification confidence below threshold | Create a human-review task. Document status is `awaiting_review`. Do not auto-accept.                                                        |
+| Database write failure                    | Transaction rolled back. Error logged. Structured error response returned. Audit event recorded if possible.                                 |
+| File upload exceeds size limit            | Request rejected with 413 before file is read into memory.                                                                                   |
+| Invalid file type detected                | Request rejected with 422. Audit event `file.rejected` logged.                                                                               |
+| JWT expired or invalid                    | Request rejected with 401. No further processing.                                                                                            |
+| Tenant isolation violation detected       | Request rejected with 403. Security alert logged as `tenant.isolation.violation`.                                                            |
 
 ---
 
 ## 17. Deployment Evolution
 
-| Phase | Deployment model |
-|---|---|
-| Phase 0 | Pure documentation foundation. |
-| Phase 1 | Monorepo scaffold and local Docker Compose infrastructure. |
-| Phase 2–15 | Docker Compose development environment across feature phases. |
-| Phase 16 | Kubernetes (production). Helm charts. Argo CD GitOps. OpenTofu for infrastructure. |
+| Phase      | Deployment model                                                                   |
+| ---------- | ---------------------------------------------------------------------------------- |
+| Phase 0    | Pure documentation foundation.                                                     |
+| Phase 1    | Monorepo scaffold and local Docker Compose infrastructure.                         |
+| Phase 2–15 | Docker Compose development environment across feature phases.                      |
+| Phase 16   | Kubernetes (production). Helm charts. Argo CD GitOps. OpenTofu for infrastructure. |
 
 ---
 
@@ -465,7 +471,7 @@ flowchart TD
     subgraph DeveloperWorkstation ["Developer Workstation (Local)"]
         CodexCLI["Codex CLI (MCP Client)"]
         CodexConfig[".codex/config.toml (Gitignored)"]
-        
+
         subgraph LocalMCPServers ["Local MCP Servers (stdio / Docker)"]
             GitHubMCP["GitHub MCP Server (Docker: ghcr.io/github/github-mcp-server)"]
             Context7["Context7 MCP (@upstash/context7-mcp)"]
@@ -489,6 +495,7 @@ flowchart TD
 ```
 
 ### Key Architectural Boundaries for MCP
+
 1. **Separation from Production Runtime:** MCP servers are developer tools in Stages 1–3 and never connect to production databases or services.
 2. **Protocol Boundary:** MCP operates via JSON-RPC over stdio or Docker process pipes.
 3. **Identity & Authorization:** Local MCP tools run under the developer's personal access credentials (e.g. read-only GitHub PAT), never system service accounts.
@@ -496,5 +503,4 @@ flowchart TD
 
 ---
 
-*See `docs/adr/` for all Architecture Decision Records that underpin this design.*
-
+_See `docs/adr/` for all Architecture Decision Records that underpin this design._

@@ -10,7 +10,11 @@ services:
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-trusted_ai_dev_password_change_me}
       POSTGRES_DB: ${POSTGRES_DB:-trusted_ai_db}
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U $${POSTGRES_USER:-trusted_ai_dev} -d $${POSTGRES_DB:-trusted_ai_db}"]
+      test:
+        [
+          'CMD-SHELL',
+          'pg_isready -U $${POSTGRES_USER:-trusted_ai_dev} -d $${POSTGRES_DB:-trusted_ai_db}',
+        ]
       interval: 5s
       timeout: 5s
       retries: 5
@@ -27,7 +31,7 @@ services:
     container_name: trusted-ai-backend
     restart: unless-stopped
     ports:
-      - "127.0.0.1:${BACKEND_PORT:-3000}:3000"
+      - '127.0.0.1:${BACKEND_PORT:-3000}:3000'
     environment:
       PORT: 3000
       DATABASE_URL: postgresql://${POSTGRES_USER:-trusted_ai_dev}:${POSTGRES_PASSWORD:-trusted_ai_dev_password_change_me}@postgres:5432/${POSTGRES_DB:-trusted_ai_db}?schema=public
@@ -44,7 +48,8 @@ services:
         - action: rebuild
           path: ../../package-lock.json
     healthcheck:
-      test: ["CMD-SHELL", "wget --no-verbose --tries=1 --spider http://localhost:3000/health || exit 1"]
+      test:
+        ['CMD-SHELL', 'wget --no-verbose --tries=1 --spider http://localhost:3000/health || exit 1']
       interval: 10s
       timeout: 5s
       retries: 3
@@ -68,7 +73,11 @@ services:
         - action: rebuild
           path: ../../apps/ai-service/uv.lock
     healthcheck:
-      test: ["CMD-SHELL", "python -c 'import urllib.request; urllib.request.urlopen(\"http://localhost:8000/health\")' || exit 1"]
+      test:
+        [
+          'CMD-SHELL',
+          'python -c ''import urllib.request; urllib.request.urlopen("http://localhost:8000/health")'' || exit 1',
+        ]
       interval: 10s
       timeout: 5s
       retries: 3
@@ -83,7 +92,7 @@ services:
     container_name: trusted-ai-frontend
     restart: unless-stopped
     ports:
-      - "127.0.0.1:${FRONTEND_PORT:-4200}:4200"
+      - '127.0.0.1:${FRONTEND_PORT:-4200}:4200'
     develop:
       watch:
         - action: sync
@@ -103,12 +112,12 @@ services:
     container_name: trusted-ai-keycloak
     command: start-dev
     ports:
-      - "127.0.0.1:${KEYCLOAK_PORT:-8080}:8080"
+      - '127.0.0.1:${KEYCLOAK_PORT:-8080}:8080'
     environment:
       KEYCLOAK_ADMIN: ${KEYCLOAK_ADMIN:-admin}
       KEYCLOAK_ADMIN_PASSWORD: ${KEYCLOAK_ADMIN_PASSWORD:-admin_password_change_me}
-      KC_HTTP_ENABLED: "true"
-      KC_HOSTNAME_STRICT: "false"
+      KC_HTTP_ENABLED: 'true'
+      KC_HOSTNAME_STRICT: 'false'
     networks:
       - internal-net
 

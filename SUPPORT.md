@@ -12,12 +12,12 @@ The **Cambodia Trusted AI Document Platform** is an open-source project maintain
 
 ## 2. Where to Get Help
 
-| Need | Channel | Guidance |
-|---|---|---|
-| **Questions & Public Discussion** | GitHub Issue Forms | Use the most appropriate GitHub issue form for questions or proposals that can be discussed publicly. (Enabling GitHub Discussions is a pending repository-owner setting). |
-| **Bug Reports** | GitHub Issues | Report confirmed bugs using the [Bug Report form](.github/ISSUE_TEMPLATE/bug_report.yml). |
-| **Feature Requests** | GitHub Issues | Submit ideas using the [Feature Request form](.github/ISSUE_TEMPLATE/feature_request.yml). |
-| **Security Vulnerabilities** | Private Security Disclosure | Follow [SECURITY.md](SECURITY.md) to submit a confidential security advisory under the Security tab. **Never post vulnerabilities in public issues!** |
+| Need                              | Channel                     | Guidance                                                                                                                                                                   |
+| --------------------------------- | --------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **Questions & Public Discussion** | GitHub Issue Forms          | Use the most appropriate GitHub issue form for questions or proposals that can be discussed publicly. (Enabling GitHub Discussions is a pending repository-owner setting). |
+| **Bug Reports**                   | GitHub Issues               | Report confirmed bugs using the [Bug Report form](.github/ISSUE_TEMPLATE/bug_report.yml).                                                                                  |
+| **Feature Requests**              | GitHub Issues               | Submit ideas using the [Feature Request form](.github/ISSUE_TEMPLATE/feature_request.yml).                                                                                 |
+| **Security Vulnerabilities**      | Private Security Disclosure | Follow [SECURITY.md](SECURITY.md) to submit a confidential security advisory under the Security tab. **Never post vulnerabilities in public issues!**                      |
 
 ---
 

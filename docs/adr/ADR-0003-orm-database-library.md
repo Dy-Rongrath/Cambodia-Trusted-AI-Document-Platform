@@ -28,6 +28,7 @@ The NestJS backend requires a type-safe, maintainable way to interact with Postg
 We will use **Prisma** (current stable, 5.x or 6.x) as the ORM and database access library for the NestJS backend.
 
 Prisma provides:
+
 - A declarative schema file (`prisma/schema.prisma`) from which TypeScript types and a migration history are generated.
 - A type-safe query client (`PrismaClient`) that prevents SQL injection and provides IDE autocomplete.
 - A migration system (`prisma migrate`) that generates SQL migration files that are stored in the repository and can be reviewed.
@@ -35,17 +36,18 @@ Prisma provides:
 
 ## Alternatives Considered
 
-| Option | Description | Why rejected or deferred |
-|---|---|---|
-| Drizzle ORM | Lightweight, SQL-like, type-safe query builder | Excellent choice. More explicit SQL, faster runtime, smaller bundle. Rejected for Phase 0 because Prisma's declarative schema and migration system is easier to understand for a developer building familiarity with SQL. Can be revisited if Prisma's abstraction causes problems. |
-| TypeORM | Mature NestJS ORM | More footguns than Prisma. Decorator-based schema can become confusing. Migration reliability has historically been weaker. Not recommended for new projects. |
-| Kysely | Type-safe SQL query builder | Excellent for developers who prefer full SQL control. More verbose than Prisma for simple CRUD. Lacks the schema-first migration workflow. Can be added alongside Prisma for complex queries if needed. |
-| Raw SQL (node-postgres) | Direct SQL with `pg` client | Full control but loses type safety. Every query requires manual type annotation. Only appropriate for very performance-critical queries where Prisma proves insufficient. |
-| MikroORM | Full-featured ORM with unit-of-work pattern | Less community adoption in the NestJS ecosystem than Prisma. Steeper learning curve. |
+| Option                  | Description                                    | Why rejected or deferred                                                                                                                                                                                                                                                            |
+| ----------------------- | ---------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Drizzle ORM             | Lightweight, SQL-like, type-safe query builder | Excellent choice. More explicit SQL, faster runtime, smaller bundle. Rejected for Phase 0 because Prisma's declarative schema and migration system is easier to understand for a developer building familiarity with SQL. Can be revisited if Prisma's abstraction causes problems. |
+| TypeORM                 | Mature NestJS ORM                              | More footguns than Prisma. Decorator-based schema can become confusing. Migration reliability has historically been weaker. Not recommended for new projects.                                                                                                                       |
+| Kysely                  | Type-safe SQL query builder                    | Excellent for developers who prefer full SQL control. More verbose than Prisma for simple CRUD. Lacks the schema-first migration workflow. Can be added alongside Prisma for complex queries if needed.                                                                             |
+| Raw SQL (node-postgres) | Direct SQL with `pg` client                    | Full control but loses type safety. Every query requires manual type annotation. Only appropriate for very performance-critical queries where Prisma proves insufficient.                                                                                                           |
+| MikroORM                | Full-featured ORM with unit-of-work pattern    | Less community adoption in the NestJS ecosystem than Prisma. Steeper learning curve.                                                                                                                                                                                                |
 
 ## Consequences
 
 ### Positive consequences
+
 - TypeScript types are automatically generated from the Prisma schema — no manual type maintenance.
 - Migration files are SQL-readable and stored in the repository (`prisma/migrations/`). They can be reviewed before being applied.
 - `prisma migrate deploy` is safe for production (applies only unapplied migrations).
@@ -54,12 +56,14 @@ Prisma provides:
 - Prisma Studio provides a visual database browser for development debugging.
 
 ### Negative consequences / trade-offs
+
 - Prisma adds a code-generation step — `prisma generate` must be run after schema changes.
 - Prisma's query engine runs as a separate process (in older versions) or is embedded. Adds a small memory overhead.
 - Prisma does not support all PostgreSQL-specific features natively (e.g., complex RLS policies, some array operations). These must use `$queryRaw` or `$executeRaw` with manual parameterisation.
 - Schema migrations cannot be created interactively — they must be generated by Prisma from schema diff.
 
 ### Neutral consequences
+
 - `prisma/schema.prisma` is the single source of truth for the database schema.
 - Generated client is placed in `node_modules/@prisma/client` — not committed to the repository.
 - CI must run `prisma generate` before compiling TypeScript.
@@ -84,6 +88,7 @@ Prisma's schema defines all personal data fields. Sensitive fields (e.g., docume
 ## Migration Impact
 
 Migrating from Prisma to Drizzle or raw SQL would require:
+
 - Rewriting all repository methods.
 - Migrating migration management (Prisma migrations → Drizzle Kit or Flyway).
 - Updating CI/CD pipelines.

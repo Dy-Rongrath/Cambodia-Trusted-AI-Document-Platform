@@ -32,26 +32,31 @@ We need an architectural decision framework to evaluate object-storage options f
 ## Considered Options
 
 ### Option 1: Defer Object-Storage Container Selection to Phase 4 (Recommended Default)
+
 - **Description:** Phase 1 scaffolding includes PostgreSQL 17 and optional Keycloak 26 containers only. Object-storage container integration is deferred until Phase 4 (Secure Document Upload) when file storage APIs are implemented.
 - **Pros:** Keeps Phase 1 Docker Compose environment minimal and fast to start. Avoids premature container dependencies before file upload code exists.
 - **Cons:** Document storage container is not verified until Phase 4.
 
 ### Option 2: Local-Filesystem Adapter (Deferred to Phase 4)
+
 - **Description:** Implement a storage abstraction in NestJS with a local filesystem driver for development and an S3 driver for cloud/production when storage code is created in Phase 4.
 - **Pros:** Zero container overhead in local development. Extremely fast execution and simple local setup.
 - **Cons:** S3 API behavior (e.g. presigned URLs, S3 headers) is simulated rather than executed against a real S3 endpoint in local development.
 
 ### Option 3: Garage S3 Storage
+
 - **Description:** [Garage](https://garagehq.deuxfleurs.fr/) is an open-source, lightweight, self-hosted object-storage service written in Rust, licensed under **AGPLv3**.
 - **Pros:** Low resource consumption, native ARM64 / Apple Silicon support, clean single-binary distribution, simple configuration.
 - **Cons:** AGPLv3 licence requires legal review for distribution/hosting obligations; designed primarily for self-hosted cluster deployment.
 
 ### Option 4: SeaweedFS S3 Gateway
+
 - **Description:** [SeaweedFS](https://github.com/seaweedfs/seaweedfs) is an open-source, actively maintained distributed storage system with built-in S3 API gateway support written in Go, licensed under **Apache 2.0**.
 - **Pros:** Permissive Apache 2.0 licence, fast file handling, native ARM64 support, active open-source maintenance.
 - **Cons:** Multi-component architecture (Master, Volume, S3 Gateway) introduces slight configuration complexity for local development.
 
 ### Option 5: MinIO / MinIO AIStor Offerings
+
 - **Description:** [MinIO](https://min.io/) is an S3-compatible object storage server.
 - **Licensing & Upstream Status:** The open-source `minio/minio` repository is archived and is no longer an actively maintained open-source option for new platform adoption. MinIO AIStor Free may be available at no monetary cost for eligible single-node deployments. However, it is governed by proprietary licence terms and is not an open-source replacement for the archived `minio/minio` community repository. Its modification, redistribution, activation, deployment, and support terms must be reviewed before it can be considered for this project.
 - **Pros:** High S3 API compatibility, widely known tooling and documentation.
@@ -61,16 +66,16 @@ We need an architectural decision framework to evaluate object-storage options f
 
 ## Evaluation Matrix
 
-| Criterion | Option 1 (Defer to Ph 4) | Option 2 (LocalFS) | Option 3 (Garage) | Option 4 (SeaweedFS) | Option 5 (MinIO / AIStor) |
-|---|---|---|---|---|---|
-| **Phase 1 Dependency** | None | None | Docker container | Docker container | Docker container |
-| **Licence** | N/A | Apache-2.0 | AGPLv3 | Apache-2.0 | Archived AGPLv3 source / proprietary AIStor Free or commercial terms |
-| **S3 API Fidelity** | N/A | Simulated | High | High | Very High |
-| **Resource Footprint** | Zero | Near Zero | Very Low | Low | Moderate |
-| **ARM64 / Apple Silicon** | Native | Native | Native | Native | Native |
-| **Solo Developer Fit** | Excellent | Excellent | Good | Good | Fair |
+| Criterion                 | Option 1 (Defer to Ph 4) | Option 2 (LocalFS) | Option 3 (Garage) | Option 4 (SeaweedFS) | Option 5 (MinIO / AIStor)                                            |
+| ------------------------- | ------------------------ | ------------------ | ----------------- | -------------------- | -------------------------------------------------------------------- |
+| **Phase 1 Dependency**    | None                     | None               | Docker container  | Docker container     | Docker container                                                     |
+| **Licence**               | N/A                      | Apache-2.0         | AGPLv3            | Apache-2.0           | Archived AGPLv3 source / proprietary AIStor Free or commercial terms |
+| **S3 API Fidelity**       | N/A                      | Simulated          | High              | High                 | Very High                                                            |
+| **Resource Footprint**    | Zero                     | Near Zero          | Very Low          | Low                  | Moderate                                                             |
+| **ARM64 / Apple Silicon** | Native                   | Native             | Native            | Native               | Native                                                               |
+| **Solo Developer Fit**    | Excellent                | Excellent          | Good              | Good                 | Fair                                                                 |
 
-*Note: Qualitative resource footprint estimates must be benchmarked on the maintainer's Apple Silicon Mac before provider approval in Phase 4.*
+_Note: Qualitative resource footprint estimates must be benchmarked on the maintainer's Apple Silicon Mac before provider approval in Phase 4._
 
 ---
 

@@ -10,20 +10,20 @@
 
 ## Server Details
 
-| Field | Value |
-|---|---|
-| **Server Name** | [e.g. github-mcp-server] |
-| **Source / Repository** | [URL or npm package / Docker image tag] |
-| **Publisher / Maintainer** | [Official org, trusted vendor, open-source maintainer] |
-| **Transport Type** | stdio / Streamable HTTP / Docker stdio |
-| **Target Environment** | Local Development (Stages 1–3) / Staging / Production (Phase 15+) |
+| Field                      | Value                                                             |
+| -------------------------- | ----------------------------------------------------------------- |
+| **Server Name**            | [e.g. github-mcp-server]                                          |
+| **Source / Repository**    | [URL or npm package / Docker image tag]                           |
+| **Publisher / Maintainer** | [Official org, trusted vendor, open-source maintainer]            |
+| **Transport Type**         | stdio / Streamable HTTP / Docker stdio                            |
+| **Target Environment**     | Local Development (Stages 1–3) / Staging / Production (Phase 15+) |
 
 ## Proposed Tools and Capabilities
 
-| Tool Name | Scope / Action | Access Level | Purpose |
-|---|---|---|---|
-| [tool_1] | Read-only search | Read-only | [Description] |
-| [tool_2] | Read file contents | Read-only | [Description] |
+| Tool Name | Scope / Action     | Access Level | Purpose       |
+| --------- | ------------------ | ------------ | ------------- |
+| [tool_1]  | Read-only search   | Read-only    | [Description] |
+| [tool_2]  | Read file contents | Read-only    | [Description] |
 
 ## Security & Privacy Impact
 
