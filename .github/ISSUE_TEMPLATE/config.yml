@@ -2,4 +2,4 @@ blank_issues_enabled: false
 contact_links:
   - name: Report a Security Vulnerability
     url: https://github.com/Dy-Rongrath/Cambodia-Trusted-AI-Document-Platform/security/advisories/new
-    about: Submit a confidential security advisory under the Security tab. DO NOT report vulnerabilities in public issues! See SECURITY.md for details.
+    about: Documented route for submitting a confidential security advisory under the Security tab. (Requires owner Private Vulnerability Reporting verification). DO NOT report vulnerabilities in public issues! See SECURITY.md for details.

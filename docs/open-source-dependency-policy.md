@@ -17,7 +17,7 @@ Before adding any new dependency to `package.json`, `pyproject.toml`, Docker bas
 
 1. Search existing codebase and ADRs to confirm an equivalent capability does not already exist.
 2. Complete the dependency evaluation checklist below.
-3. For major or security-critical dependencies, submit an Architecture Decision Record (ADR) or task proposal for maintainer review ([AGENTS.md](file:///Users/dyrongrath/Documents/trusted-ai-platform/AGENTS.md) Section 7).
+3. For major or security-critical dependencies, submit an Architecture Decision Record (ADR) or task proposal for maintainer review ([AGENTS.md](../AGENTS.md) Section 7).
 
 ### Evaluation Checklist
 

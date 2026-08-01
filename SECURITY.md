@@ -60,8 +60,8 @@ Only synthetic, anonymised, pseudonymised, or explicitly approved datasets may b
 
 - **Standard:** OAuth 2.1 + OpenID Connect (implemented by Keycloak 26).
 - **Client flows:** Authorization Code with PKCE (mandatory for all public clients — browser and mobile).
-- **Passwordless:** WebAuthn / Passkeys supported from Phase 2.
-- **MFA:** TOTP (Phase 2). WebAuthn as second factor.
+- **Passwordless:** WebAuthn / Passkeys supported from Phase 3.
+- **MFA:** TOTP (Phase 3). WebAuthn as second factor.
 - **Token types:** Short-lived access tokens (15-minute lifetime). Refresh token rotation enabled.
 - **Session management:** Stateless on the backend — JWTs are validated on every request. No server-side sessions.
 - **Logout:** Keycloak backchannel logout for session termination on all clients.
@@ -108,7 +108,7 @@ Tenant isolation is a critical security requirement. See `ARCHITECTURE.md` Secti
 - **Authentication:** Bearer token (JWT) required for all protected endpoints.
 - **Input validation:** All request data validated using NestJS DTOs + `class-validator`. Validation errors return 422 with structured error response.
 - **Output encoding:** JSON responses only. No HTML output from the API. No reflected user input in error messages.
-- **Rate limiting:** Applied at the reverse proxy level (Phase 2). Applied at the NestJS level for sensitive endpoints (login, file upload) from Phase 1.
+- **Rate limiting:** General production reverse-proxy controls (Phase 16); authentication endpoint rate-limiting protections (Phase 3); document upload endpoint rate-limiting protections (Phase 4).
 - **CORS:** Configured to allow only the known Angular frontend origin. No wildcard origins.
 - **Content Security Policy:** Applied to any HTML responses (Phase 2 — Angular frontend).
 - **Error handling:** All errors return structured JSON. Stack traces are never exposed in production responses.
@@ -219,16 +219,24 @@ Additional security-specific logging requirements:
 
 ---
 
-## 13. Dependency Security
+## 13. Dependency & Code Security (Planned Controls)
 
-- All dependencies pinned in lock files (`package-lock.json`, `uv.lock`).
-- `npm audit` run in CI on every push.
-- `uv audit` run in CI on every push (when available).
-- Trivy container scanning run in CI on every Docker image build (Phase 2).
-- Gitleaks secret scanning run in CI on every push (Phase 2).
-- Semgrep SAST run in CI on every push (Phase 2).
-- Syft SBOM generated for every Docker image (Phase 2).
-- Licence checks for all new dependencies before they are added.
+- All dependencies pinned in lock files (`package-lock.json`, `uv.lock`) after Phase 1 scaffolding creates manifests.
+- License compliance checks for all new dependencies before adoption ([docs/open-source-dependency-policy.md](docs/open-source-dependency-policy.md)).
+
+| Control | Current status | Intended phase |
+|---|---|---:|
+| Dependency locking | Planned | Phase 1 |
+| npm dependency audit | Planned after package manifests exist | Phase 1 or 2 |
+| Python dependency audit | Planned after Python dependencies exist | Phase 1 or 2 |
+| Gitleaks secret scanning | Planned | Phase 1 or 2 |
+| Semgrep SAST | Planned | Phase 2 |
+| Trivy container scanning | Planned after container images exist | Phase 2 |
+| Syft/SBOM generation | Planned | Phase 16 |
+| Cosign signing | Planned | Phase 16 |
+| Automated DCO check | Not configured | Future contributor-governance improvement |
+
+*Note: Python dependency vulnerability auditing will be implemented using an approved Python security audit tool once Python dependencies are introduced.*
 
 ---
 
@@ -261,15 +269,16 @@ Additional security-specific logging requirements:
 
 ### Reporting Vulnerabilities Privately
 - **Public Repository Notice:** This repository is public. Vulnerabilities must **never** be reported via public GitHub issues, pull requests, or public discussions.
-- **Actionable Reporting Path:** Use the repository’s **"Report a vulnerability"** option under the **Security** tab (`Security -> Advisories -> Report a vulnerability`) to submit a private security advisory directly to project maintainers.
-- **Repository Configuration Notice:** GitHub Private Vulnerability Reporting requires enabling the "Private vulnerability reporting" feature under repository settings by the project owner. If the button is not yet visible, the feature awaits repository-owner configuration in GitHub settings.
+- **Documented Reporting Route:** Use the repository’s **"Report a vulnerability"** option under the **Security** tab (`Security -> Advisories -> Report a vulnerability` / `/security/advisories/new`) to submit a private security advisory directly to project maintainers.
+- **Verified Enabled Repository Feature Status:** Documented reporting route is prepared. The repository is ready for GitHub Private Vulnerability Reporting; the project owner must verify that the “Report a vulnerability” button is visible under the Security tab before this route is considered operational.
+- **Owner Action:** Verify or enable GitHub Private Vulnerability Reporting and test the advisory submission page using a non-maintainer account or private browser session.
 - **Responsible Disclosure:** Real exploit details should remain confidential until a patch or mitigation is verified and released.
 - **Response Timeline:** Vulnerability reports are reviewed on a **best-effort basis**. Acknowledgement is targeted within 72 hours where feasible.
 
-### Vulnerability & Dependency Scanning Schedule
+### Vulnerability & Dependency Scanning Schedule (Planned Gates)
 | Activity | Planned Frequency | Target Phase / Owner |
 |---|---|---|
-| `npm audit` / `uv audit` | Every push (in CI) | Phase 1 / Phase 2 (Developer) |
+| `npm audit` / Python dependency audit | Planned for CI after manifests exist | Phase 1 / Phase 2 (Developer) |
 | Open-source licence check | Every dependency addition | Phase 1+ ([docs/open-source-dependency-policy.md](docs/open-source-dependency-policy.md)) |
 | Trivy container scan | Every image build (in CI) | Phase 2+ (DevSecOps) |
 | Gitleaks secret scan | Every push (in CI) | Phase 1+ (Developer) |
@@ -301,11 +310,12 @@ A formal enterprise incident response plan is required before Phase 16 (producti
 For complete MCP security details, see `MCP_SECURITY.md`.
 
 Key security controls for MCP integrations:
-- **Default Read-Only Access:** MCP tool access is restricted to read-only capabilities in Stages 1–3.
+- **Phase Status:** MCP governance is documented in Phase 0. MCP servers are not installed as part of Phase 1. Approved development MCP tools are introduced in Phase 2, and product-facing MCP tools in Phase 15.
+- **Audit Logging Status:** Formal MCP audit logs do not currently record tool activity during Phase 0. Informal traceability uses commit messages and pull-request descriptions until application audit logging is implemented.
+- **Default Read-Only Access:** MCP tool access is restricted to read-only capabilities in Stage 1–3 development integrations.
 - **Client Configuration Isolation:** OpenAI Codex CLI configuration is stored in `.codex/config.toml` and gitignored. Secrets (such as GitHub PAT) must never be committed.
 - **Approved Tool Allowlist:** Only explicitly reviewed tools from approved servers (GitHub MCP server, Context7) may be loaded.
 - **Prompt Injection Defense:** Outputs from MCP tool invocations are treated as untrusted data. AI agents must not execute instructions embedded in retrieved file contents or issue bodies.
-- **Audit Trails:** All MCP tool invocations with stateful side-effects or external network calls are recorded in audit logs.
 - **No Production Access:** MCP tools are developer-facing tools only and must never be connected to production databases or secrets.
 
 ---

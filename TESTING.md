@@ -288,15 +288,17 @@ Every feature must be verifiable without a production environment. Tests are not
 ---
 
 
-## 3. Coverage Thresholds
+## 3. Proposed Coverage Thresholds (Planned Targets)
 
-| Project | Threshold | Metric |
+The following coverage thresholds represent proposed targets for future code components:
+
+| Project | Proposed Target | Metric |
 |---|---|---|
-| `apps/backend` | 80% | Line coverage |
-| `apps/ai-service` | 75% | Line coverage |
-| `apps/frontend` | 70% | Line coverage |
+| `apps/backend` | 80% (Proposed target) | Line coverage |
+| `apps/ai-service` | 75% (Proposed target) | Line coverage |
+| `apps/frontend` | 70% (Proposed target) | Line coverage |
 
-Coverage is measured in CI on every push. PRs that reduce coverage by more than 2% are flagged for review.
+Coverage measurement and enforcement are planned quality gates. They become active only after Phase 1 creates test suites and a CI workflow.
 
 ---
 

@@ -154,7 +154,7 @@ The following are explicitly out of scope until a later phase:
 | C-1 | **No real personal, government, NSSF, or confidential data** during development. | Security and privacy policy. |
 | C-2 | **No secrets in source code**, logs, tests, or documentation. | Security policy. |
 | C-3 | **No model is the final authority for credential authenticity.** Cryptographic verification is the source of truth. | AI governance policy. |
-| C-4 | **Open-Source Licensing:** Application code, infrastructure code, and documentation are licensed under the Apache License 2.0 (`SPDX-License-Identifier: Apache-2.0`). All major dependencies must have permissive open-source licences to avoid vendor lock-in. | Open-source policy. |
+| C-4 | **Open-Source Licensing:** Application code, infrastructure code, and documentation are licensed under the Apache License 2.0 (`SPDX-License-Identifier: Apache-2.0`). Every dependency and third-party asset must have a known licence and complete the project dependency-review process ([docs/open-source-dependency-policy.md](docs/open-source-dependency-policy.md)). Generally approved permissive licences may use normal maintainer review. Copyleft, weak-copyleft, source-available, custom, unlicensed, or commercially restricted terms require explicit maintainer and legal review before adoption. | Open-source policy. |
 | C-5 | **No Kubernetes until the platform works reliably in Docker Compose.** | Architecture principle. |
 | C-6 | **All security-sensitive changes require manual human review.** AI agents may not self-approve such changes. | AI-agent permission policy. |
 | C-7 | **TypeScript strict mode is mandatory** in all TypeScript code. | Coding standards. |
@@ -211,7 +211,7 @@ The following are explicitly out of scope until a later phase:
 
 - Monorepo scaffold (`apps/backend`, `apps/frontend`, `apps/ai-service`, `packages/shared-types`) created.
 - Root `package.json` with npm workspaces initialized.
-- Local Docker Compose environment boots cleanly with PostgreSQL 17, Keycloak 26, MinIO.
+- Local Docker Compose environment boots cleanly with PostgreSQL 17 and optional Keycloak 26 (object storage subject to ADR-0008).
 - NestJS backend and FastAPI AI service health endpoints operational.
 - Angular frontend placeholder builds and runs cleanly.
 - Basic GitHub Actions CI pipeline passes (lint, type-check, unit test).

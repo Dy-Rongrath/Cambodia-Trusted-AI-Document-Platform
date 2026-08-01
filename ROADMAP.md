@@ -23,7 +23,7 @@ Establish all foundation documents, repository structure, and governance rules b
 
 ### Scope
 - All foundation documents (`AGENTS.md`, `PROJECT_CONTEXT.md`, `ARCHITECTURE.md`, `SECURITY.md`, `MCP_SECURITY.md`, `DEVELOPMENT.md`, `TESTING.md`, `DATA_GOVERNANCE.md`, `AI_GOVERNANCE.md`, `ROADMAP.md`, `CONTRIBUTING.md`, `README.md`).
-- Open-source legal and community health files (`LICENSE` Apache-2.0, `DCO.md` DCO 1.1, `CODE_OF_CONDUCT.md` v2.1, `GOVERNANCE.md`, `SUPPORT.md`, `CHANGELOG.md`, `docs/open-source-dependency-policy.md`).
+- Open-source legal and community health files (`LICENSE` Apache-2.0, `DCO.md` DCO 1.1, `CODE_OF_CONDUCT.md` v3.0, `GOVERNANCE.md`, `SUPPORT.md`, `CHANGELOG.md`, `docs/open-source-dependency-policy.md`).
 - GitHub community templates (`.github/ISSUE_TEMPLATE/` issue forms, `.github/PULL_REQUEST_TEMPLATE.md`).
 - Repository configuration files (`.gitignore`, `.gitattributes`, `.nvmrc`).
 - Architecture documentation and initial ADRs (ADR-0001 through ADR-0007).
@@ -81,7 +81,7 @@ Create the monorepo scaffold, application skeletons, local Docker Compose enviro
 - Any AI model (Phase 6).
 
 ### Security requirements
-- Docker Compose may expose the frontend, backend, and Keycloak login endpoint to localhost for development. PostgreSQL, MinIO administration, the AI service, and internal infrastructure must remain on the private Docker network unless a documented development need requires otherwise.
+- Docker Compose may expose the frontend, backend, and Keycloak login endpoint to localhost for development. PostgreSQL, any future object-storage administration endpoint, the AI service, and internal infrastructure must remain on the private Docker network unless a documented development need requires otherwise.
 - `.env.example` must contain placeholder values only.
 - `docker-compose.yml` must not contain any secrets (use `${ENV_VAR}` references).
 

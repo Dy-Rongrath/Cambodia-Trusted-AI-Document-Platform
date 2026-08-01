@@ -40,10 +40,10 @@ This file (`AGENTS.md`) is the primary entry point and source of navigation for 
 - [LICENSE](LICENSE) — Apache License 2.0 terms and conditions.
 - [DCO.md](DCO.md) — Developer Certificate of Origin 1.1 sign-off rules.
 - [GOVERNANCE.md](GOVERNANCE.md) — Maintainer-led governance model, commercial neutrality, and trademark policy.
-- [CODE_OF_CONDUCT.md](CODE_OF_CONDUCT.md) — Contributor Covenant 2.1 standards and enforcement guidelines.
+- [CODE_OF_CONDUCT.md](CODE_OF_CONDUCT.md) — Contributor Covenant 3.0 standards and enforcement guidelines.
 - [SUPPORT.md](SUPPORT.md) — Best-effort community support policy.
 - [docs/open-source-dependency-policy.md](docs/open-source-dependency-policy.md) — Open-source dependency licensing and approval rules.
-- [docs/adr/](docs/adr/) — Architecture Decision Records (ADR-0001 through ADR-0007).
+- [docs/adr/](docs/adr/) — Architecture Decision Records (ADR-0001 through ADR-0008).
 - [docs/threat-model.md](docs/threat-model.md) — STRIDE threat model including MCP threat categories.
 - [docs/templates/](docs/templates/) — Reusable task templates for features, bug fixes, security reviews, database migrations, AI experiments, and MCP integrations.
 - [docs/roles/](docs/roles/) — Specialist AI role instructions.
@@ -129,7 +129,7 @@ This file (`AGENTS.md`) is the primary entry point and source of navigation for 
 ## 6. Open-Source & Licensing Rules
 
 - **Preserve Apache-2.0 Notices:** Maintain official Apache License 2.0 text in [LICENSE](LICENSE) without altering legal text. Project copyright is recorded in [NOTICE](NOTICE).
-- **Third-Party Standard Texts:** Third-party standard legal and community texts (DCO 1.1, Contributor Covenant v2.1) must retain their upstream copyright notices and attributions in [THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md) and must NOT be relicensed under Apache-2.0.
+- **Third-Party Standard Texts:** Third-party standard legal and community texts (DCO 1.1, Contributor Covenant 3.0) must retain their upstream copyright notices and attributions in [THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md) and must NOT be relicensed under Apache-2.0.
 - **Unified Dependency Licensing:** Every dependency and third-party asset must have a known licence and complete the project dependency-review process ([docs/open-source-dependency-policy.md](docs/open-source-dependency-policy.md)). Generally approved permissive licences (Apache-2.0, MIT, BSD, ISC, PostgreSQL, PSF-2.0) may be accepted through normal maintainer review. Copyleft, weak-copyleft, source-available, custom, unlicensed, or commercially restricted terms require explicit maintainer and legal review before adoption.
 - **No Unverified Repository Claims:** Do not claim GitHub repository settings (e.g. Private Vulnerability Reporting, GitHub Discussions, automated DCO bot) or automated CI scanners are active without verification.
 - **Local-First & Zero Paid Cloud:** Early-phase code and setup must run locally on Apple Silicon M5 without requiring paid cloud API keys or cloud subscriptions.

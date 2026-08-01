@@ -70,9 +70,9 @@ Every pull request must meet the following criteria:
 - **Clear Description:** Explains what changed and why, linking to relevant GitHub Issues.
 - **Tests Included:** Unit and integration tests cover success, failure, and security edge cases.
 - **Documentation Updated:** Relevant specifications, ADRs, or README files are updated to reflect the code changes.
-- **Zero Secrets:** Verified by local checks and Gitleaks (`.env` files or secret tokens strictly prohibited).
+- **Zero Secrets:** Automated secret scanning is not currently configured. Contributors and maintainers must manually inspect changes for credentials, tokens, private keys, personal data, and restricted configuration until a scanner is implemented (`.env` files or secret tokens strictly prohibited).
 - **No Real Data:** Synthetic data fixtures only.
-- **Dependency Compliance:** New dependencies and third-party assets have known licences, are pinned where appropriate, are documented, and complete the review process in [docs/open-source-dependency-policy.md](docs/open-source-dependency-policy.md).
+- **Dependency Compliance:** Every dependency and asset must have a known licence and complete the review process in [docs/open-source-dependency-policy.md](docs/open-source-dependency-policy.md). Generally approved permissive licences use normal maintainer review; copyleft, source-available, custom, or restricted terms require explicit maintainer and legal review.
 - **Architecture Compliance:** Architecture or auth changes include an approved ADR in `docs/adr/`.
 - **DCO Certification:** All commits include valid `Signed-off-by` lines (`git commit -s`).
 

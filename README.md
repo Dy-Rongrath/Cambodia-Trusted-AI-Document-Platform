@@ -87,10 +87,10 @@ The platform is designed to support local-first engineering and low-cost accessi
 | [ROADMAP.md](ROADMAP.md) | 16-phase implementation roadmap |
 | [LICENSE](LICENSE) | Official Apache License 2.0 legal text |
 | [NOTICE](NOTICE) | Project copyright and primary attribution notice |
-| [THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md) | Third-party legal and community text attributions (DCO 1.1, Contributor Covenant v2.1) |
+| [THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md) | Third-party legal and community text attributions (DCO 1.1, Contributor Covenant v3.0) |
 | [DCO.md](DCO.md) | Developer Certificate of Origin 1.1 sign-off guidelines |
 | [GOVERNANCE.md](GOVERNANCE.md) | Maintainer governance model, commercial neutrality, and trademark policy |
-| [CODE_OF_CONDUCT.md](CODE_OF_CONDUCT.md) | Contributor Covenant 2.1 community standards |
+| [CODE_OF_CONDUCT.md](CODE_OF_CONDUCT.md) | Contributor Covenant 3.0 community standards |
 | [SUPPORT.md](SUPPORT.md) | Best-effort community support policy |
 | [CHANGELOG.md](CHANGELOG.md) | Project release changelog and semver policy |
 | [CONTRIBUTING.md](CONTRIBUTING.md) | Contribution workflow, PR rules, and DCO sign-off requirements |
@@ -124,7 +124,7 @@ trusted-ai-platform/
 │   ├── ISSUE_TEMPLATE/       # Structured GitHub issue forms
 │   └── PULL_REQUEST_TEMPLATE.md # Pull request checklist & DCO verification
 ├── docs/
-│   ├── adr/                  # ADR-0001 through ADR-0007
+│   ├── adr/                  # ADR-0001 through ADR-0008
 │   ├── threat-model.md       # STRIDE threat model (including 15 MCP threats)
 │   ├── open-source-dependency-policy.md # Dependency licensing rules
 │   ├── templates/            # Task templates
@@ -144,7 +144,7 @@ trusted-ai-platform/
 ├── THIRD_PARTY_NOTICES.md    # Third-party standard legal text attributions
 ├── DCO.md                    # Developer Certificate of Origin 1.1 rules
 ├── GOVERNANCE.md             # Maintainer governance & trademark policy
-├── CODE_OF_CONDUCT.md        # Contributor Covenant 2.1 standards
+├── CODE_OF_CONDUCT.md        # Contributor Covenant 3.0 standards
 ├── SUPPORT.md                # Best-effort community support policy
 ├── CHANGELOG.md              # Project changelog (semver pre-release)
 ├── CONTRIBUTING.md           # Contribution guidelines & PR checklist
@@ -175,7 +175,9 @@ trusted-ai-platform/
 
 ## Contributing & Developer Setup
 
-We welcome community contributions! Please review our contribution guides before submitting a pull request:
+The repository is open for review and limited contributions. Full external contributor onboarding remains pending configuration of a private conduct reporting channel.
+
+Please review our contribution guides before submitting a pull request:
 
 1. Read [AGENTS.md](AGENTS.md) and [CONTRIBUTING.md](CONTRIBUTING.md).
 2. Check open issues or create a new issue using our [GitHub Issue Templates](.github/ISSUE_TEMPLATE/).
