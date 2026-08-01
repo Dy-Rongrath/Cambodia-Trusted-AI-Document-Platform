@@ -23,6 +23,14 @@ vault-token
 kubeconfig
 *.kubeconfig
 
+# MCP (Model Context Protocol) Secrets and Client Configs
+.codex/config.toml
+.codex/
+.mcp-credentials
+mcp-server-config.json
+.cursor/mcp.json
+
+
 # =============================================================================
 # NODE.JS / NPM / PNPM
 # =============================================================================

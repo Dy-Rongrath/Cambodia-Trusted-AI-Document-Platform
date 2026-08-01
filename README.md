@@ -15,16 +15,18 @@ All foundation documents have been created. The platform is ready for Phase 1 (c
 | Document | Purpose |
 |---|---|
 | [PROJECT_CONTEXT.md](PROJECT_CONTEXT.md) | Product purpose, users, scope, glossary, and success criteria |
-| [ARCHITECTURE.md](ARCHITECTURE.md) | System design, module responsibilities, trust boundaries, and data flows |
+| [ARCHITECTURE.md](ARCHITECTURE.md) | System design, module responsibilities, trust boundaries, data flows, and MCP boundary |
 | [SECURITY.md](SECURITY.md) | Security policy, controls, and incident response |
-| [DEVELOPMENT.md](DEVELOPMENT.md) | Local setup, coding standards, and definition of done |
-| [TESTING.md](TESTING.md) | Testing strategy, quality gates, and coverage thresholds |
+| [MCP_SECURITY.md](MCP_SECURITY.md) | Model Context Protocol security rules, tool governance, and client setup |
+| [DEVELOPMENT.md](DEVELOPMENT.md) | Local setup, coding standards, MCP dev workflow, definition of done |
+| [TESTING.md](TESTING.md) | Testing strategy, quality gates, coverage thresholds, MCP security testing |
 | [DATA_GOVERNANCE.md](DATA_GOVERNANCE.md) | Data sourcing rules, lineage, retention, and governance |
-| [AI_GOVERNANCE.md](AI_GOVERNANCE.md) | Permitted AI uses, human oversight, model governance, and responsible-AI commitments |
-| [ROADMAP.md](ROADMAP.md) | 14-phase implementation plan |
-| [docs/adr/](docs/adr/) | Architecture Decision Records |
-| [docs/threat-model.md](docs/threat-model.md) | STRIDE threat model |
-| [docs/templates/](docs/templates/) | Reusable task templates |
+| [AI_GOVERNANCE.md](AI_GOVERNANCE.md) | Permitted AI uses, human oversight, model governance, responsible-AI commitments |
+| [CONTRIBUTING.md](CONTRIBUTING.md) | Contribution guidelines, PR requirements, and security rules |
+| [ROADMAP.md](ROADMAP.md) | 16-phase implementation plan |
+| [docs/adr/](docs/adr/) | Architecture Decision Records (ADR-0001 through ADR-0007) |
+| [docs/threat-model.md](docs/threat-model.md) | STRIDE threat model (including MCP threat categories) |
+| [docs/templates/](docs/templates/) | Reusable task templates (feature, bug-fix, mcp-integration, mcp-review, etc.) |
 | [docs/roles/](docs/roles/) | Specialist AI agent role instructions |
 | [.agents/AGENTS.md](.agents/AGENTS.md) | AI-agent guardrails and approval boundaries |
 
@@ -35,9 +37,11 @@ All foundation documents have been created. The platform is ready for Phase 1 (c
 | Backend | Node.js 24 · TypeScript · NestJS · PostgreSQL 17 · Prisma |
 | AI Service | Python 3.12 · FastAPI · PyTorch · Hugging Face Transformers · uv |
 | Frontend | Angular · TypeScript · Angular Signals |
-| Mobile | Flutter (Phase 11) |
+| Mobile | Flutter (Phase 12) |
+| AI Development | Model Context Protocol (MCP) · OpenAI Codex CLI · GitHub MCP · Context7 |
 | Authentication | Keycloak 26 · OAuth 2.1 · OIDC · WebAuthn / Passkeys |
-| Infrastructure | Docker · Docker Compose · (Kubernetes in Phase 14) |
+| Infrastructure | Docker · Docker Compose · (Kubernetes in Phase 16) |
+
 
 ## Repository structure
 

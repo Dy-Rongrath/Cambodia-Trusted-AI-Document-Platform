@@ -447,4 +447,45 @@ Introduced incrementally. See `ROADMAP.md` for phase targets.
 
 ---
 
+## 18. Model Context Protocol (MCP) Integration Boundary
+
+MCP serves as an **AI-assisted development integration layer**, NOT as the primary application architecture or service-to-service communication framework.
+
+```mermaid
+flowchart TD
+    subgraph DeveloperWorkstation ["Developer Workstation (Local)"]
+        CodexCLI["Codex CLI (MCP Client)"]
+        CodexConfig[".codex/config.toml (Gitignored)"]
+        
+        subgraph LocalMCPServers ["Local MCP Servers (stdio / Docker)"]
+            GitHubMCP["GitHub MCP Server (Docker: ghcr.io/github/github-mcp-server)"]
+            Context7["Context7 MCP (@upstash/context7-mcp)"]
+        end
+    end
+
+    subgraph ExternalServices ["External Services"]
+        GitHubAPI["GitHub API (api.github.com)"]
+        UpstashDocs["Context7 Docs API"]
+    end
+
+    CodexCLI -->|Reads config| CodexConfig
+    CodexCLI -->|stdio / Docker JSON-RPC| GitHubMCP
+    CodexCLI -->|stdio JSON-RPC| Context7
+    GitHubMCP -->|HTTPS PAT Read-Only| GitHubAPI
+    Context7 -->|HTTPS Read-Only| UpstashDocs
+
+    style DeveloperWorkstation fill:#f9f9f9,stroke:#333,stroke-width:2px;
+    style LocalMCPServers fill:#e1f5fe,stroke:#0288d1,stroke-width:1px;
+    style ExternalServices fill:#fff3e0,stroke:#f57c00,stroke-width:1px;
+```
+
+### Key Architectural Boundaries for MCP
+1. **Separation from Production Runtime:** MCP servers are developer tools in Stages 1–3 and never connect to production databases or services.
+2. **Protocol Boundary:** MCP operates via JSON-RPC over stdio or Docker process pipes.
+3. **Identity & Authorization:** Local MCP tools run under the developer's personal access credentials (e.g. read-only GitHub PAT), never system service accounts.
+4. **Data Isolation:** Application business logic, NestJS modules, and database repositories do not invoke MCP servers. MCP wraps external context for the AI agent, not application code.
+
+---
+
 *See `docs/adr/` for all Architecture Decision Records that underpin this design.*
+

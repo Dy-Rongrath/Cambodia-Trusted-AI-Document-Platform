@@ -246,6 +246,21 @@ Every feature must be verifiable without a production environment. Tests are not
 
 ---
 
+### 2.14 Model Context Protocol (MCP) Security and Tool Testing
+
+**Scope:** Verify that MCP tools, permissions, input sanitisation, and security boundaries operate as intended.
+
+**What to test:**
+- **MCP Tool Permission Enforcement:** Verify that read-only MCP tools reject write attempts and restricted path access.
+- **MCP Input Validation:** Verify that MCP tools validate input schemas and reject malformed or out-of-bounds parameters.
+- **MCP Prompt Injection Resilience:** Test agent behaviour when retrieved tool outputs contain adversarial prompt injection instructions (e.g. injected instructions in repository files or GitHub issues). Verify the agent treats output strictly as untrusted data.
+- **MCP Audit Logging:** Verify that all stateful MCP operations and external server calls generate structured audit log entries.
+- **MCP Failure Modes:** Test agent graceful degradation when an MCP server times out or disconnects (agent must continue working without crashing).
+- **MCP Configuration Validation:** Run pre-commit checks to verify `.codex/config.toml` and `.mcp-credentials` are present in `.gitignore` and not committed.
+
+---
+
+
 ## 3. Coverage Thresholds
 
 | Project | Threshold | Metric |
