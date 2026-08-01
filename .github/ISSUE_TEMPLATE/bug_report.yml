@@ -7,6 +7,14 @@ body:
     attributes:
       value: |
         Thank you for reporting a bug! Please ensure no secrets or real personal/government data are included in this issue.
+        Note: If this is a security vulnerability, do NOT use this form — see SECURITY.md to report confidentially.
+  - type: checkboxes
+    id: non_security_check
+    attributes:
+      label: Vulnerability Confirmation
+      options:
+        - label: I confirm that this is a bug report and NOT a security vulnerability disclosure.
+          required: true
   - type: textarea
     id: description
     attributes:
@@ -15,6 +23,20 @@ body:
       placeholder: Describe what happened...
     validations:
       required: true
+  - type: input
+    id: affected_component
+    attributes:
+      label: Affected Component or Service
+      placeholder: e.g. apps/backend, apps/ai-service, apps/frontend, infra/docker
+    validations:
+      required: false
+  - type: input
+    id: repo_version
+    attributes:
+      label: Repository Commit or Version
+      placeholder: e.g. commit hash or branch (e.g. main @ 6c1f33c)
+    validations:
+      required: false
   - type: textarea
     id: reproduction
     attributes:
@@ -44,28 +66,21 @@ body:
     id: os
     attributes:
       label: Operating System
-      placeholder: e.g. macOS Sequoia (Apple Silicon M5), Ubuntu 24.04
+      placeholder: e.g. macOS Sequoia, Ubuntu 24.04, Windows 11
     validations:
       required: false
   - type: input
-    id: cpu
+    id: cpu_arch
     attributes:
-      label: CPU Architecture
-      placeholder: e.g. arm64 / Apple Silicon, x86_64
+      label: CPU Architecture / Apple Silicon / ARM64 Compatibility
+      placeholder: e.g. Apple Silicon (ARM64), Linux ARM64, x86_64
     validations:
       required: false
   - type: input
-    id: node_version
+    id: node_python_version
     attributes:
-      label: Node.js Version (where applicable)
-      placeholder: e.g. 24.15.0
-    validations:
-      required: false
-  - type: input
-    id: python_version
-    attributes:
-      label: Python Version (where applicable)
-      placeholder: e.g. 3.12.2
+      label: Node.js / Python / Browser Version
+      placeholder: e.g. Node 24.15.0, Python 3.12, Chrome 125
     validations:
       required: false
   - type: textarea

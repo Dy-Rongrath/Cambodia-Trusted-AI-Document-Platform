@@ -14,6 +14,17 @@ body:
       placeholder: e.g. ARCHITECTURE.md, TESTING.md, docs/threat-model.md
     validations:
       required: true
+  - type: dropdown
+    id: doc_category
+    attributes:
+      label: Documentation Issue Category
+      options:
+        - "General documentation improvement"
+        - "Legal or licensing correction"
+        - "Security documentation correction"
+        - "Time-sensitive version or status information"
+    validations:
+      required: true
   - type: textarea
     id: issue_details
     attributes:
@@ -32,15 +43,6 @@ body:
     id: evidence
     attributes:
       label: Source or Evidence
-      description: Reference ADRs, roadmap phases, or official specification links supporting this fix.
-    validations:
-      required: false
-  - type: dropdown
-    id: time_sensitivity
-    attributes:
-      label: Time Sensitivity
-      options:
-        - "Phase 0 / Phase 1 immediate blocker"
-        - "General documentation improvement"
+      description: Reference ADRs, roadmap phases, official legal text, or specification links supporting this fix.
     validations:
       required: false

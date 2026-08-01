@@ -36,25 +36,30 @@ body:
       placeholder: e.g. Phase 1, Phase 4, Phase 6
     validations:
       required: false
+  - type: checkboxes
+    id: platform_affected
+    attributes:
+      label: Affected Platforms & Architectures
+      options:
+        - label: Apple Silicon (ARM64)
+        - label: Linux ARM64
+        - label: Linux x86_64
+        - label: macOS
+        - label: Windows
+        - label: Local resource consumption / Low-budget impact
+  - type: textarea
+    id: platform_compatibility
+    attributes:
+      label: Platform and CPU Architecture Compatibility
+      description: Explain how this feature performs on ARM64 / Apple Silicon and lightweight local environments.
+      placeholder: e.g. Native ARM64 support, low CPU/RAM footprint...
+    validations:
+      required: false
   - type: textarea
     id: security_impact
     attributes:
       label: Security & Privacy Impact
       description: Does this feature touch authentication, tenant isolation, document storage, AI predictions, or credential signing?
-    validations:
-      required: false
-  - type: textarea
-    id: resource_impact
-    attributes:
-      label: Resource & Cost Impact
-      description: Does this require paid cloud infrastructure or heavy local resources? (Local-first & zero paid cloud preferred)
-    validations:
-      required: false
-  - type: input
-    id: apple_silicon_impact
-    attributes:
-      label: Apple Silicon M5 Compatibility
-      placeholder: e.g. Confirmed native ARM64 support
     validations:
       required: false
   - type: dropdown
