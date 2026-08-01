@@ -1,3 +1,12 @@
+# Phase 1 — datasource and generator configuration only.
+#
+# No application model is defined in Phase 1.
+# Prisma Client is generated without models using --allow-no-models.
+# The $queryRaw raw-query method (SELECT 1) is used for connectivity testing.
+#
+# Business models are introduced in later phases when application schema
+# design begins under explicit human approval.
+
 datasource db {
   provider = "postgresql"
   url      = env("DATABASE_URL")
@@ -5,10 +14,4 @@ datasource db {
 
 generator client {
   provider = "prisma-client-js"
-}
-
-/// Phase 1 scaffold model for Prisma Client generation without business logic.
-model PlatformScaffold {
-  id        Int      @id @default(autoincrement())
-  createdAt DateTime @default(now())
 }
