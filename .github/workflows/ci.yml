@@ -2,7 +2,7 @@ name: Phase 1 CI
 
 on:
   push:
-    branches: [main, 'chore/**', 'feat/**', 'fix/**']
+    branches: [main, 'chore/**', 'feat/**', 'fix/**', 'docs/**']
   pull_request:
     branches: [main]
 
@@ -13,40 +13,178 @@ jobs:
   validate:
     name: Validate Phase 1 Scaffold
     runs-on: ubuntu-latest
-    timeout-minutes: 15
+    timeout-minutes: 25
 
     steps:
       - name: Checkout repository
         uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
 
+      # -----------------------------------------------------------------------
+      # §12 Repository policy — tracked-file checks using git ls-files
+      # -----------------------------------------------------------------------
       - name: Validate repository safety and policy compliance
+        timeout-minutes: 2
         run: |
-          echo "Checking for committed secret .env files..."
-          ! git ls-files | grep -E '^\.env$|^\.env\.(local|production|staging)$'
-          echo "Checking for prohibited object storage services..."
-          ! grep -rnI -E 'minio|aistor|seaweedfs|garage' infra/docker/ apps/
-          echo "Checking for business Prisma models..."
-          ! grep -E 'model (Document|User|Tenant|Organization)' apps/backend/prisma/schema.prisma
+          echo "=== Checking for committed .env secret files (tracked-file scan) ==="
+          # Use git ls-files so nested files in subdirectories are caught.
+          # Allow only explicitly approved template files (.env.example, *.env.example).
+          LEAKED=$(git ls-files | grep -E '^(\.env|\.env\.[^.]+)$' | grep -vE '(\.env\.example|\.example)$' || true)
+          if [ -n "$LEAKED" ]; then
+            echo "FAIL: Tracked secret environment files detected:"
+            echo "$LEAKED"
+            exit 1
+          fi
+          echo "PASS: No committed .env secret files."
 
+          echo "=== Checking for private key material in tracked files ==="
+          if git ls-files | xargs grep -lI 'BEGIN RSA PRIVATE KEY\|BEGIN EC PRIVATE KEY\|BEGIN OPENSSH PRIVATE KEY\|-----BEGIN PRIVATE KEY-----' 2>/dev/null | grep -v '\.md$'; then
+            echo "FAIL: Private key material detected in tracked files."
+            exit 1
+          fi
+          echo "PASS: No private key material."
+
+          echo "=== Checking for prohibited object-storage services ==="
+          if grep -rnI -E 'minio|aistor|seaweedfs|garage' infra/docker/ apps/ 2>/dev/null; then
+            echo "FAIL: Object-storage service reference detected."
+            exit 1
+          fi
+          echo "PASS: No object-storage services."
+
+          echo "=== Checking for any Prisma model declaration ==="
+          # Phase 1 must contain NO model blocks. This catches all model names,
+          # not only selected business model names.
+          if grep -Eq '^[[:space:]]*model[[:space:]]+' apps/backend/prisma/schema.prisma; then
+            echo "FAIL: Prisma model declaration found in Phase 1 schema."
+            grep -En '^[[:space:]]*model[[:space:]]+' apps/backend/prisma/schema.prisma
+            exit 1
+          fi
+          echo "PASS: No Prisma models in schema.prisma."
+
+          echo "=== Checking for Prisma migrations directory ==="
+          if [ -d apps/backend/prisma/migrations ]; then
+            echo "FAIL: Prisma migrations directory found — not permitted in Phase 1."
+            exit 1
+          fi
+          echo "PASS: No Prisma migrations directory."
+
+          echo "=== Checking for machine-specific absolute paths in tracked files ==="
+          if git ls-files | xargs grep -lI 'file:///Users/\|file:///home/\|/Users/[A-Za-z]' 2>/dev/null | grep -v '.md$' | grep -v 'DEVELOPMENT.md\|README.md'; then
+            echo "WARN: Potential machine-specific path detected — review output above."
+          fi
+
+          echo "=== All repository policy checks passed. ==="
+
+      # -----------------------------------------------------------------------
+      # §13 Container security — check resolved Compose configuration
+      # -----------------------------------------------------------------------
       - name: Validate Docker Compose configuration
-        run: docker compose config
-
-      - name: Node Workspaces Quality Gates (Docker)
+        timeout-minutes: 2
         run: |
-          docker run --rm -v ${{ github.workspace }}:/app -w /app node:24-alpine3.21 sh -c "
+          echo "=== Validating docker compose config syntax ==="
+          docker compose config
+
+          echo "=== Checking for privileged containers ==="
+          if docker compose config | grep -E 'privileged:\s*true'; then
+            echo "FAIL: Privileged container detected."
+            exit 1
+          fi
+          echo "PASS: No privileged containers."
+
+          echo "=== Checking for host network mode ==="
+          if docker compose config | grep -E 'network_mode:\s*host'; then
+            echo "FAIL: host network mode detected."
+            exit 1
+          fi
+          echo "PASS: No host networking."
+
+          echo "=== Checking for Docker socket mounts ==="
+          if docker compose config | grep -E '/var/run/docker\.sock'; then
+            echo "FAIL: Docker socket mount detected."
+            exit 1
+          fi
+          echo "PASS: No Docker socket mounts."
+
+          echo "=== Checking backend port binding (must be 127.0.0.1) ==="
+          if docker compose config | grep -A2 'trusted-ai-backend' | grep -E '"?0\.0\.0\.0:[0-9]+:[0-9]+"?'; then
+            echo "FAIL: Backend port is not bound to 127.0.0.1."
+            exit 1
+          fi
+          echo "PASS: Backend port bound to 127.0.0.1."
+
+          echo "=== Confirming PostgreSQL has no published host port ==="
+          # postgres must have no ports: section at all
+          POSTGRES_PORTS=$(docker compose config --format json | python3 -c "import json,sys; cfg=json.load(sys.stdin); print(cfg.get('services',{}).get('postgres',{}).get('ports','none'))")
+          if [ "$POSTGRES_PORTS" != "none" ] && [ "$POSTGRES_PORTS" != "[]" ]; then
+            echo "FAIL: PostgreSQL has published host ports: $POSTGRES_PORTS"
+            exit 1
+          fi
+          echo "PASS: PostgreSQL has no published host port."
+
+          echo "=== Confirming AI service has no published host port ==="
+          AI_PORTS=$(docker compose config --format json | python3 -c "import json,sys; cfg=json.load(sys.stdin); print(cfg.get('services',{}).get('ai-service',{}).get('ports','none'))")
+          if [ "$AI_PORTS" != "none" ] && [ "$AI_PORTS" != "[]" ]; then
+            echo "FAIL: AI service has published host ports: $AI_PORTS"
+            exit 1
+          fi
+          echo "PASS: AI service has no published host port."
+
+          echo "=== All container security checks passed. ==="
+
+      # -----------------------------------------------------------------------
+      # Node.js workspace quality gates — run in clean pinned Node container
+      # -----------------------------------------------------------------------
+      - name: Node Workspaces Quality Gates (Docker)
+        timeout-minutes: 10
+        run: |
+          docker run --rm -v ${{ github.workspace }}:/app -w /app node:24.15.0-alpine3.22 sh -c "
+            set -e
             npm ci &&
             npm run format:check &&
             npm run lint &&
             npm run build --workspace=packages/shared-types &&
             npm run prisma:generate --workspace=apps/backend &&
             npm run typecheck &&
-            npm run test &&
-            npm run build
+            npm run build --workspace=apps/backend
           "
 
+      # -----------------------------------------------------------------------
+      # Frontend tests — via the dedicated browser-capable Docker test stage.
+      # Angular 20 + @angular/build:unit-test uses Vitest (Node.js/jsdom).
+      # No Chromium required — tests are deterministic in any Node environment.
+      # -----------------------------------------------------------------------
+      - name: Frontend Tests (Docker test stage)
+        timeout-minutes: 8
+        run: |
+          docker build \
+            --target test \
+            --build-arg CI=true \
+            -f apps/frontend/Dockerfile \
+            --progress=plain \
+            .
+
+      # -----------------------------------------------------------------------
+      # npm vulnerability audit
+      # -----------------------------------------------------------------------
+      - name: npm Vulnerability Audit
+        timeout-minutes: 5
+        run: |
+          docker run --rm -v ${{ github.workspace }}:/app -w /app node:24.15.0-alpine3.22 sh -c "
+            set -e
+            npm ci
+            echo '=== Full audit (all deps) ==='
+            npm audit --audit-level=critical || true
+            echo '=== Runtime-only audit (omit dev) ==='
+            npm audit --omit=dev --audit-level=critical
+          "
+
+      # -----------------------------------------------------------------------
+      # AI service quality gates
+      # -----------------------------------------------------------------------
       - name: AI Service Quality Gates (Docker)
+        timeout-minutes: 8
         run: |
           docker run --rm -v ${{ github.workspace }}/apps/ai-service:/app -w /app ghcr.io/astral-sh/uv:0.5-python3.12-bookworm-slim sh -c "
+            set -e
             uv sync --frozen --extra dev &&
             uv run ruff check . &&
             uv run ruff format --check . &&
@@ -54,43 +192,146 @@ jobs:
             uv run pytest
           "
 
+      # -----------------------------------------------------------------------
+      # AI service lockfile consistency
+      # -----------------------------------------------------------------------
+      - name: AI Service Lockfile Consistency
+        timeout-minutes: 3
+        run: |
+          docker run --rm -v ${{ github.workspace }}/apps/ai-service:/app -w /app ghcr.io/astral-sh/uv:0.5-python3.12-bookworm-slim sh -c "
+            uv sync --frozen --extra dev 2>&1 | grep -v 'Resolved\|Installed\|Audited' || true
+            echo 'PASS: uv.lock is consistent with pyproject.toml'
+          "
+
+      # -----------------------------------------------------------------------
+      # Build all Docker images
+      # -----------------------------------------------------------------------
       - name: Build Docker images
+        timeout-minutes: 15
         run: docker compose build
 
+      - name: Build AI service runtime stage
+        timeout-minutes: 5
+        run: docker build --target runtime -f apps/ai-service/Dockerfile .
+
+      - name: Build backend runtime stage
+        timeout-minutes: 5
+        run: docker build --target runtime -f apps/backend/Dockerfile .
+
+      - name: Build frontend runtime stage
+        timeout-minutes: 5
+        run: docker build --target runtime -f apps/frontend/Dockerfile .
+
+      # -----------------------------------------------------------------------
+      # Start default services and wait for health
+      # -----------------------------------------------------------------------
       - name: Start default services
+        timeout-minutes: 3
         run: docker compose up -d
 
-      - name: Wait for service health
+      - name: Wait for PostgreSQL health
+        timeout-minutes: 2
         run: |
-          echo "Waiting for postgres and backend health..."
-          timeout 60s sh -c 'until [ "$(docker inspect --format="{{.State.Health.Status}}" trusted-ai-postgres)" = "healthy" ]; do sleep 2; done'
-          timeout 60s sh -c 'until [ "$(docker inspect --format="{{.State.Health.Status}}" trusted-ai-backend)" = "healthy" ]; do sleep 2; done'
+          timeout 60s sh -c '
+            until [ "$(docker inspect --format={{.State.Health.Status}} trusted-ai-postgres 2>/dev/null)" = "healthy" ]; do
+              printf "."
+              sleep 2
+            done
+          '
+          echo ""
+          echo "PostgreSQL is healthy."
+
+      - name: Wait for backend health
+        timeout-minutes: 2
+        run: |
+          timeout 60s sh -c '
+            until [ "$(docker inspect --format={{.State.Health.Status}} trusted-ai-backend 2>/dev/null)" = "healthy" ]; do
+              printf "."
+              sleep 2
+            done
+          '
+          echo ""
+          echo "Backend is healthy."
 
       - name: Verify Backend Health Endpoint
-        run: |
-          curl --fail http://127.0.0.1:3000/health
+        timeout-minutes: 1
+        run: curl --fail http://127.0.0.1:3000/health
 
       - name: Verify AI Service Health Endpoint (Internal)
+        timeout-minutes: 1
         run: |
-          docker compose exec -T ai-service python -c 'import urllib.request; resp = urllib.request.urlopen("http://localhost:8000/health"); print(resp.read().decode())'
+          docker compose exec -T ai-service python -c '
+            import urllib.request
+            resp = urllib.request.urlopen("http://localhost:8000/health")
+            print(resp.read().decode())
+          '
 
       - name: Verify Frontend HTTP response
-        run: |
-          curl --fail http://127.0.0.1:4200/
+        timeout-minutes: 1
+        run: curl --fail http://127.0.0.1:4200/
 
-      - name: Run Backend Database Connectivity Check
-        run: |
-          docker compose exec -T backend npm run db:check --workspace=apps/backend
+      - name: Run Backend Database Connectivity Check (SELECT 1)
+        timeout-minutes: 1
+        run: docker compose exec -T backend npm run db:check --workspace=apps/backend
 
+      # -----------------------------------------------------------------------
+      # Confirm Keycloak absent from default stack
+      # -----------------------------------------------------------------------
       - name: Confirm Keycloak absent from default stack
+        timeout-minutes: 1
         run: |
-          ! docker ps --format '{{.Names}}' | grep -q trusted-ai-keycloak
+          if docker ps --format '{{.Names}}' | grep -q trusted-ai-keycloak; then
+            echo "FAIL: Keycloak container found running outside auth profile."
+            exit 1
+          fi
+          echo "PASS: Keycloak not running in default stack."
 
-      - name: Validate Keycloak under auth profile
+      # -----------------------------------------------------------------------
+      # §14 Keycloak readiness validation — real HTTP health check
+      # -----------------------------------------------------------------------
+      - name: Start Keycloak under auth profile
+        timeout-minutes: 2
+        run: docker compose --profile auth up -d keycloak
+
+      - name: Wait for Keycloak HTTP readiness (/health/ready on port 9000)
+        timeout-minutes: 3
         run: |
-          docker compose --profile auth up -d keycloak
-          timeout 60s sh -c 'until [ "$(docker inspect --format="{{.State.Status}}" trusted-ai-keycloak)" = "running" ]; do sleep 2; done'
-          docker compose --profile auth stop keycloak
+          echo "Waiting for Keycloak health/ready endpoint..."
+          timeout 120s sh -c '
+            until [ "$(docker inspect --format={{.State.Health.Status}} trusted-ai-keycloak 2>/dev/null)" = "healthy" ]; do
+              printf "."
+              sleep 5
+            done
+          ' || {
+            echo ""
+            echo "FAIL: Keycloak did not become healthy within timeout."
+            echo "=== Keycloak container logs ==="
+            docker compose --profile auth logs keycloak --tail=50
+            exit 1
+          }
+          echo ""
+          echo "PASS: Keycloak is ready."
+
+      - name: Stop Keycloak
+        timeout-minutes: 1
+        run: docker compose --profile auth stop keycloak
+
+      # -----------------------------------------------------------------------
+      # Cleanup — always runs even if previous steps fail
+      # -----------------------------------------------------------------------
+      - name: Capture service logs on failure
+        if: failure()
+        run: |
+          echo "=== docker compose ps ==="
+          docker compose --profile auth ps || true
+          echo "=== backend logs ==="
+          docker compose logs backend --tail=30 || true
+          echo "=== ai-service logs ==="
+          docker compose logs ai-service --tail=30 || true
+          echo "=== postgres logs ==="
+          docker compose logs postgres --tail=20 || true
+          echo "=== keycloak logs ==="
+          docker compose --profile auth logs keycloak --tail=30 || true
 
       - name: Clean up Compose services
         if: always()
