@@ -25,10 +25,9 @@ RUN npm run build --workspace=apps/backend
 FROM base AS runtime
 ENV NODE_ENV=production
 USER node
-COPY --chown=node:node --from=dependencies /app/node_modules ./node_modules
+COPY --chown=node:node --from=build /app/node_modules ./node_modules
 COPY --chown=node:node --from=build /app/packages/shared-types ./packages/shared-types
 COPY --chown=node:node --from=build /app/apps/backend/dist ./apps/backend/dist
-COPY --chown=node:node --from=build /app/apps/backend/node_modules ./apps/backend/node_modules
 COPY --chown=node:node --from=build /app/apps/backend/package.json ./apps/backend/package.json
 
 EXPOSE 3000
