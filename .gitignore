@@ -1,0 +1,257 @@
+###############################################################################
+# trusted-ai-platform — .gitignore
+# Covers: Node.js · Python · Docker · IDE · Secrets · ML models · Datasets
+###############################################################################
+
+# =============================================================================
+# SECRETS AND ENVIRONMENT — NEVER COMMIT THESE
+# =============================================================================
+.env
+.env.*
+!.env.example
+!.env.*.example
+*.pem
+*.key
+*.p12
+*.pfx
+*.crt
+*.cer
+*.der
+secrets/
+.secrets/
+vault-token
+kubeconfig
+*.kubeconfig
+
+# =============================================================================
+# NODE.JS / NPM / PNPM
+# =============================================================================
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+.npm/
+.pnpm-store/
+.yarn/
+# Build output
+dist/
+build/
+out/
+.next/
+.nuxt/
+.cache/
+# Coverage
+coverage/
+.nyc_output/
+# TypeScript
+*.tsbuildinfo
+# Lock files — commit package-lock.json and pnpm-lock.yaml, but not both
+# (keep whichever matches your chosen package manager)
+
+# =============================================================================
+# PYTHON
+# =============================================================================
+# Virtual environments
+.venv/
+venv/
+env/
+ENV/
+.env/
+# uv
+.python-version
+# pyenv
+.python-version
+# Byte-compiled / optimised
+__pycache__/
+*.py[cod]
+*$py.class
+*.pyo
+*.pyd
+# Distribution / packaging
+.eggs/
+*.egg-info/
+dist/
+build/
+*.egg
+MANIFEST
+# Testing
+.pytest_cache/
+.coverage
+htmlcov/
+.tox/
+.nox/
+# mypy
+.mypy_cache/
+# ruff cache
+.ruff_cache/
+# Jupyter
+.ipynb_checkpoints/
+# Type stubs
+*.pyi
+!py.typed
+# uv lock file — DO commit uv.lock (reproducible installs)
+# DO NOT add uv.lock here
+
+# =============================================================================
+# MACHINE LEARNING — MODEL WEIGHTS AND DATASETS
+# =============================================================================
+# Model weight files — often gigabytes; use DVC or object storage
+*.bin
+*.pt
+*.pth
+*.ckpt
+*.safetensors
+*.gguf
+*.ggml
+*.pkl
+*.pickle
+*.joblib
+# Hugging Face model cache
+.cache/huggingface/
+models/
+!models/.gitkeep
+# Datasets — use DVC for large datasets
+data/raw/
+data/processed/
+data/interim/
+!data/.gitkeep
+!data/raw/.gitkeep
+!data/processed/.gitkeep
+!data/interim/.gitkeep
+# MLflow artefacts
+mlruns/
+mlflow.db
+# DVC cache
+.dvc/cache/
+.dvc/tmp/
+# Label Studio
+label-studio-data/
+
+# =============================================================================
+# DOCKER
+# =============================================================================
+# Docker volumes mounted locally
+docker-volumes/
+postgres-data/
+keycloak-data/
+redis-data/
+minio-data/
+# Compose override files (local developer customisation — do not commit)
+docker-compose.override.yml
+
+# =============================================================================
+# DATABASE
+# =============================================================================
+*.sqlite
+*.sqlite3
+*.db
+# Prisma generated client (regenerated on install)
+# DO commit prisma/schema.prisma and migrations/
+# DO NOT commit generated client if it is in .gitignore
+
+# =============================================================================
+# LOGS
+# =============================================================================
+logs/
+*.log
+npm-debug.log*
+loki-data/
+
+# =============================================================================
+# OPERATING SYSTEM
+# =============================================================================
+# macOS
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+.AppleDouble
+.LSOverride
+Icon?
+# Windows
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+$RECYCLE.BIN/
+# Linux
+*~
+
+# =============================================================================
+# EDITORS AND IDEs
+# =============================================================================
+# JetBrains (IntelliJ, PyCharm, WebStorm, etc.)
+.idea/
+*.iml
+*.iws
+*.ipr
+# VS Code (allow shared recommended extensions)
+.vscode/
+!.vscode/extensions.json
+!.vscode/settings.json
+# Vim / Neovim
+*.swp
+*.swo
+*.swn
+Session.vim
+# Emacs
+*~
+\#*\#
+.\#*
+
+# =============================================================================
+# TESTING
+# =============================================================================
+test-results/
+playwright-report/
+e2e-results/
+.playwright/
+
+# =============================================================================
+# CERTIFICATES AND CRYPTOGRAPHIC MATERIAL
+# =============================================================================
+*.jks
+*.truststore
+*.keystore
+tls/
+certs/
+keys/
+
+# =============================================================================
+# TEMPORARY AND SCRATCH FILES
+# =============================================================================
+tmp/
+temp/
+scratch/
+*.tmp
+*.temp
+*.bak
+*.orig
+
+# =============================================================================
+# SECURITY SCANNING ARTEFACTS
+# =============================================================================
+trivy-report*
+semgrep-report*
+sbom*.json
+*.spdx
+gitleaks-report*
+zap-report*
+
+# =============================================================================
+# INFRASTRUCTURE
+# =============================================================================
+.terraform/
+*.tfstate
+*.tfstate.*
+*.tfplan
+.tofu/
+helm-charts-downloaded/
+
+# =============================================================================
+# MISCELLANEOUS
+# =============================================================================
+.turbo/
+.nx/
+*.tgz
