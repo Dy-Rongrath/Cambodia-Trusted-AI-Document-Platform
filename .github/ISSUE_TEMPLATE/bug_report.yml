@@ -1,0 +1,85 @@
+name: Bug Report
+description: Create a report to help us fix a bug or issue.
+title: "[BUG]: "
+labels: ["bug"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thank you for reporting a bug! Please ensure no secrets or real personal/government data are included in this issue.
+  - type: textarea
+    id: description
+    attributes:
+      label: Bug Description
+      description: A clear and concise description of what the bug is.
+      placeholder: Describe what happened...
+    validations:
+      required: true
+  - type: textarea
+    id: reproduction
+    attributes:
+      label: Steps to Reproduce
+      description: Detailed steps to reproduce the behaviour.
+      placeholder: |
+        1. Go to '...'
+        2. Click on '...'
+        3. See error
+    validations:
+      required: true
+  - type: textarea
+    id: expected
+    attributes:
+      label: Expected Behaviour
+      description: What you expected to happen.
+    validations:
+      required: true
+  - type: textarea
+    id: actual
+    attributes:
+      label: Actual Behaviour
+      description: What actually happened.
+    validations:
+      required: true
+  - type: input
+    id: os
+    attributes:
+      label: Operating System
+      placeholder: e.g. macOS Sequoia (Apple Silicon M5), Ubuntu 24.04
+    validations:
+      required: false
+  - type: input
+    id: cpu
+    attributes:
+      label: CPU Architecture
+      placeholder: e.g. arm64 / Apple Silicon, x86_64
+    validations:
+      required: false
+  - type: input
+    id: node_version
+    attributes:
+      label: Node.js Version (where applicable)
+      placeholder: e.g. 24.15.0
+    validations:
+      required: false
+  - type: input
+    id: python_version
+    attributes:
+      label: Python Version (where applicable)
+      placeholder: e.g. 3.12.2
+    validations:
+      required: false
+  - type: textarea
+    id: logs
+    attributes:
+      label: Relevant Logs
+      description: Paste any relevant terminal or browser log output here. Remove all secrets, tokens, or personal data!
+      render: shell
+    validations:
+      required: false
+  - type: checkboxes
+    id: sanitization_confirmation
+    attributes:
+      label: Security & Privacy Confirmation
+      options:
+        - label: I confirm that no secrets, passwords, private keys, API tokens, or real personal/government data are included in this issue report.
+          required: true

@@ -1,0 +1,68 @@
+name: Feature Request
+description: Propose a new feature, capability, or architectural enhancement.
+title: "[FEAT]: "
+labels: ["enhancement"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thank you for proposing a feature! Please check existing issues and the roadmap before submitting.
+  - type: textarea
+    id: problem
+    attributes:
+      label: Problem Statement
+      description: What problem or gap does this feature solve?
+      placeholder: Describe the challenge or use case...
+    validations:
+      required: true
+  - type: textarea
+    id: proposed_solution
+    attributes:
+      label: Proposed Solution
+      description: A clear description of what you want to happen.
+    validations:
+      required: true
+  - type: textarea
+    id: alternatives
+    attributes:
+      label: Alternatives Considered
+      description: Any alternative solutions or features you have considered.
+    validations:
+      required: false
+  - type: input
+    id: roadmap_phase
+    attributes:
+      label: Targeted Roadmap Phase
+      placeholder: e.g. Phase 1, Phase 4, Phase 6
+    validations:
+      required: false
+  - type: textarea
+    id: security_impact
+    attributes:
+      label: Security & Privacy Impact
+      description: Does this feature touch authentication, tenant isolation, document storage, AI predictions, or credential signing?
+    validations:
+      required: false
+  - type: textarea
+    id: resource_impact
+    attributes:
+      label: Resource & Cost Impact
+      description: Does this require paid cloud infrastructure or heavy local resources? (Local-first & zero paid cloud preferred)
+    validations:
+      required: false
+  - type: input
+    id: apple_silicon_impact
+    attributes:
+      label: Apple Silicon M5 Compatibility
+      placeholder: e.g. Confirmed native ARM64 support
+    validations:
+      required: false
+  - type: dropdown
+    id: contribution_willingness
+    attributes:
+      label: Willingness to Contribute
+      options:
+        - "Yes, I am willing to submit a pull request for this feature."
+        - "No, I am only requesting this feature for the community."
+    validations:
+      required: false

@@ -1,0 +1,46 @@
+name: Documentation Issue
+description: Report an inaccuracy, clarification, or missing detail in documentation.
+title: "[DOCS]: "
+labels: ["documentation"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thank you for helping keep our documentation accurate and aligned!
+  - type: input
+    id: doc_path
+    attributes:
+      label: Target Document Path
+      placeholder: e.g. ARCHITECTURE.md, TESTING.md, docs/threat-model.md
+    validations:
+      required: true
+  - type: textarea
+    id: issue_details
+    attributes:
+      label: Incorrect or Unclear Section
+      description: Describe what section is incorrect, outdated, or hard to understand.
+    validations:
+      required: true
+  - type: textarea
+    id: suggested_correction
+    attributes:
+      label: Suggested Correction
+      description: Proposed replacement text or clarification.
+    validations:
+      required: false
+  - type: textarea
+    id: evidence
+    attributes:
+      label: Source or Evidence
+      description: Reference ADRs, roadmap phases, or official specification links supporting this fix.
+    validations:
+      required: false
+  - type: dropdown
+    id: time_sensitivity
+    attributes:
+      label: Time Sensitivity
+      options:
+        - "Phase 0 / Phase 1 immediate blocker"
+        - "General documentation improvement"
+    validations:
+      required: false
