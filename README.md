@@ -32,7 +32,7 @@ The project may be called production-ready only after evidence exists for all 16
 ## Project Status
 
 - **Phase 0 — Documentation and Governance Foundation:** Complete
-- **Phase 1 — Engineering Scaffold and Tooling:** In Progress (NestJS backend, FastAPI AI service, Angular frontend, shared-types, Docker Compose, CI)
+- **Phase 1 — Engineering Scaffold and Tooling:** Phase 1 implementation validated locally — remote CI validation pending
 - **Maintainer:** Dy Rongrath (Solo project owner & maintainer)
 
 > **Independence Notice:** This is an independent open-source project. It is not affiliated with, endorsed by, commissioned by, or operated by any Cambodian government institution or public agency.
@@ -67,24 +67,24 @@ cp .env.example .env
 
 ## Key Capabilities & Roadmap
 
-| # | Capability | Target Phase |
-|---|---|---|
-| 1 | Engineering scaffold, local Docker Compose, & CI tooling | Phase 1 |
-| 2 | Development MCP adoption & read-only tools | Phase 2 |
-| 3 | Authentication & multi-tenant organisation management | Phase 3 |
-| 4 | Secure document upload & quarantine malware validation | Phase 4 |
-| 5 | Audit logging, OpenTelemetry & Prometheus observability | Phase 5 |
-| 6 | Khmer & English document classification model | Phase 6 |
-| 7 | Human review workflow for uncertain AI predictions | Phase 7 |
-| 8 | Structured information extraction | Phase 8 |
-| 9 | Multilingual AI assistant & LLM prompt-injection defenses | Phase 9 |
-| 10 | MLOps pipeline, drift detection, & model cards | Phase 10 |
-| 11 | Verifiable credential issuance & QR verification (SD-JWT VC) | Phase 11 |
-| 12 | Flutter mobile credential wallet | Phase 12 |
-| 13 | Secure inter-organisation data exchange | Phase 13 |
-| 14 | European data-space integration (EDC connector) | Phase 14 |
-| 15 | Product-facing MCP capabilities | Phase 15 |
-| 16 | Production hardening, Kubernetes, & Cosign signed releases | Phase 16 |
+| #   | Capability                                                   | Target Phase |
+| --- | ------------------------------------------------------------ | ------------ |
+| 1   | Engineering scaffold, local Docker Compose, & CI tooling     | Phase 1      |
+| 2   | Development MCP adoption & read-only tools                   | Phase 2      |
+| 3   | Authentication & multi-tenant organisation management        | Phase 3      |
+| 4   | Secure document upload & quarantine malware validation       | Phase 4      |
+| 5   | Audit logging, OpenTelemetry & Prometheus observability      | Phase 5      |
+| 6   | Khmer & English document classification model                | Phase 6      |
+| 7   | Human review workflow for uncertain AI predictions           | Phase 7      |
+| 8   | Structured information extraction                            | Phase 8      |
+| 9   | Multilingual AI assistant & LLM prompt-injection defenses    | Phase 9      |
+| 10  | MLOps pipeline, drift detection, & model cards               | Phase 10     |
+| 11  | Verifiable credential issuance & QR verification (SD-JWT VC) | Phase 11     |
+| 12  | Flutter mobile credential wallet                             | Phase 12     |
+| 13  | Secure inter-organisation data exchange                      | Phase 13     |
+| 14  | European data-space integration (EDC connector)              | Phase 14     |
+| 15  | Product-facing MCP capabilities                              | Phase 15     |
+| 16  | Production hardening, Kubernetes, & Cosign signed releases   | Phase 16     |
 
 ---
 
@@ -101,46 +101,46 @@ The platform is designed to support local-first engineering and low-cost accessi
 
 ## Documentation Hierarchy
 
-| Document | Purpose |
-|---|---|
-| [AGENTS.md](AGENTS.md) | Primary AI-agent guardrails, open-source rules, and approval boundaries |
-| [PROJECT_CONTEXT.md](PROJECT_CONTEXT.md) | Product purpose, target users, business capabilities, glossary, and open-source constraints |
-| [ARCHITECTURE.md](ARCHITECTURE.md) | System design, module responsibilities, trust boundaries, data flows, and MCP boundary |
-| [SECURITY.md](SECURITY.md) | Security policy, file upload security, secrets management, and disclosure guidelines |
-| [MCP_SECURITY.md](MCP_SECURITY.md) | Model Context Protocol security rules, tool allowlisting, and versioning policy |
-| [DEVELOPMENT.md](DEVELOPMENT.md) | Technical standards, coding guidelines, commit rules, and definition of done |
-| [TESTING.md](TESTING.md) | Testing strategy, planned quality gates, coverage thresholds, and security testing |
-| [DATA_GOVERNANCE.md](DATA_GOVERNANCE.md) | Data sourcing rules, anonymisation, dataset lineage (DVC), and retention policy |
-| [AI_GOVERNANCE.md](AI_GOVERNANCE.md) | Permitted AI uses, mandatory human oversight, model cards, and responsible-AI policy |
-| [ROADMAP.md](ROADMAP.md) | 16-phase implementation roadmap |
-| [LICENSE](LICENSE) | Official Apache License 2.0 legal text |
-| [NOTICE](NOTICE) | Project copyright and primary attribution notice |
-| [THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md) | Third-party legal and community text attributions (DCO 1.1, Contributor Covenant v3.0) |
-| [DCO.md](DCO.md) | Developer Certificate of Origin 1.1 sign-off guidelines |
-| [GOVERNANCE.md](GOVERNANCE.md) | Maintainer governance model, commercial neutrality, and trademark policy |
-| [CODE_OF_CONDUCT.md](CODE_OF_CONDUCT.md) | Contributor Covenant 3.0 community standards |
-| [SUPPORT.md](SUPPORT.md) | Best-effort community support policy |
-| [CHANGELOG.md](CHANGELOG.md) | Project release changelog and semver policy |
-| [CONTRIBUTING.md](CONTRIBUTING.md) | Contribution workflow, PR rules, and DCO sign-off requirements |
-| [docs/open-source-dependency-policy.md](docs/open-source-dependency-policy.md) | Open-source dependency evaluation and licensing rules |
-| [docs/adr/](docs/adr/) | Architecture Decision Records (ADR-0001 through ADR-0008) |
-| [docs/threat-model.md](docs/threat-model.md) | STRIDE threat model (including 15 MCP threat categories) |
-| [docs/templates/](docs/templates/) | Reusable task templates (feature, bug-fix, mcp-integration, etc.) |
-| [docs/roles/](docs/roles/) | Specialist AI agent role instructions |
+| Document                                                                       | Purpose                                                                                     |
+| ------------------------------------------------------------------------------ | ------------------------------------------------------------------------------------------- |
+| [AGENTS.md](AGENTS.md)                                                         | Primary AI-agent guardrails, open-source rules, and approval boundaries                     |
+| [PROJECT_CONTEXT.md](PROJECT_CONTEXT.md)                                       | Product purpose, target users, business capabilities, glossary, and open-source constraints |
+| [ARCHITECTURE.md](ARCHITECTURE.md)                                             | System design, module responsibilities, trust boundaries, data flows, and MCP boundary      |
+| [SECURITY.md](SECURITY.md)                                                     | Security policy, file upload security, secrets management, and disclosure guidelines        |
+| [MCP_SECURITY.md](MCP_SECURITY.md)                                             | Model Context Protocol security rules, tool allowlisting, and versioning policy             |
+| [DEVELOPMENT.md](DEVELOPMENT.md)                                               | Technical standards, coding guidelines, commit rules, and definition of done                |
+| [TESTING.md](TESTING.md)                                                       | Testing strategy, planned quality gates, coverage thresholds, and security testing          |
+| [DATA_GOVERNANCE.md](DATA_GOVERNANCE.md)                                       | Data sourcing rules, anonymisation, dataset lineage (DVC), and retention policy             |
+| [AI_GOVERNANCE.md](AI_GOVERNANCE.md)                                           | Permitted AI uses, mandatory human oversight, model cards, and responsible-AI policy        |
+| [ROADMAP.md](ROADMAP.md)                                                       | 16-phase implementation roadmap                                                             |
+| [LICENSE](LICENSE)                                                             | Official Apache License 2.0 legal text                                                      |
+| [NOTICE](NOTICE)                                                               | Project copyright and primary attribution notice                                            |
+| [THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md)                               | Third-party legal and community text attributions (DCO 1.1, Contributor Covenant v3.0)      |
+| [DCO.md](DCO.md)                                                               | Developer Certificate of Origin 1.1 sign-off guidelines                                     |
+| [GOVERNANCE.md](GOVERNANCE.md)                                                 | Maintainer governance model, commercial neutrality, and trademark policy                    |
+| [CODE_OF_CONDUCT.md](CODE_OF_CONDUCT.md)                                       | Contributor Covenant 3.0 community standards                                                |
+| [SUPPORT.md](SUPPORT.md)                                                       | Best-effort community support policy                                                        |
+| [CHANGELOG.md](CHANGELOG.md)                                                   | Project release changelog and semver policy                                                 |
+| [CONTRIBUTING.md](CONTRIBUTING.md)                                             | Contribution workflow, PR rules, and DCO sign-off requirements                              |
+| [docs/open-source-dependency-policy.md](docs/open-source-dependency-policy.md) | Open-source dependency evaluation and licensing rules                                       |
+| [docs/adr/](docs/adr/)                                                         | Architecture Decision Records (ADR-0001 through ADR-0008)                                   |
+| [docs/threat-model.md](docs/threat-model.md)                                   | STRIDE threat model (including 15 MCP threat categories)                                    |
+| [docs/templates/](docs/templates/)                                             | Reusable task templates (feature, bug-fix, mcp-integration, etc.)                           |
+| [docs/roles/](docs/roles/)                                                     | Specialist AI agent role instructions                                                       |
 
 ---
 
 ## Technology Stack
 
-| Layer | Technology |
-|---|---|
-| Backend | Node.js 24 · TypeScript · NestJS · PostgreSQL 17 · Prisma |
-| AI Service | Python 3.12 · FastAPI · PyTorch · Hugging Face Transformers · uv |
-| Frontend | Angular · TypeScript · Angular Signals |
-| Mobile | Flutter (Phase 12) |
+| Layer          | Technology                                                              |
+| -------------- | ----------------------------------------------------------------------- |
+| Backend        | Node.js 24 · TypeScript · NestJS · PostgreSQL 17 · Prisma               |
+| AI Service     | Python 3.12 · FastAPI · PyTorch · Hugging Face Transformers · uv        |
+| Frontend       | Angular · TypeScript · Angular Signals                                  |
+| Mobile         | Flutter (Phase 12)                                                      |
 | AI Development | Model Context Protocol (MCP) · OpenAI Codex CLI · GitHub MCP · Context7 |
-| Authentication | Keycloak 26 · OAuth 2.1 · OIDC · WebAuthn / Passkeys |
-| Infrastructure | Docker · Docker Compose · (Kubernetes in Phase 16) |
+| Authentication | Keycloak 26 · OAuth 2.1 · OIDC · WebAuthn / Passkeys                    |
+| Infrastructure | Docker · Docker Compose · (Kubernetes in Phase 16)                      |
 
 ---
 

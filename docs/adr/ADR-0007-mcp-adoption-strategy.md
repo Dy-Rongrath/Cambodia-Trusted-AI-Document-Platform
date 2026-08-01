@@ -17,6 +17,7 @@ Dy Rongrath, Project Owner — approved through review and merge of PR #1 on 202
 The Model Context Protocol (MCP) provides a standard JSON-RPC protocol for AI agents (MCP clients) to connect to tools, data sources, and documentation servers (MCP servers). Adopting MCP can significantly accelerate developer productivity by giving AI coding assistants up-to-date documentation and scoped repository context.
 
 However, ungoverned MCP integration introduces critical security risks:
+
 - Exposing secrets if configuration files containing credentials (e.g. GitHub PATs) are committed.
 - Unintended execution of shell commands, database queries, or write actions if broad tools are enabled.
 - Prompt injection via retrieved file contents or documentation tool outputs.
@@ -36,6 +37,7 @@ Specific decision choices:
    - **Context7 MCP Server** (`@upstash/context7-mcp@<PINNED_VERSION>` via stdio) for version-specific official library documentation (NestJS, Prisma, FastAPI, Angular, PyTorch).
 3. **Credential Management (D-MCP-3):** Credentials (such as GitHub PAT) are exported as environment variables in the developer's local shell profile and referenced via `env_vars` in `.codex/config.toml` (`mcp_servers` block). The config file is strictly **gitignored**. No credentials or tokens are stored in configuration files, source control, or `.env` files.
 4. **Hosting Model (D-MCP-4):**
+
    - **Stages 1–3:** Local-only stdio and Docker processes running on the developer's machine.
    - **Post-Phase 1 Team Sharing:** Transition GitHub server to GitHub's managed remote endpoint (`https://api.githubcopilot.com/mcp/`) after Phase 1 code is validated, leveraging GitHub Copilot OAuth authentication for team access.
 
@@ -44,23 +46,25 @@ Specific decision choices:
 
 ## Alternatives Considered
 
-| Option | Description | Why rejected or deferred |
-|---|---|---|
-| Claude Desktop / Cursor client | IDE-integrated MCP clients | Codex CLI is chosen as the primary client. Cursor remains a valid alternative; both follow the same gitignored per-project configuration policy. |
-| Unrestricted third-party MCP servers | Installing public MCP marketplace servers directly | Rejected due to supply-chain risk and lack of security review. Every server requires a 16-point review before installation. |
-| Storing PATs in `.env` files | Putting MCP credentials in `.env` | Rejected. `.env` files are for application configuration. `.codex/config.toml` isolates developer tool secrets. |
-| Full write access tools in Stage 1 | Enabling automated PR creation and file pushing via MCP | Rejected. Human approval is mandatory for all repository state changes (`AGENTS.md` Section 13). |
-| Custom internal MCP server immediately | Building a custom NestJS/Python MCP server in Phase 0/1 | Deferred. Custom MCP servers will only be considered in Stage 3 if read-only Stage 1/2 tools prove insufficient. |
+| Option                                 | Description                                             | Why rejected or deferred                                                                                                                         |
+| -------------------------------------- | ------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------ |
+| Claude Desktop / Cursor client         | IDE-integrated MCP clients                              | Codex CLI is chosen as the primary client. Cursor remains a valid alternative; both follow the same gitignored per-project configuration policy. |
+| Unrestricted third-party MCP servers   | Installing public MCP marketplace servers directly      | Rejected due to supply-chain risk and lack of security review. Every server requires a 16-point review before installation.                      |
+| Storing PATs in `.env` files           | Putting MCP credentials in `.env`                       | Rejected. `.env` files are for application configuration. `.codex/config.toml` isolates developer tool secrets.                                  |
+| Full write access tools in Stage 1     | Enabling automated PR creation and file pushing via MCP | Rejected. Human approval is mandatory for all repository state changes (`AGENTS.md` Section 13).                                                 |
+| Custom internal MCP server immediately | Building a custom NestJS/Python MCP server in Phase 0/1 | Deferred. Custom MCP servers will only be considered in Stage 3 if read-only Stage 1/2 tools prove insufficient.                                 |
 
 ## Consequences
 
 ### Positive consequences
+
 - Developers gain real-time, accurate context from official documentation and repository state.
 - Prevents documentation hallucinations for fast-evolving libraries (FastAPI, Prisma, NestJS).
 - Strict gitignore rules and read-only PAT scopes minimise credential exposure risk.
 - Explicit approval boundaries prevent unauthorized automated write actions.
 
 ### Negative consequences / trade-offs
+
 - Developers must manually set up `.codex/config.toml` and generate a read-only GitHub PAT.
 - External API calls to Context7/Upstash are made for documentation lookups (no personal data transmitted).
 

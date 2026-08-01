@@ -16,12 +16,15 @@ The platform is built in 16 phases. Each phase builds on the previous and delive
 **Status:** Complete
 
 ### Objective
+
 Establish all foundation documents, repository structure, and governance rules before any feature code or application scaffolding is written.
 
 ### Prerequisites
+
 - Empty repository with Git initialised.
 
 ### Scope
+
 - All foundation documents (`AGENTS.md`, `PROJECT_CONTEXT.md`, `ARCHITECTURE.md`, `SECURITY.md`, `MCP_SECURITY.md`, `DEVELOPMENT.md`, `TESTING.md`, `DATA_GOVERNANCE.md`, `AI_GOVERNANCE.md`, `ROADMAP.md`, `CONTRIBUTING.md`, `README.md`).
 - Open-source legal and community health files (`LICENSE` Apache-2.0, `DCO.md` DCO 1.1, `CODE_OF_CONDUCT.md` v3.0, `GOVERNANCE.md`, `SUPPORT.md`, `CHANGELOG.md`, `docs/open-source-dependency-policy.md`).
 - GitHub community templates (`.github/ISSUE_TEMPLATE/` issue forms, `.github/PULL_REQUEST_TEMPLATE.md`).
@@ -33,34 +36,40 @@ Establish all foundation documents, repository structure, and governance rules b
 - Reusable task templates and specialist role instructions.
 
 ### Out of scope
+
 - Any application source code (`apps/`, `packages/`).
 - Any Docker Compose configuration (`infra/docker/`).
 - Any CI/CD pipeline.
 - Any database schema or migration.
 
 ### Acceptance criteria
+
 - All foundation documents created, aligned, and reviewed.
 - Repository initialised with proper `.gitignore`, `.gitattributes`, `.nvmrc`.
 - Remote repository connected.
 - Zero application code, secrets, or real data present.
 
 ### Deliverables
+
 - All foundation documents committed to repository.
 
 ---
 
 ## Phase 1 — Engineering Scaffold and Tooling
 
-**Status:** Phase 1 implementation complete locally — remote CI validation pending
+**Status:** Phase 1 implementation validated locally — remote CI validation pending
 
 ### Objective
+
 Create the monorepo scaffold, application skeletons, local Docker Compose environment, and CI/CD basics. No business logic yet.
 
 ### Prerequisites
+
 - Phase 0 complete and approved.
 - Developer toolchain set up (Node 24, Python 3.12, uv, Docker).
 
 ### Scope
+
 - Root `package.json` with npm workspaces.
 - `apps/backend`: NestJS application skeleton (health endpoint only).
 - `apps/ai-service`: FastAPI application skeleton (health endpoint only).
@@ -76,16 +85,19 @@ Create the monorepo scaffold, application skeletons, local Docker Compose enviro
 - Updated `README.md` and repository setup documentation.
 
 ### Out of scope
+
 - Authentication implementation (Phase 3).
 - Database schema (Phase 3).
 - Any AI model (Phase 6).
 
 ### Security requirements
+
 - Docker Compose may expose the frontend, backend, and Keycloak login endpoint to localhost for development. PostgreSQL, any future object-storage administration endpoint, the AI service, and internal infrastructure must remain on the private Docker network unless a documented development need requires otherwise.
 - `.env.example` must contain placeholder values only.
 - `docker-compose.yml` must not contain any secrets (use `${ENV_VAR}` references).
 
 ### Testing requirements
+
 - Health endpoint tests for backend and AI service.
 - NestJS application bootstraps without error.
 - FastAPI application bootstraps without error.
@@ -93,11 +105,13 @@ Create the monorepo scaffold, application skeletons, local Docker Compose enviro
 - All linters and type checkers pass.
 
 ### Acceptance criteria
+
 - `docker compose up` starts all infrastructure services cleanly.
 - All three application skeletons start without errors.
 - CI pipeline passes on first commit.
 
 ### Deliverables
+
 - Monorepo scaffold committed to `main`.
 - CI pipeline passing.
 
@@ -106,13 +120,16 @@ Create the monorepo scaffold, application skeletons, local Docker Compose enviro
 ## Phase 2 — AI-Assisted Development and MCP Foundation
 
 ### Objective
+
 Set up approved read-only Model Context Protocol (MCP) servers to assist developer productivity safely.
 
 ### Prerequisites
+
 - Phase 1 complete.
 - `MCP_SECURITY.md` and `ADR-0007` approved.
 
 ### Scope
+
 - Configure OpenAI Codex CLI with `.codex/config.toml` (gitignored).
 - Local GitHub MCP server (`ghcr.io/github/github-mcp-server` Docker container) with read-only PAT for repository context.
 - Context7 MCP server (`@upstash/context7-mcp` via stdio) for official library documentation lookup.
@@ -120,20 +137,24 @@ Set up approved read-only Model Context Protocol (MCP) servers to assist develop
 - Verify MCP security boundaries and read-only tool restrictions.
 
 ### Out of scope
+
 - Any write-capable MCP tools.
 - Remote MCP hosting endpoints (evaluating after Phase 1 validation).
 - Database or application API access via MCP.
 
 ### Security requirements
+
 - `.codex/config.toml` strictly gitignored.
 - Read-only GitHub PAT stored in developer local config only.
 - All MCP tool outputs treated as untrusted data.
 
 ### Testing requirements
+
 - Verify Codex CLI loads GitHub and Context7 servers cleanly (`codex mcp list`).
 - Verify read-only restriction enforcement.
 
 ### Acceptance criteria
+
 - Codex CLI accesses repository context and library docs via MCP without errors.
 - Zero secrets committed to Git.
 
@@ -141,14 +162,16 @@ Set up approved read-only Model Context Protocol (MCP) servers to assist develop
 
 ## Phase 3 — Authentication and Organisation Management
 
-
 ### Objective
+
 Implement secure authentication and multi-tenant organisation management.
 
 ### Prerequisites
+
 - Phase 1 complete.
 
 ### Scope
+
 - Keycloak realm configuration (realm export committed to repository).
 - NestJS JWT validation (Keycloak JWKS endpoint).
 - NestJS `AuthModule`, `OrganisationModule`, `UserModule`.
@@ -163,16 +186,19 @@ Implement secure authentication and multi-tenant organisation management.
 - WebAuthn / Passkey setup in Keycloak (configuration only).
 
 ### Security requirements
+
 - JWT validation tests: expired, forged, wrong audience.
 - Tenant isolation tests for user queries.
 - Cross-tenant access tests must fail.
 
 ### Testing requirements
+
 - Unit tests for JWT validation guards.
 - Integration tests for all auth and organisation endpoints.
 - Dedicated tenant-isolation test suite.
 
 ### Acceptance criteria
+
 - A user can log in via Keycloak and reach a protected dashboard.
 - An admin can create an organisation.
 - A user in Org A cannot access Org B's data.
@@ -182,12 +208,15 @@ Implement secure authentication and multi-tenant organisation management.
 ## Phase 4 — Secure Document Upload
 
 ### Objective
+
 Allow authenticated organisation users to upload documents securely.
 
 ### Prerequisites
+
 - Phase 3 complete.
 
 ### Scope
+
 - `DocumentModule` in NestJS.
 - Prisma schema: `documents`, `document_files` tables.
 - File upload API with:
@@ -204,17 +233,20 @@ Allow authenticated organisation users to upload documents securely.
 - Frontend: document list view.
 
 ### Security requirements
+
 - File type spoofing attack must be rejected.
 - Oversized file must be rejected before buffering.
 - Audit event recorded for every upload (success and failure).
 - Uploaded files not accessible directly from storage (pre-signed URLs only).
 
 ### Testing requirements
+
 - File upload security test suite (see `TESTING.md` Section 2.7).
 - Integration tests for all document endpoints.
 - Audit event tests.
 
 ### Acceptance criteria
+
 - A valid PDF can be uploaded and stored.
 - A JPEG disguised as a PDF is rejected with 422.
 - A file exceeding the size limit is rejected with 413.
@@ -225,12 +257,15 @@ Allow authenticated organisation users to upload documents securely.
 ## Phase 5 — Audit Logging and Observability
 
 ### Objective
+
 Make the platform's behaviour observable and auditable.
 
 ### Prerequisites
+
 - Phase 4 complete.
 
 ### Scope
+
 - Complete `AuditModule` with structured `audit_events` table (append-only).
 - Audit log query API (platform admin only).
 - OpenTelemetry SDK integration in NestJS backend.
@@ -242,11 +277,13 @@ Make the platform's behaviour observable and auditable.
 - OWASP ZAP automated API scan in CI.
 
 ### Testing requirements
+
 - Audit event integrity tests (verify INSERT-only constraint).
 - Metrics endpoint tests.
 - Rate-limiting tests.
 
 ### Acceptance criteria
+
 - Every important action produces an audit event.
 - Grafana dashboard shows request rates, error rates, and latency.
 - Loki receives all structured log output.
@@ -256,14 +293,17 @@ Make the platform's behaviour observable and auditable.
 ## Phase 6 — Basic Document Classification Model
 
 ### Objective
+
 Train, evaluate, and deploy the first document classification model.
 
 ### Prerequisites
+
 - Phase 5 complete.
 - An approved synthetic dataset exists (see `DATA_GOVERNANCE.md`).
 - Model card template complete.
 
 ### Scope
+
 - Dataset card for the first training dataset.
 - Data preprocessing pipeline in `apps/ai-service`.
 - Fine-tuning script using Hugging Face Transformers and PEFT/LoRA.
@@ -280,19 +320,23 @@ Train, evaluate, and deploy the first document classification model.
 - `ai.prediction` audit event.
 
 ### Out of scope
+
 - Full review-task queue workflow, `ReviewModule`, or `review_tasks` tables (deferred to Phase 7).
 
 ### Security requirements
+
 - AI service endpoint authenticated with internal API key.
 - Model hash verification before loading.
 - No document content in logs.
 
 ### Testing requirements
+
 - AI evaluation test suite (see `TESTING.md` Section 2.8).
 - Model regression tests.
 - Confidence threshold boundary tests.
 
 ### Acceptance criteria
+
 - Model achieves defined accuracy thresholds on the test set.
 - Khmer documents evaluated separately and meet the Khmer threshold.
 - Predictions below threshold reliably set document status to `REVIEW_REQUIRED`.
@@ -303,12 +347,15 @@ Train, evaluate, and deploy the first document classification model.
 ## Phase 7 — Human Review Workflow
 
 ### Objective
+
 Build the human-review workflow for uncertain AI predictions marked `REVIEW_REQUIRED`.
 
 ### Prerequisites
+
 - Phase 6 complete.
 
 ### Scope
+
 - `ReviewModule` in NestJS.
 - Prisma schema: `review_tasks`, `review_decisions` tables.
 - Automatic creation of review tasks for documents with `REVIEW_REQUIRED` status.
@@ -320,11 +367,13 @@ Build the human-review workflow for uncertain AI predictions marked `REVIEW_REQU
 - Override rate monitoring metric.
 
 ### Testing requirements
+
 - Review workflow integration tests.
 - Permission tests (only org_reviewer role can submit decisions).
 - Audit event tests.
 
 ### Acceptance criteria
+
 - Documents marked `REVIEW_REQUIRED` appear as actionable tasks in the reviewer queue.
 - Reviewers can confirm or override AI predictions.
 - Override rate is tracked as a operational metric.
@@ -334,12 +383,15 @@ Build the human-review workflow for uncertain AI predictions marked `REVIEW_REQU
 ## Phase 8 — Information Extraction
 
 ### Objective
+
 Extract structured fields from classified documents.
 
 ### Prerequisites
+
 - Phase 7 complete.
 
 ### Scope
+
 - Information extraction model training and evaluation.
 - FastAPI extraction endpoint.
 - Extracted field storage and API.
@@ -347,6 +399,7 @@ Extract structured fields from classified documents.
 - Frontend: display extracted fields alongside the source document.
 
 ### Testing requirements
+
 - Extraction accuracy evaluation.
 - Human validation workflow tests.
 
@@ -355,19 +408,23 @@ Extract structured fields from classified documents.
 ## Phase 9 — Multilingual AI Assistant
 
 ### Objective
+
 Provide AI-generated document explanations in Khmer and English.
 
 ### Prerequisites
+
 - Phase 8 complete.
 - Prompt injection protection design approved.
 
 ### Scope
+
 - LLM integration for document explanation (self-hosted or approved managed model).
 - Prompt injection mitigations (see `AI_GOVERNANCE.md` Section 15).
 - Explanation API.
 - Frontend: explanation display alongside document.
 
 ### Security requirements
+
 - Prompt injection protection tests.
 - Indirect prompt injection protection tests.
 - No personal data from other users in prompt context.
@@ -377,12 +434,15 @@ Provide AI-generated document explanations in Khmer and English.
 ## Phase 10 — MLOps and Model Governance
 
 ### Objective
+
 Operationalise model training, evaluation, and monitoring.
 
 ### Prerequisites
+
 - Phase 9 complete.
 
 ### Scope
+
 - Automated model evaluation pipeline in CI.
 - Model regression gate (block deployment if metrics regress).
 - Drift detection (data drift and prediction drift).
@@ -396,14 +456,17 @@ Operationalise model training, evaluation, and monitoring.
 ## Phase 11 — Verifiable Credentials
 
 ### Objective
+
 Issue and verify digitally signed credentials using European identity standards.
 
 ### Prerequisites
+
 - Phase 10 complete.
 - Key management strategy approved.
 - EU AI Act compliance assessment completed.
 
 ### Scope
+
 - SD-JWT VC credential format implementation.
 - OpenID4VCI credential issuance endpoint.
 - OpenID4VP credential presentation verification.
@@ -414,6 +477,7 @@ Issue and verify digitally signed credentials using European identity standards.
 - Keycloak or ZITADEL migration assessment for OpenID4VCI (see ADR-0004).
 
 ### Security requirements
+
 - Human approval mandatory before every credential issuance.
 - Cryptographic signature verification is the source of truth — AI classification is never sufficient alone.
 - Credential forgery tests.
@@ -424,12 +488,15 @@ Issue and verify digitally signed credentials using European identity standards.
 ## Phase 12 — Flutter Mobile Wallet
 
 ### Objective
+
 Allow credential holders to store and present credentials on a mobile device.
 
 ### Prerequisites
+
 - Phase 11 complete.
 
 ### Scope
+
 - Flutter mobile application.
 - OpenID4VCI credential reception.
 - OpenID4VP credential presentation.
@@ -442,12 +509,15 @@ Allow credential holders to store and present credentials on a mobile device.
 ## Phase 13 — Secure Inter-Organisation Data Exchange
 
 ### Objective
+
 Allow verified data sharing between trusted organisations on the platform.
 
 ### Prerequisites
+
 - Phase 12 complete.
 
 ### Scope
+
 - Organisation-to-organisation data-sharing protocol.
 - Consent and usage-control policies.
 - Data-sharing audit events.
@@ -458,13 +528,16 @@ Allow verified data sharing between trusted organisations on the platform.
 ## Phase 14 — European Data-Space Integration
 
 ### Objective
+
 Connect the platform to European data-space infrastructure.
 
 ### Prerequisites
+
 - Phase 13 complete.
 - Eclipse Dataspace Components evaluated and approved.
 
 ### Scope
+
 - Eclipse Dataspace Components (EDC) connector integration.
 - Dataspace Protocol implementation.
 - Gaia-X trust concept alignment.
@@ -476,14 +549,17 @@ Connect the platform to European data-space infrastructure.
 ## Phase 15 — Product-Facing MCP Capabilities
 
 ### Objective
+
 Safely expose approved application capabilities via product-facing MCP tools for external AI integration.
 
 ### Prerequisites
+
 - Phases 3–14 complete and fully validated.
 - Complete application authentication, authorisation, tenant isolation, and audit logging operational.
 - Product-facing MCP threat model and security review approved.
 
 ### Scope
+
 - Product-facing MCP server wrapping NestJS API endpoints.
 - OAuth 2.1 authentication for external MCP clients.
 - Fine-grained permission scoping for MCP tools.
@@ -491,6 +567,7 @@ Safely expose approved application capabilities via product-facing MCP tools for
 - MCP invocation rate-limiting and audit event logging (`mcp.tool.invoked`).
 
 ### Security requirements
+
 - Product-facing MCP tools must wrap approved application REST APIs.
 - Must enforce application-layer authorisation and PostgreSQL tenant isolation.
 - Must never allow direct SQL or shell execution via MCP.
@@ -500,9 +577,11 @@ Safely expose approved application capabilities via product-facing MCP tools for
 ## Phase 16 — Production Hardening and Kubernetes
 
 ### Objective
+
 Deploy the platform to a production environment with full observability, security, and operational maturity.
 
 ### Prerequisites
+
 - All previous phases validated in a staging environment.
 - Security audit completed by a specialist.
 - EU AI Act compliance assessment completed.
@@ -510,6 +589,7 @@ Deploy the platform to a production environment with full observability, securit
 - Incident response plan documented and tested.
 
 ### Scope
+
 - Kubernetes manifests for all services.
 - Helm charts.
 - Argo CD GitOps deployment.
@@ -529,5 +609,4 @@ Deploy the platform to a production environment with full observability, securit
 
 ---
 
-*This roadmap is a living document. Phases may be reordered or split based on evidence from earlier phases.*
-
+_This roadmap is a living document. Phases may be reordered or split based on evidence from earlier phases._

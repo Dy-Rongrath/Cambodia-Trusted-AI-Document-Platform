@@ -33,29 +33,30 @@ PostgreSQL 17 is the current stable release (released September 2024) and will r
 
 Key PostgreSQL features used by this platform:
 
-| Feature | Usage |
-|---|---|
-| Row-level security (RLS) | Tenant isolation enforcement at the database layer |
-| JSONB columns | Flexible metadata storage for documents and audit events |
-| pgvector extension | Future vector similarity search for document embeddings |
-| UUID support | Primary keys as UUIDs for all tenant-scoped tables |
-| Transactions | Multi-step operations (upload + audit log) wrapped in transactions |
-| Partial indexes | Performance on tenant-scoped queries |
-| pg_audit extension | Database-level audit logging (Phase 14+) |
+| Feature                  | Usage                                                              |
+| ------------------------ | ------------------------------------------------------------------ |
+| Row-level security (RLS) | Tenant isolation enforcement at the database layer                 |
+| JSONB columns            | Flexible metadata storage for documents and audit events           |
+| pgvector extension       | Future vector similarity search for document embeddings            |
+| UUID support             | Primary keys as UUIDs for all tenant-scoped tables                 |
+| Transactions             | Multi-step operations (upload + audit log) wrapped in transactions |
+| Partial indexes          | Performance on tenant-scoped queries                               |
+| pg_audit extension       | Database-level audit logging (Phase 14+)                           |
 
 ## Alternatives Considered
 
-| Option | Description | Why rejected or deferred |
-|---|---|---|
-| PostgreSQL 16 | Previous stable release | Still supported, but 17 adds performance improvements relevant to JSON and vacuum operations. No reason to use an older version for a new project. |
-| MySQL 8 / MariaDB | Popular relational database | Less robust JSON support. No native row-level security. pgvector not available. Community ecosystem for NestJS/Prisma favours PostgreSQL. |
-| SQLite | Embedded database | Not suitable for a multi-user, multi-service production system. |
-| MongoDB | Document database | Does not provide the relational integrity, row-level security, or transaction guarantees required. JSONB in PostgreSQL provides document flexibility without sacrificing these properties. |
-| CockroachDB | Distributed SQL | PostgreSQL-compatible, but adds operational complexity without justification at current scale. Review if horizontal sharding becomes necessary. |
+| Option            | Description                 | Why rejected or deferred                                                                                                                                                                   |
+| ----------------- | --------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| PostgreSQL 16     | Previous stable release     | Still supported, but 17 adds performance improvements relevant to JSON and vacuum operations. No reason to use an older version for a new project.                                         |
+| MySQL 8 / MariaDB | Popular relational database | Less robust JSON support. No native row-level security. pgvector not available. Community ecosystem for NestJS/Prisma favours PostgreSQL.                                                  |
+| SQLite            | Embedded database           | Not suitable for a multi-user, multi-service production system.                                                                                                                            |
+| MongoDB           | Document database           | Does not provide the relational integrity, row-level security, or transaction guarantees required. JSONB in PostgreSQL provides document flexibility without sacrificing these properties. |
+| CockroachDB       | Distributed SQL             | PostgreSQL-compatible, but adds operational complexity without justification at current scale. Review if horizontal sharding becomes necessary.                                            |
 
 ## Consequences
 
 ### Positive consequences
+
 - Full ACID compliance protects data integrity across all operations.
 - Row-level security provides a second enforcement layer for tenant isolation.
 - pgvector enables future semantic search without introducing a separate vector database.
@@ -64,12 +65,14 @@ Key PostgreSQL features used by this platform:
 - Strong community and long-term support track record.
 
 ### Negative consequences / trade-offs
+
 - Requires careful schema design and migration discipline.
 - RLS policies add complexity to the database setup and must be tested explicitly.
 - Slightly higher operational complexity than a managed cloud-only database.
 - Horizontal scaling requires read replicas or sharding — not needed at current scale.
 
 ### Neutral consequences
+
 - The `postgres:17-alpine` Docker image is used for local development.
 - For production, a managed PostgreSQL service is recommended to reduce operational burden.
 
@@ -78,6 +81,7 @@ Key PostgreSQL features used by this platform:
 High positive impact. PostgreSQL row-level security provides a mandatory second layer of tenant isolation. Even if application-layer isolation is bypassed by a bug, RLS prevents cross-tenant data access.
 
 The database user used by the application has the minimum required privileges:
+
 - Application role: `SELECT`, `INSERT`, `UPDATE`, `DELETE` on specific tables. `INSERT` only on `audit_events`.
 - Migration role: `CREATE TABLE`, `ALTER TABLE` — used only during migrations.
 - No `SUPERUSER` for the application role.

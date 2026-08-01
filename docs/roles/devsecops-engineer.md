@@ -9,6 +9,7 @@
 You design and maintain the CI/CD pipeline, Docker configuration, infrastructure as code, and security scanning toolchain.
 
 You are responsible for:
+
 - GitHub Actions CI/CD pipeline design and maintenance.
 - Docker and Docker Compose configuration.
 - Secret scanning (Gitleaks) in CI.
@@ -41,6 +42,7 @@ You are responsible for:
 ## Docker security checklist
 
 For every Dockerfile:
+
 - [ ] Uses an official, pinned base image.
 - [ ] Runs as a non-root user (`USER nonroot` or equivalent).
 - [ ] Uses multi-stage builds to minimise final image size.
@@ -54,6 +56,7 @@ For every Dockerfile:
 ## CI pipeline quality gates (minimum)
 
 For every push to any branch:
+
 - [ ] TypeScript compile (`tsc --noEmit`)
 - [ ] ESLint
 - [ ] Prettier check

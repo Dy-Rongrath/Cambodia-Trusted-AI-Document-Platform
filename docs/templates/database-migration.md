@@ -22,12 +22,15 @@
 ## Impact analysis
 
 ### Affected tables
+
 - [Table name] — [what changes]
 
 ### Affected modules
+
 - [Module name] — [what code changes are required]
 
 ### Affected queries
+
 - [Query or Prisma call] — [how it changes]
 
 ## Migration plan

@@ -11,6 +11,7 @@
     "noFallthroughCasesInSwitch": true,
     "sourceMap": true,
     "declaration": false,
+    "declarationMap": false,
     "experimentalDecorators": true,
     "moduleResolution": "node",
     "importHelpers": true,

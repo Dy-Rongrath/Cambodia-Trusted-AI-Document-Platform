@@ -32,6 +32,7 @@ We will use **uv** (version 0.7.x or latest stable) as the Python package and pr
 uv is developed by Astral (the same team behind Ruff). It is written in Rust and is a drop-in replacement for pip, pip-tools, pip-compile, virtualenv, and parts of pyenv. It creates and manages virtual environments automatically and produces a `uv.lock` file for reproducible installs.
 
 Key commands:
+
 - `uv sync` — install all dependencies from the lock file.
 - `uv add <package>` — add a dependency and update the lock file.
 - `uv run <command>` — run a command inside the virtual environment.
@@ -42,18 +43,19 @@ The `uv.lock` file is committed to the repository for reproducible installs.
 
 ## Alternatives Considered
 
-| Option | Description | Why rejected or deferred |
-|---|---|---|
-| Poetry | Mature Python dependency manager | Widely used, good documentation. Rejected because uv is significantly faster (10–100x), supports the same `pyproject.toml` standard, and is the emerging community standard. Poetry is a valid fallback if uv proves unstable. |
-| pip + requirements.txt | Simple pip-based dependency tracking | Non-reproducible without pip-tools. Does not manage virtual environments. Does not support pyproject.toml natively for complex projects. Not suitable for production-grade Python. |
-| pip + pip-tools | pip-compile for reproducible requirements | Better than plain pip, but slower and more manual than uv. Superseded by uv's design. |
-| conda / mamba | Conda package manager | Heavier than needed. Primarily for scientific computing environments with non-Python binary dependencies. Not aligned with the standard Python packaging ecosystem (pyproject.toml, PyPI). |
-| Pipenv | Earlier standard for Python project management | Slower than uv. Less actively developed. Largely superseded by Poetry and now uv in the community. |
-| Hatch | Modern Python project manager | Valid choice. Less community momentum than uv at this time. |
+| Option                 | Description                                    | Why rejected or deferred                                                                                                                                                                                                       |
+| ---------------------- | ---------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| Poetry                 | Mature Python dependency manager               | Widely used, good documentation. Rejected because uv is significantly faster (10–100x), supports the same `pyproject.toml` standard, and is the emerging community standard. Poetry is a valid fallback if uv proves unstable. |
+| pip + requirements.txt | Simple pip-based dependency tracking           | Non-reproducible without pip-tools. Does not manage virtual environments. Does not support pyproject.toml natively for complex projects. Not suitable for production-grade Python.                                             |
+| pip + pip-tools        | pip-compile for reproducible requirements      | Better than plain pip, but slower and more manual than uv. Superseded by uv's design.                                                                                                                                          |
+| conda / mamba          | Conda package manager                          | Heavier than needed. Primarily for scientific computing environments with non-Python binary dependencies. Not aligned with the standard Python packaging ecosystem (pyproject.toml, PyPI).                                     |
+| Pipenv                 | Earlier standard for Python project management | Slower than uv. Less actively developed. Largely superseded by Poetry and now uv in the community.                                                                                                                             |
+| Hatch                  | Modern Python project manager                  | Valid choice. Less community momentum than uv at this time.                                                                                                                                                                    |
 
 ## Consequences
 
 ### Positive consequences
+
 - Extremely fast dependency resolution and installation (Rust-based, 10–100x faster than pip).
 - `uv.lock` provides a fully reproducible, hash-verified install across all environments.
 - Virtual environment management is automatic — no manual `python -m venv` required.
@@ -63,11 +65,13 @@ The `uv.lock` file is committed to the repository for reproducible installs.
 - Active development and responsive maintainer team (Astral).
 
 ### Negative consequences / trade-offs
+
 - uv is newer than Poetry — some edge cases may be less documented or have fewer community answers.
 - The `uv.lock` format is different from Poetry's `poetry.lock` — migration requires re-resolving dependencies.
 - uv does not yet support all pip plugins and features.
 
 ### Neutral consequences
+
 - The `.venv/` directory is created inside `apps/ai-service/` — excluded from Git via `.gitignore`.
 - The root `package.json` npm workspaces do not include the Python service.
 - CI installs uv as the first step of the Python CI job via `curl -LsSf https://astral.sh/uv/install.sh | sh` or via the `astral-sh/setup-uv` GitHub Actions action.
@@ -92,6 +96,7 @@ No direct privacy impact from the choice of package manager.
 ## Migration Impact
 
 Migrating from uv to Poetry would require:
+
 - Converting `uv.lock` to `poetry.lock` by re-resolving all dependencies.
 - Updating Dockerfiles and CI scripts.
 - This is a low-cost migration if needed.

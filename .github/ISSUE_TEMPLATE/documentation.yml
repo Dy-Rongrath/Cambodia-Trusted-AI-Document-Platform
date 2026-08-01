@@ -1,7 +1,7 @@
 name: Documentation Issue
 description: Report an inaccuracy, clarification, or missing detail in documentation.
-title: "[DOCS]: "
-labels: ["documentation"]
+title: '[DOCS]: '
+labels: ['documentation']
 body:
   - type: markdown
     attributes:
@@ -19,10 +19,10 @@ body:
     attributes:
       label: Documentation Issue Category
       options:
-        - "General documentation improvement"
-        - "Legal or licensing correction"
-        - "Security documentation correction"
-        - "Time-sensitive version or status information"
+        - 'General documentation improvement'
+        - 'Legal or licensing correction'
+        - 'Security documentation correction'
+        - 'Time-sensitive version or status information'
     validations:
       required: true
   - type: textarea

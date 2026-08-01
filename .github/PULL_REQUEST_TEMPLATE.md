@@ -1,30 +1,38 @@
 # Pull Request Summary
 
 ## Description
+
 Provide a concise summary of the changes made and the problem being solved.
 
 ## Related Issue
+
 Fixes # (issue number)
 
 ## Roadmap Phase
+
 Targeted Phase: e.g. Phase 0, Phase 1
 
 ## Type of Change
+
 - [ ] Bug fix (non-breaking change which fixes an issue)
 - [ ] New feature (non-breaking change which adds functionality)
 - [ ] Documentation / Legal / Governance update
 - [ ] Security / Refactoring
 
 ## Architectural & Governance Impact
+
 - Does this change require an Architecture Decision Record (ADR)? Yes/No
 - Does this change modify security, authentication, tenant isolation, or MCP rules? Yes/No
 
 ## Resource & Platform Impact
+
 - [ ] Verified native execution on Apple Silicon (ARM64) / Linux ARM64 / x86_64.
 - [ ] Requires zero paid cloud infrastructure services during local development.
 
 ## Testing & Verification Performed
+
 Describe the commands and tests executed to verify the change (or N/A for documentation-only PRs):
+
 - [ ] Code formatting & linting (`npm run lint`, `uv run ruff check` — where applicable)
 - [ ] Type checking (`tsc --noEmit`, `uv run mypy` — where applicable)
 - [ ] Unit & integration tests (`npm test`, `uv run pytest` — where applicable)

@@ -9,11 +9,11 @@ The developer environment is **Docker-first**. Language runtimes (Node.js 24, Py
 
 ### Required Host Machine Tooling
 
-| Tool | Version | Install link | Required on Host |
-|---|---|---|---|
-| **Docker Desktop** | Latest (Docker Engine 29+ / Compose v5+) | https://www.docker.com/products/docker-desktop/ | **Yes** |
-| **Git** | Recent | https://git-scm.com/ | **Yes** |
-| **Codex CLI** | Pinned config | OpenAI Codex CLI (when using AI assistance) | Optional |
+| Tool               | Version                                  | Install link                                    | Required on Host |
+| ------------------ | ---------------------------------------- | ----------------------------------------------- | ---------------- |
+| **Docker Desktop** | Latest (Docker Engine 29+ / Compose v5+) | https://www.docker.com/products/docker-desktop/ | **Yes**          |
+| **Git**            | Recent                                   | https://git-scm.com/                            | **Yes**          |
+| **Codex CLI**      | Pinned config                            | OpenAI Codex CLI (when using AI assistance)     | Optional         |
 
 > **Note:** Node.js, npm, Python, `uv`, NestJS CLI, Angular CLI, and Prisma CLI are **not required on the host**. Host-installed runtimes are documented only as an optional advanced fallback.
 
@@ -54,19 +54,18 @@ cp .env.example .env
 ./scripts/docker/stop.sh
 ```
 
-
 ---
 
 ## 2. Supported Runtime Versions
 
-| Runtime | Required version | How to pin |
-|---|---|---|
-| Node.js | 24.15.0 | `.nvmrc` in repository root |
-| Python | 3.12.x (latest patch) | `pyenv local` in `apps/ai-service/` |
-| npm | 11.x (bundled with Node) | — |
-| uv | Latest stable | Installed globally via the Astral install script |
-| PostgreSQL | 17 (Docker image) | `postgres:17-alpine` in `docker-compose.yml` |
-| Keycloak | 26 (Docker image) | `quay.io/keycloak/keycloak:26` in `docker-compose.yml` |
+| Runtime    | Required version         | How to pin                                             |
+| ---------- | ------------------------ | ------------------------------------------------------ |
+| Node.js    | 24.15.0                  | `.nvmrc` in repository root                            |
+| Python     | 3.12.x (latest patch)    | `pyenv local` in `apps/ai-service/`                    |
+| npm        | 11.x (bundled with Node) | —                                                      |
+| uv         | Latest stable            | Installed globally via the Astral install script       |
+| PostgreSQL | 17 (Docker image)        | `postgres:17-alpine` in `docker-compose.yml`           |
+| Keycloak   | 26 (Docker image)        | `quay.io/keycloak/keycloak:26` in `docker-compose.yml` |
 
 **Caution:** The macOS system Python (`/usr/bin/python3`) is Apple's Xcode Python (3.9, EOL). Never use it for project code. Always use the Python installed by pyenv.
 
@@ -106,6 +105,7 @@ cp .env.example .env
 ### Dependency approval
 
 Adding a new dependency requires:
+
 1. Confirming no existing dependency provides the capability.
 2. Checking the licence (MIT, Apache 2.0, or BSD preferred).
 3. Checking the package's maintenance status.
@@ -118,16 +118,17 @@ Adding a new dependency requires:
 
 We use a **trunk-based development** approach with short-lived feature branches.
 
-| Branch | Purpose | Protected? |
-|---|---|---|
-| `main` | Production-ready code. Always releasable. | Yes — requires PR and review |
-| `feature/<description>` | Feature development. Short-lived (≤ 5 days). | No |
-| `fix/<description>` | Bug fixes. Short-lived. | No |
-| `hotfix/<description>` | Emergency production fixes. Merged to main directly with expedited review. | No |
-| `docs/<description>` | Documentation-only changes. | No |
-| `chore/<description>` | Non-functional changes (dependency updates, tooling). | No |
+| Branch                  | Purpose                                                                    | Protected?                   |
+| ----------------------- | -------------------------------------------------------------------------- | ---------------------------- |
+| `main`                  | Production-ready code. Always releasable.                                  | Yes — requires PR and review |
+| `feature/<description>` | Feature development. Short-lived (≤ 5 days).                               | No                           |
+| `fix/<description>`     | Bug fixes. Short-lived.                                                    | No                           |
+| `hotfix/<description>`  | Emergency production fixes. Merged to main directly with expedited review. | No                           |
+| `docs/<description>`    | Documentation-only changes.                                                | No                           |
+| `chore/<description>`   | Non-functional changes (dependency updates, tooling).                      | No                           |
 
 **Rules:**
+
 - Feature branches are created from `main`.
 - Feature branches are merged to `main` via pull request.
 - Pull requests require at least one review (from yourself using a second account is not acceptable — get a genuine review when the team grows).
@@ -141,6 +142,7 @@ We use a **trunk-based development** approach with short-lived feature branches.
 We use **Conventional Commits** (https://www.conventionalcommits.org/).
 
 Format:
+
 ```
 <type>(<scope>): <short summary>
 
@@ -151,34 +153,34 @@ Format:
 
 ### Types
 
-| Type | When to use |
-|---|---|
-| `feat` | A new feature |
-| `fix` | A bug fix |
-| `docs` | Documentation changes only |
-| `style` | Formatting, whitespace — no logic changes |
-| `refactor` | Code restructuring — no feature or fix |
-| `test` | Adding or updating tests |
-| `chore` | Maintenance — dependency updates, tooling |
-| `ci` | CI/CD configuration changes |
-| `security` | Security fix or control improvement |
-| `perf` | Performance improvement |
+| Type       | When to use                               |
+| ---------- | ----------------------------------------- |
+| `feat`     | A new feature                             |
+| `fix`      | A bug fix                                 |
+| `docs`     | Documentation changes only                |
+| `style`    | Formatting, whitespace — no logic changes |
+| `refactor` | Code restructuring — no feature or fix    |
+| `test`     | Adding or updating tests                  |
+| `chore`    | Maintenance — dependency updates, tooling |
+| `ci`       | CI/CD configuration changes               |
+| `security` | Security fix or control improvement       |
+| `perf`     | Performance improvement                   |
 
 ### Scopes
 
-| Scope | Module |
-|---|---|
-| `backend` | NestJS backend |
-| `ai-service` | Python FastAPI AI service |
-| `frontend` | Angular frontend |
-| `shared-types` | Shared TypeScript types |
-| `infra` | Docker, CI/CD, infrastructure |
-| `docs` | Documentation |
-| `auth` | Authentication module |
-| `document` | Document module |
-| `classification` | Classification module |
-| `review` | Human review module |
-| `audit` | Audit log module |
+| Scope            | Module                        |
+| ---------------- | ----------------------------- |
+| `backend`        | NestJS backend                |
+| `ai-service`     | Python FastAPI AI service     |
+| `frontend`       | Angular frontend              |
+| `shared-types`   | Shared TypeScript types       |
+| `infra`          | Docker, CI/CD, infrastructure |
+| `docs`           | Documentation                 |
+| `auth`           | Authentication module         |
+| `document`       | Document module               |
+| `classification` | Classification module         |
+| `review`         | Human review module           |
+| `audit`          | Audit log module              |
 
 ### Examples
 
@@ -243,6 +245,7 @@ All TypeScript projects use strict mode. Minimum `tsconfig.json` settings:
 ### Configuration
 
 All Python code is checked with:
+
 - **Ruff** for linting and formatting (configured in `pyproject.toml`).
 - **mypy** for static type checking (strict mode).
 
@@ -279,11 +282,13 @@ warn_unused_configs = true
 - All incoming HTTP request data must go through a DTO with `class-validator` decorators.
 - Apply `ValidationPipe` globally in `main.ts`:
   ```typescript
-  app.useGlobalPipes(new ValidationPipe({
-    whitelist: true,        // strip unknown properties
-    forbidNonWhitelisted: true,  // reject requests with unknown properties
-    transform: true,        // transform plain objects to class instances
-  }));
+  app.useGlobalPipes(
+    new ValidationPipe({
+      whitelist: true, // strip unknown properties
+      forbidNonWhitelisted: true, // reject requests with unknown properties
+      transform: true, // transform plain objects to class instances
+    }),
+  );
   ```
 - Validate file uploads separately (size, type, magic bytes) before the file reaches business logic.
 
@@ -399,6 +404,7 @@ warn_unused_configs = true
 See `SECURITY.md` Section 13 for full dependency security requirements.
 
 Before adding any dependency:
+
 1. Check if an existing dependency already provides the capability.
 2. Check the licence.
 3. Check maintenance status.
@@ -434,19 +440,19 @@ A feature task is considered complete only when all of the following are true:
 
 ## 16. Patterns to Avoid
 
-| Anti-pattern | Why | Alternative |
-|---|---|---|
-| God classes | Impossible to test or reason about | Small, focused classes with a single responsibility |
-| Duplicated business logic | Two sources of truth diverge | Extract to a shared module or service |
-| Giant utility files | Becomes a dumping ground | Focused, well-named utility modules |
-| Silent error handling (`catch {}`) | Hides bugs | Log and re-throw or convert to typed error |
-| Inline secrets | Leaks to source control | Environment variables + secrets manager |
-| Unstructured logs (`console.log`) | Unsearchable, unparseable | Structured JSON logger |
-| `process.env` in business logic | Untestable, unvalidated | `ConfigService` with validation at startup |
-| Premature microservices | Distributed systems complexity without benefit | Modular monolith — extract only when justified |
-| Premature Kubernetes | Operational complexity without benefit | Docker Compose until the platform is stable |
-| Unnecessary abstractions | Complexity without value | YAGNI — build what is needed now |
-| Trusting user input for security decisions | Security bypass | Always validate and sanitise; take security context from the JWT |
+| Anti-pattern                               | Why                                            | Alternative                                                      |
+| ------------------------------------------ | ---------------------------------------------- | ---------------------------------------------------------------- |
+| God classes                                | Impossible to test or reason about             | Small, focused classes with a single responsibility              |
+| Duplicated business logic                  | Two sources of truth diverge                   | Extract to a shared module or service                            |
+| Giant utility files                        | Becomes a dumping ground                       | Focused, well-named utility modules                              |
+| Silent error handling (`catch {}`)         | Hides bugs                                     | Log and re-throw or convert to typed error                       |
+| Inline secrets                             | Leaks to source control                        | Environment variables + secrets manager                          |
+| Unstructured logs (`console.log`)          | Unsearchable, unparseable                      | Structured JSON logger                                           |
+| `process.env` in business logic            | Untestable, unvalidated                        | `ConfigService` with validation at startup                       |
+| Premature microservices                    | Distributed systems complexity without benefit | Modular monolith — extract only when justified                   |
+| Premature Kubernetes                       | Operational complexity without benefit         | Docker Compose until the platform is stable                      |
+| Unnecessary abstractions                   | Complexity without value                       | YAGNI — build what is needed now                                 |
+| Trusting user input for security decisions | Security bypass                                | Always validate and sanitise; take security context from the JWT |
 
 ---
 
@@ -457,6 +463,7 @@ Model Context Protocol (MCP) connects the OpenAI Codex CLI agent to approved loc
 > **Requirement:** Before Phase 2 MCP installation, verify the current stable Codex MCP configuration schema, GitHub MCP server release, Context7 release, and MCP protocol compatibility using official documentation. Record the selected versions in `ADR-0007` or an ADR amendment. Do not use `@latest` or unpinned Docker image tags.
 
 ### Approved Client & Servers (Stage 1)
+
 - **Client:** OpenAI Codex CLI
 - **Servers:**
   1. **GitHub MCP Server** (Docker stdio): `ghcr.io/github/github-mcp-server:<PINNED_VERSION>` (Read-only repository access)
@@ -497,6 +504,7 @@ tool_timeout_sec = 30
 ```
 
 ### Setup Steps
+
 1. Generate a GitHub Personal Access Token (PAT) with fine-grained read-only repository permissions for `Dy-Rongrath/Cambodia-Trusted-AI-Document-Platform`.
 2. Export the token in your local shell profile (outside the config file):
    ```bash
@@ -507,12 +515,11 @@ tool_timeout_sec = 30
 5. Run `codex mcp list` to verify both servers load cleanly.
 
 ### Mandatory Rules
+
 - **NEVER commit `.codex/config.toml` or any file containing GitHub PATs or secrets.**
 - All MCP tools in Stage 1 are read-only. Do not enable write parameters without approval.
 - See `MCP_SECURITY.md` for full governance rules.
 
 ---
 
-*Read `ARCHITECTURE.md`, `SECURITY.md`, `MCP_SECURITY.md`, and `AGENTS.md` alongside this document.*
-
-
+_Read `ARCHITECTURE.md`, `SECURITY.md`, `MCP_SECURITY.md`, and `AGENTS.md` alongside this document._

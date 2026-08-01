@@ -7,7 +7,7 @@ async function main() {
     console.log('Database connectivity check succeeded:', result);
   } catch (error) {
     console.error('Database connectivity check failed:', error);
-    process.exit(1);
+    process.exitCode = 1;
   } finally {
     await prisma.$disconnect();
   }

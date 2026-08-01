@@ -1,4 +1,4 @@
-FROM node:24.15.0-alpine3.21 AS base
+FROM node:24-alpine3.21 AS base
 WORKDIR /app
 
 FROM base AS dependencies
@@ -7,15 +7,19 @@ COPY packages/shared-types/package.json ./packages/shared-types/
 COPY apps/backend/package.json ./apps/backend/
 RUN npm ci --workspace=apps/backend --workspace=packages/shared-types
 
-FROM dependencies AS test
+FROM dependencies AS development
 COPY tsconfig.base.json ./
 COPY packages/shared-types ./packages/shared-types
 COPY apps/backend ./apps/backend
 RUN npm run build --workspace=packages/shared-types
 RUN npm run prisma:generate --workspace=apps/backend
+EXPOSE 3000
+CMD ["npm", "run", "dev", "--workspace=apps/backend"]
+
+FROM development AS test
 CMD ["npm", "run", "test", "--workspace=apps/backend"]
 
-FROM test AS build
+FROM development AS build
 RUN npm run build --workspace=apps/backend
 
 FROM base AS runtime

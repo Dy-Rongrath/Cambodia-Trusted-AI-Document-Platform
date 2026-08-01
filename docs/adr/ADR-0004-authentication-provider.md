@@ -34,6 +34,7 @@ We will use **Keycloak 26** (current stable release as of 2025–2026) as the id
 Keycloak is the leading open-source identity and access management (IAM) solution. It implements OAuth 2.1, OIDC, SAML 2.0, and WebAuthn standards. It is self-hostable, runs in Docker, and has strong NestJS ecosystem support.
 
 Key features used:
+
 - **Realm per environment** (development, staging, production).
 - **Keycloak Organisations** (introduced in Keycloak 24+) for multi-tenant organisation management.
 - **WebAuthn authenticator** for Passkey support.
@@ -43,17 +44,18 @@ Key features used:
 
 ## Alternatives Considered
 
-| Option | Description | Why rejected or deferred |
-|---|---|---|
-| ZITADEL | Modern Go-based IAM with excellent OpenID4VCI roadmap | Strong candidate. More modern codebase, better native credential issuance support, lighter resource footprint (Go vs. Java). Rejected for Phase 0 because Keycloak has a larger community, more documentation, and more NestJS integration examples. ZITADEL is recommended for re-evaluation when OpenID4VCI credential issuance is implemented in Phase 10. |
-| Auth0 | Managed cloud IAM | Vendor lock-in. Data residency concerns. Cost at scale. Not self-hostable. Rejected. |
-| Supabase Auth | Simpler managed auth | Insufficient for enterprise multi-tenant management, WebAuthn, and OIDC compliance at the required level. |
-| custom JWT implementation | Build authentication from scratch | Never acceptable. Authentication must not be implemented from scratch. |
-| AWS Cognito / Azure AD B2C | Cloud-managed IAM | Vendor lock-in. Not self-hostable. Cost concerns. Rejected. |
+| Option                     | Description                                           | Why rejected or deferred                                                                                                                                                                                                                                                                                                                                      |
+| -------------------------- | ----------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| ZITADEL                    | Modern Go-based IAM with excellent OpenID4VCI roadmap | Strong candidate. More modern codebase, better native credential issuance support, lighter resource footprint (Go vs. Java). Rejected for Phase 0 because Keycloak has a larger community, more documentation, and more NestJS integration examples. ZITADEL is recommended for re-evaluation when OpenID4VCI credential issuance is implemented in Phase 10. |
+| Auth0                      | Managed cloud IAM                                     | Vendor lock-in. Data residency concerns. Cost at scale. Not self-hostable. Rejected.                                                                                                                                                                                                                                                                          |
+| Supabase Auth              | Simpler managed auth                                  | Insufficient for enterprise multi-tenant management, WebAuthn, and OIDC compliance at the required level.                                                                                                                                                                                                                                                     |
+| custom JWT implementation  | Build authentication from scratch                     | Never acceptable. Authentication must not be implemented from scratch.                                                                                                                                                                                                                                                                                        |
+| AWS Cognito / Azure AD B2C | Cloud-managed IAM                                     | Vendor lock-in. Not self-hostable. Cost concerns. Rejected.                                                                                                                                                                                                                                                                                                   |
 
 ## Consequences
 
 ### Positive consequences
+
 - Full OAuth 2.1 + OIDC compliance out of the box.
 - WebAuthn / Passkeys supported natively.
 - NestJS passport strategy (`@nestjs/passport` + `passport-jwt`) integrates cleanly with Keycloak-issued JWTs.
@@ -63,12 +65,14 @@ Key features used:
 - Active development and long-term support (Red Hat backing).
 
 ### Negative consequences / trade-offs
+
 - Keycloak is Java-based — higher memory footprint than Go-based alternatives (ZITADEL). Not a concern at current scale.
 - Keycloak configuration is complex. The admin UI is powerful but can be overwhelming. Infrastructure-as-code for Keycloak configuration is recommended (Terraform Keycloak provider or Keycloak export/import).
 - OpenID4VCI credential issuance support in Keycloak is limited — this is why ZITADEL is flagged for re-evaluation in Phase 10.
 - Keycloak upgrades can require realm migration. Plan upgrades carefully.
 
 ### Neutral consequences
+
 - Local development: `quay.io/keycloak/keycloak:26` Docker image with volume-mounted realm export.
 - Realm configuration is exported to JSON and committed to the repository for reproducibility.
 - The NestJS backend validates Keycloak-issued JWTs using the JWKS endpoint — no shared secret.
@@ -76,6 +80,7 @@ Key features used:
 ## Security Impact
 
 High positive impact. Keycloak provides:
+
 - Brute-force protection.
 - MFA (TOTP, WebAuthn).
 - Token revocation.
@@ -84,6 +89,7 @@ High positive impact. Keycloak provides:
 - Configurable token lifetimes and refresh token rotation.
 
 Security configuration requirements:
+
 - Disable unused authentication flows.
 - Enforce PKCE for all public clients.
 - Set short access token lifetimes (15 minutes recommended).
@@ -94,6 +100,7 @@ Security configuration requirements:
 ## Privacy Impact
 
 Keycloak stores user credentials and profile data. In production, the Keycloak database must:
+
 - Be a separate PostgreSQL instance (not shared with application data).
 - Be encrypted at rest.
 - Be backed up regularly.
@@ -111,6 +118,7 @@ Keycloak logs may contain personal data (usernames, IP addresses). Log retention
 ## Migration Impact
 
 Migrating from Keycloak to another IdP would require:
+
 - Exporting user data and re-importing it into the new IdP.
 - Updating JWT claims mapping in the NestJS backend.
 - Updating OIDC client configuration in the Angular frontend.

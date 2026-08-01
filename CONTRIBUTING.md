@@ -25,6 +25,7 @@ Before writing code or documentation:
 We follow **Trunk-Based Development** with focused, short-lived feature branches:
 
 ### Step 1: Create a Branch
+
 Fork the repository or create a branch from `main` using standard prefix conventions:
 
 - `feat/<description>` — New feature or capability
@@ -34,11 +35,13 @@ Fork the repository or create a branch from `main` using standard prefix convent
 - `chore/<description>` — Maintenance, tooling, or dependency updates
 
 ### Step 2: Make Focused Changes
+
 - Keep changes small, self-contained, and focused on a single purpose.
 - Do not perform unsolicited refactoring or styling changes outside your task scope.
 - Follow technical standards defined in [DEVELOPMENT.md](DEVELOPMENT.md).
 
 ### Step 3: DCO Sign-off on Commits
+
 All contributions must be certified under the **Developer Certificate of Origin (DCO 1.1)**. Sign off every commit message using `git commit -s`:
 
 ```bash
@@ -48,7 +51,9 @@ git commit -s -m "feat(auth): validate JWT audience claim via Keycloak JWKS"
 This adds a `Signed-off-by: Your Name <your.email@example.com>` line certifying that you have the legal right to submit your work under the Apache-2.0 licence (see [DCO.md](DCO.md)). Automated DCO bot enforcement is not currently configured.
 
 ### Step 4: Run Validation
+
 Run local linters, type checks, and tests before opening a PR:
+
 ```bash
 npm run lint         # TypeScript/NestJS linting
 tsc --noEmit         # Type check
@@ -56,6 +61,7 @@ uv run ruff check    # Python AI service linting
 ```
 
 ### Step 5: Submit a Pull Request
+
 - Open a PR against the `main` branch using our [.github/PULL_REQUEST_TEMPLATE.md](.github/PULL_REQUEST_TEMPLATE.md).
 - Ensure all items in the PR checklist are completed.
 - Address review feedback promptly. The project maintainer will review and merge approved PRs.

@@ -34,20 +34,23 @@ Use the form: "We will use / adopt / reject / defer X."
 
 ## Alternatives Considered
 
-| Option | Description | Why rejected or deferred |
-|---|---|---|
-| Option A | ... | ... |
-| Option B | ... | ... |
+| Option   | Description | Why rejected or deferred |
+| -------- | ----------- | ------------------------ |
+| Option A | ...         | ...                      |
+| Option B | ...         | ...                      |
 
 ## Consequences
 
 ### Positive consequences
+
 - ...
 
 ### Negative consequences / trade-offs
+
 - ...
 
 ### Neutral consequences
+
 - ...
 
 ## Security Impact
