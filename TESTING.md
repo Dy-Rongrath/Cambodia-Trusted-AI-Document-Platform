@@ -230,12 +230,12 @@ Every feature must be verifiable without a production environment. Tests are not
 - All protected endpoints return 401 without authentication.
 - All endpoints validate Content-Type on POST/PUT requests.
 
-**What to run in CI (tooling):**
-- Gitleaks: secret scanning on every commit.
-- Semgrep: SAST on every push (Phase 2).
-- `npm audit` / `uv audit`: dependency vulnerability check on every push.
-- Trivy: container image scan on every image build (Phase 2).
-- OWASP ZAP: automated API scan on every release (Phase 4).
+**Planned CI security tooling (to be configured in CI as application manifests and pipelines are created):**
+- Gitleaks: secret scanning on every commit (Planned Phase 1). Until CI is configured, manual checks are required.
+- Semgrep: SAST on every push (Planned Phase 2).
+- `npm audit` / `uv audit`: dependency vulnerability check on every push (Planned Phase 1/2).
+- Trivy: container image scan on every image build (Planned Phase 2).
+- OWASP ZAP: automated API scan on every release (Planned Phase 4).
 
 ---
 

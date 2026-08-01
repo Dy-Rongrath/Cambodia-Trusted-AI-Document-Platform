@@ -14,10 +14,10 @@ The **Cambodia Trusted AI Document Platform** is an open-source project maintain
 
 | Need | Channel | Guidance |
 |---|---|---|
-| **Questions & Discussions** | GitHub Discussions | Ask general questions, discuss architecture, or share usage ideas. |
-| **Bug Reports** | GitHub Issues | Report confirmed bugs using the [Bug Report template](.github/ISSUE_TEMPLATE/bug_report.yml). |
-| **Feature Requests** | GitHub Issues | Submit ideas using the [Feature Request template](.github/ISSUE_TEMPLATE/feature_request.yml). |
-| **Security Vulnerabilities** | Private Security Disclosure | Follow [SECURITY.md](SECURITY.md). **Never post vulnerabilities in public issues.** |
+| **Questions & Public Discussion** | GitHub Issue Forms | Use the most appropriate GitHub issue form for questions or proposals that can be discussed publicly. (Enabling GitHub Discussions is a pending repository-owner setting). |
+| **Bug Reports** | GitHub Issues | Report confirmed bugs using the [Bug Report form](.github/ISSUE_TEMPLATE/bug_report.yml). |
+| **Feature Requests** | GitHub Issues | Submit ideas using the [Feature Request form](.github/ISSUE_TEMPLATE/feature_request.yml). |
+| **Security Vulnerabilities** | Private Security Disclosure | Follow [SECURITY.md](SECURITY.md) to submit a confidential security advisory under the Security tab. **Never post vulnerabilities in public issues!** |
 
 ---
 

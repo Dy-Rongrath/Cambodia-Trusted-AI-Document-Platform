@@ -85,7 +85,9 @@ The platform is designed to support local-first engineering and low-cost accessi
 | [DATA_GOVERNANCE.md](DATA_GOVERNANCE.md) | Data sourcing rules, anonymisation, dataset lineage (DVC), and retention policy |
 | [AI_GOVERNANCE.md](AI_GOVERNANCE.md) | Permitted AI uses, mandatory human oversight, model cards, and responsible-AI policy |
 | [ROADMAP.md](ROADMAP.md) | 16-phase implementation roadmap |
-| [LICENSE](LICENSE) | Apache License 2.0 legal text |
+| [LICENSE](LICENSE) | Official Apache License 2.0 legal text |
+| [NOTICE](NOTICE) | Project copyright and primary attribution notice |
+| [THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md) | Third-party legal and community text attributions (DCO 1.1, Contributor Covenant v2.1) |
 | [DCO.md](DCO.md) | Developer Certificate of Origin 1.1 sign-off guidelines |
 | [GOVERNANCE.md](GOVERNANCE.md) | Maintainer governance model, commercial neutrality, and trademark policy |
 | [CODE_OF_CONDUCT.md](CODE_OF_CONDUCT.md) | Contributor Covenant 2.1 community standards |
@@ -93,7 +95,7 @@ The platform is designed to support local-first engineering and low-cost accessi
 | [CHANGELOG.md](CHANGELOG.md) | Project release changelog and semver policy |
 | [CONTRIBUTING.md](CONTRIBUTING.md) | Contribution workflow, PR rules, and DCO sign-off requirements |
 | [docs/open-source-dependency-policy.md](docs/open-source-dependency-policy.md) | Open-source dependency evaluation and licensing rules |
-| [docs/adr/](docs/adr/) | Architecture Decision Records (ADR-0001 through ADR-0007) |
+| [docs/adr/](docs/adr/) | Architecture Decision Records (ADR-0001 through ADR-0008) |
 | [docs/threat-model.md](docs/threat-model.md) | STRIDE threat model (including 15 MCP threat categories) |
 | [docs/templates/](docs/templates/) | Reusable task templates (feature, bug-fix, mcp-integration, etc.) |
 | [docs/roles/](docs/roles/) | Specialist AI agent role instructions |
@@ -137,7 +139,9 @@ trusted-ai-platform/
 ├── DATA_GOVERNANCE.md        # Data sourcing, lineage & retention
 ├── AI_GOVERNANCE.md          # Permitted/prohibited AI uses & human oversight
 ├── ROADMAP.md                # 16-phase implementation roadmap
-├── LICENSE                   # Apache License 2.0 legal text
+├── LICENSE                   # Official Apache License 2.0 legal text
+├── NOTICE                    # Project copyright notice
+├── THIRD_PARTY_NOTICES.md    # Third-party standard legal text attributions
 ├── DCO.md                    # Developer Certificate of Origin 1.1 rules
 ├── GOVERNANCE.md             # Maintainer governance & trademark policy
 ├── CODE_OF_CONDUCT.md        # Contributor Covenant 2.1 standards
@@ -190,7 +194,7 @@ This platform processes sensitive documents and credentials. If you discover a s
 
 ## Open-Source Licence
 
-This project is licensed under the **Apache License 2.0**.
-See [LICENSE](LICENSE) for details.
+The project’s original source code, infrastructure code, and original documentation are licensed under the **Apache License 2.0**.
+See [LICENSE](LICENSE) for the official licence text and [NOTICE](NOTICE) for project copyright details.
 
-The Apache License 2.0 applies to the application source code, infrastructure configurations, and documentation. Third-party datasets, model weights, fonts, icons, and user-uploaded data are subject to their respective upstream licences and usage terms (see [docs/open-source-dependency-policy.md](docs/open-source-dependency-policy.md)).
+Third-party standard legal and community texts ([THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md)), third-party datasets, model weights, fonts, icons, media, dependencies, and user-uploaded content remain subject to their respective upstream licences and terms (see [docs/open-source-dependency-policy.md](docs/open-source-dependency-policy.md)).

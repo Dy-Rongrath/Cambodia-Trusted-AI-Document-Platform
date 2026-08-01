@@ -14,7 +14,7 @@ The project uses a **maintainer-led governance model**:
 - The project owner makes final decisions on product vision, architecture, security policy, and roadmap priorities.
 - Major technical and architectural decisions are recorded transparently using Architecture Decision Records ([docs/adr/](docs/adr/)).
 - All changes are submitted via Pull Requests and require maintainer review and approval before merging.
-- Security-sensitive changes require explicit human review — AI agents and automated tools cannot self-approve or merge changes (`AGENTS.md` Section 6).
+- Security-sensitive changes require explicit human review — AI agents and automated tools cannot self-approve or merge changes ([AGENTS.md](file:///Users/dyrongrath/Documents/trusted-ai-platform/AGENTS.md) Section 7).
 
 ---
 

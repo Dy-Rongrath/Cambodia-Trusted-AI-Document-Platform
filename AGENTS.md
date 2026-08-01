@@ -128,13 +128,14 @@ This file (`AGENTS.md`) is the primary entry point and source of navigation for 
 
 ## 6. Open-Source & Licensing Rules
 
-- **Preserve Apache-2.0 Notices:** Maintain copyright and licence headers in all project files ([LICENSE](LICENSE)).
-- **Incompatible Licences Prohibited:** Do not copy or introduce code, libraries, or assets with un-cleared, custom, or copyleft licences without maintainer review ([docs/open-source-dependency-policy.md](docs/open-source-dependency-policy.md)).
-- **Licence Verification Mandatory:** Every new dependency must have a documented permissive licence (Apache-2.0, MIT, BSD, ISC, PostgreSQL, PSF).
-- **No Paid-Cloud Requirements:** Early-phase code and setup must run locally on Apple Silicon M5 without requiring paid cloud API keys or cloud subscriptions.
+- **Preserve Apache-2.0 Notices:** Maintain official Apache License 2.0 text in [LICENSE](LICENSE) without altering legal text. Project copyright is recorded in [NOTICE](NOTICE).
+- **Third-Party Standard Texts:** Third-party standard legal and community texts (DCO 1.1, Contributor Covenant v2.1) must retain their upstream copyright notices and attributions in [THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md) and must NOT be relicensed under Apache-2.0.
+- **Unified Dependency Licensing:** Every dependency and third-party asset must have a known licence and complete the project dependency-review process ([docs/open-source-dependency-policy.md](docs/open-source-dependency-policy.md)). Generally approved permissive licences (Apache-2.0, MIT, BSD, ISC, PostgreSQL, PSF-2.0) may be accepted through normal maintainer review. Copyleft, weak-copyleft, source-available, custom, unlicensed, or commercially restricted terms require explicit maintainer and legal review before adoption.
+- **No Unverified Repository Claims:** Do not claim GitHub repository settings (e.g. Private Vulnerability Reporting, GitHub Discussions, automated DCO bot) or automated CI scanners are active without verification.
+- **Local-First & Zero Paid Cloud:** Early-phase code and setup must run locally on Apple Silicon M5 without requiring paid cloud API keys or cloud subscriptions.
 - **No Unapproved Vendor Lock-In:** Prefer standard protocols (REST, OpenAPI, OIDC, S3 API) and open-source tools over proprietary vendor lock-in without an approved ADR.
-- **No Un-Reviewed Asset Licensing:** Third-party datasets, model weights, fonts, icons, or media must be documented with explicit licence review before inclusion.
-- **Preserve Contributor Attribution:** Maintain author attribution and sign off all commits using DCO (`git commit -s`, [DCO.md](DCO.md)).
+- **Object Storage Gating (ADR-0008):** Object storage provider selection is subject to [ADR-0008](docs/adr/ADR-0008-local-object-storage-strategy.md) (Status: Proposed). Do not make MinIO or an alternative container mandatory before ADR-0008 is accepted by the maintainer.
+- **Preserve Contributor Attribution:** Maintain author attribution and sign off all commits using DCO (`git commit -s`, [DCO.md](DCO.md)). Automated DCO bot enforcement is not currently configured.
 - **No Fabricated Evidence:** Never fabricate contributor names, legal approvals, test outputs, or compliance evidence.
 
 ---

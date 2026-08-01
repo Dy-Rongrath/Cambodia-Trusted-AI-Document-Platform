@@ -45,7 +45,7 @@ All contributions must be certified under the **Developer Certificate of Origin 
 git commit -s -m "feat(auth): validate JWT audience claim via Keycloak JWKS"
 ```
 
-This adds a `Signed-off-by: Your Name <your.email@example.com>` line certifying that you have the legal right to submit your work under the Apache-2.0 licence (see [DCO.md](DCO.md)).
+This adds a `Signed-off-by: Your Name <your.email@example.com>` line certifying that you have the legal right to submit your work under the Apache-2.0 licence (see [DCO.md](DCO.md)). Automated DCO bot enforcement is not currently configured.
 
 ### Step 4: Run Validation
 Run local linters, type checks, and tests before opening a PR:
@@ -72,9 +72,9 @@ Every pull request must meet the following criteria:
 - **Documentation Updated:** Relevant specifications, ADRs, or README files are updated to reflect the code changes.
 - **Zero Secrets:** Verified by local checks and Gitleaks (`.env` files or secret tokens strictly prohibited).
 - **No Real Data:** Synthetic data fixtures only.
-- **Dependency Justification:** New dependencies are permissively licensed, pinned, and justified per [docs/open-source-dependency-policy.md](docs/open-source-dependency-policy.md).
+- **Dependency Compliance:** New dependencies and third-party assets have known licences, are pinned where appropriate, are documented, and complete the review process in [docs/open-source-dependency-policy.md](docs/open-source-dependency-policy.md).
 - **Architecture Compliance:** Architecture or auth changes include an approved ADR in `docs/adr/`.
-- **DCO Certification:** All commits include valid `Signed-off-by` lines.
+- **DCO Certification:** All commits include valid `Signed-off-by` lines (`git commit -s`).
 
 ---
 
@@ -92,8 +92,8 @@ AI coding assistants (such as OpenAI Codex CLI, GitHub Copilot, or Claude) are w
 
 ## 5. Getting Help & Contact
 
-- **Questions & Discussions:** Post on GitHub Discussions.
+- **Questions & Proposals:** Use the most appropriate [GitHub Issue Form](.github/ISSUE_TEMPLATE/) for questions or proposals that can be discussed publicly.
 - **Bug Reports:** Open a GitHub Issue using the [Bug Report Form](.github/ISSUE_TEMPLATE/bug_report.yml).
-- **Security Disclosures:** Follow [SECURITY.md](SECURITY.md) for private disclosure.
+- **Security Disclosures:** Follow [SECURITY.md](SECURITY.md) to submit a confidential security advisory under the Security tab.
 
 Thank you for contributing to the Cambodia Trusted AI Document Platform!

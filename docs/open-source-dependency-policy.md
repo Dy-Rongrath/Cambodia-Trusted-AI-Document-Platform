@@ -17,7 +17,7 @@ Before adding any new dependency to `package.json`, `pyproject.toml`, Docker bas
 
 1. Search existing codebase and ADRs to confirm an equivalent capability does not already exist.
 2. Complete the dependency evaluation checklist below.
-3. For major or security-critical dependencies, submit an Architecture Decision Record (ADR) or task proposal for maintainer review (`AGENTS.md` Section 6).
+3. For major or security-critical dependencies, submit an Architecture Decision Record (ADR) or task proposal for maintainer review ([AGENTS.md](file:///Users/dyrongrath/Documents/trusted-ai-platform/AGENTS.md) Section 7).
 
 ### Evaluation Checklist
 
@@ -34,9 +34,13 @@ Every proposed dependency must document:
 - **Classification:** Runtime dependency or Development-only dependency.
 - **Alternatives Considered:** Reason why alternatives were rejected.
 
----
+## 3. Unified Licensing Evaluation Rule
 
-## 3. Approved & Permissive Licences
+Every dependency and third-party asset must have a known licence and complete the project dependency-review process.
+
+Licences in the generally approved list below may be accepted through normal maintainer review. Copyleft, weak-copyleft, source-available, custom, unlicensed, or commercially restricted terms require explicit maintainer and legal review before adoption. No licence is automatically prohibited solely by name, and no licence is automatically approved solely because it is OSI-approved. Review must evaluate distribution obligations, hosted-service obligations, static vs dynamic linking, modification disclosure, commercial restrictions, compatibility with Apache-2.0, and model/dataset-specific usage terms.
+
+### Generally Approved Permissive Licences
 
 The following permissive open-source licences are generally approved for runtime and development use:
 
@@ -53,7 +57,7 @@ The following permissive open-source licences are generally approved for runtime
 
 ## 4. Licences Requiring Additional Review
 
-Dependencies using the following licences require explicit maintainer review to evaluate potential obligations regarding source distribution, service hosting, linking, or commercial deployment:
+Dependencies or assets using the following licences require explicit maintainer and legal review before adoption:
 
 | Licence Family | Examples | Review Focus |
 |---|---|---|
@@ -70,9 +74,10 @@ To maintain clear legal boundaries across the project:
 
 | Asset Category | Licensing Policy |
 |---|---|
-| **Application & Infra Code** | Licensed under [Apache License 2.0](../LICENSE). |
+| **Application & Infra Code** | Licensed under [Apache License 2.0](../LICENSE). Project copyright recorded in [NOTICE](../NOTICE). |
 | **Documentation** | Licensed under [Apache License 2.0](../LICENSE). |
 | **Training Code** | Licensed under [Apache License 2.0](../LICENSE) (unless upstream dependency requires copyleft). |
+| **Third-Party Standard Texts** | DCO 1.1 and Contributor Covenant 2.1 retain their upstream copyrights and terms in [THIRD_PARTY_NOTICES.md](../THIRD_PARTY_NOTICES.md) and are NOT relicensed under Apache-2.0. |
 | **Datasets** | Subject to individual dataset licences. Documented via Dataset Cards. Apache-2.0 does not automatically apply. |
 | **Model Weights** | Subject to individual model weight licences (e.g. Hugging Face OpenRAIL, Llama license, etc.). Documented via Model Cards. |
 | **Third-Party Models** | Original upstream licence applies. Must be reviewed for commercial and privacy compatibility. |
