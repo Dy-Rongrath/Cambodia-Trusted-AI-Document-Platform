@@ -137,6 +137,7 @@ This file (`AGENTS.md`) is the primary entry point and source of navigation for 
 - **Object Storage Gating (ADR-0008):** Object storage provider selection is subject to [ADR-0008](docs/adr/ADR-0008-local-object-storage-strategy.md) (Status: Proposed). Do not make MinIO or an alternative container mandatory before ADR-0008 is accepted by the maintainer.
 - **Preserve Contributor Attribution:** Maintain author attribution and sign off all commits using DCO (`git commit -s`, [DCO.md](DCO.md)). Automated DCO bot enforcement is not currently configured.
 - **No Fabricated Evidence:** Never fabricate contributor names, legal approvals, test outputs, or compliance evidence.
+- **Accurate ADR Governance Metadata:** ADR metadata must list only real participants who actually contributed to the decision. AI agents, assumed job titles and nonexistent project roles must not be recorded as human reviewers, consultees or approvers.
 
 ---
 

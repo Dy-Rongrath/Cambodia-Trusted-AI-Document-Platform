@@ -3,8 +3,8 @@
 - **Status:** Proposed
 - **Date:** 2026-08-01
 - **Deciders:** Dy Rongrath (Project Owner / Lead Maintainer)
-- **Consulted:** Architecture Reviewer, Security Reviewer, DevSecOps Specialist
-- **Informed:** Core Contributors
+- **Consulted:** None — solo-development stage
+- **Informed:** Public repository readers and future contributors
 
 ---
 
