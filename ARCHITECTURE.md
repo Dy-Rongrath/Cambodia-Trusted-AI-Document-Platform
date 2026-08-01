@@ -420,7 +420,7 @@ Introduced incrementally. See `ROADMAP.md` for phase targets.
 |---|---|---|---|
 | Keycloak | Keycloak infrastructure and local-development configuration | Phase 1 | Self-hosted Docker container, realm bootstrap configuration placeholder |
 | Authentication and authorisation | User login flow, JWT validation, roles, tenant-context middleware | Phase 3 | Keycloak JWKS, AuthModule, OrganisationModule |
-| Object storage (MinIO locally, S3-compatible in production) | Document storage | Phase 4 | Encrypted at rest |
+| Object storage (S3-compatible API locally and in production) | Document storage | Phase 4 | Encrypted at rest; local container strategy subject to ADR-0008 |
 | ClamAV | Malware scanning of uploaded files | Phase 4 | Integration point defined in Phase 1 |
 | MLflow | ML experiment tracking and model registry | Phase 6 | Self-hosted |
 | Label Studio | Data annotation | Phase 10 | Self-hosted |

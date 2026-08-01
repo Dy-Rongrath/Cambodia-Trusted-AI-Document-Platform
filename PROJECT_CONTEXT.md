@@ -103,10 +103,10 @@ Phase 0 defined the planned monorepo architecture but did not create the applica
 - `apps/ai-service`: FastAPI application skeleton (health endpoint only).
 - `apps/frontend`: Angular application skeleton (placeholder page).
 - `packages/shared-types`: TypeScript types package skeleton.
-- `infra/docker/docker-compose.yml` with PostgreSQL 17, Keycloak 26, MinIO local-development configuration.
+- `infra/docker/docker-compose.yml` with PostgreSQL 17 and optional Keycloak 26 local-development configuration. Object storage is subject to [ADR-0008](docs/adr/ADR-0008-local-object-storage-strategy.md).
 - PostgreSQL connection setup and Prisma initialisation & connection verification.
-- Keycloak local-development configuration.
-- MinIO local-development configuration.
+- Keycloak local-development configuration placeholder.
+- Local object storage evaluation subject to ADR-0008.
 - Health endpoints for backend and AI service.
 - Code-quality tooling (ESLint, Prettier, Ruff, mypy).
 - Basic GitHub Actions CI workflow execution.
