@@ -495,41 +495,57 @@ A feature task is considered complete only when all of the following are true:
 
 Model Context Protocol (MCP) connects the OpenAI Codex CLI agent to approved local development context and tools.
 
+> **Requirement:** Before Phase 2 MCP installation, verify the current stable Codex MCP configuration schema, GitHub MCP server release, Context7 release, and MCP protocol compatibility using official documentation. Record the selected versions in `ADR-0007` or an ADR amendment. Do not use `@latest` or unpinned Docker image tags.
+
 ### Approved Client & Servers (Stage 1)
 - **Client:** OpenAI Codex CLI
 - **Servers:**
-  1. **GitHub MCP Server** (Docker stdio): `ghcr.io/github/github-mcp-server` (Read-only repository access)
-  2. **Context7 MCP Server** (npx stdio): `@upstash/context7-mcp` (Official documentation lookup)
+  1. **GitHub MCP Server** (Docker stdio): `ghcr.io/github/github-mcp-server:<PINNED_VERSION>` (Read-only repository access)
+  2. **Context7 MCP Server** (npx stdio): `@upstash/context7-mcp@<PINNED_VERSION>` (Official documentation lookup)
 
 ### Configuration Setup
 
 Project-specific configuration is maintained in `.codex/config.toml` in the repository root (gitignored).
 
 ```toml
-# .codex/config.toml (DO NOT COMMIT THIS FILE)
+# .codex/config.toml
+# Local developer configuration — never commit this file.
 
-[mcpServers.github]
+[mcp_servers.github]
 command = "docker"
 args = [
   "run",
   "-i",
   "--rm",
   "-e", "GITHUB_PERSONAL_ACCESS_TOKEN",
-  "ghcr.io/github/github-mcp-server"
+  "-e", "GITHUB_READ_ONLY=1",
+  "-e", "GITHUB_LOCKDOWN_MODE=1",
+  "-e", "GITHUB_TOOLSETS=repos,issues,pull_requests",
+  "ghcr.io/github/github-mcp-server:<PINNED_VERSION>"
 ]
-[mcpServers.github.env]
-GITHUB_PERSONAL_ACCESS_TOKEN = "your_read_only_github_pat_here"
+env_vars = ["GITHUB_PERSONAL_ACCESS_TOKEN"]
+startup_timeout_sec = 20
+tool_timeout_sec = 30
 
-[mcpServers.context7]
+[mcp_servers.context7]
 command = "npx"
-args = ["-y", "@upstash/context7-mcp@latest"]
+args = [
+  "-y",
+  "@upstash/context7-mcp@<PINNED_VERSION>"
+]
+startup_timeout_sec = 20
+tool_timeout_sec = 30
 ```
 
 ### Setup Steps
-1. Generate a GitHub Personal Access Token (PAT) with read-only repository permissions for `Dy-Rongrath/Cambodia-Trusted-AI-Document-Platform`.
-2. Create `.codex/config.toml` locally and paste the template above with your PAT.
-3. Verify `.codex/config.toml` is ignored by Git (`git status` must not list it).
-4. Run `codex mcp list` to verify both servers load cleanly.
+1. Generate a GitHub Personal Access Token (PAT) with fine-grained read-only repository permissions for `Dy-Rongrath/Cambodia-Trusted-AI-Document-Platform`.
+2. Export the token in your local shell profile (outside the config file):
+   ```bash
+   export GITHUB_PERSONAL_ACCESS_TOKEN="your-read-only-token"
+   ```
+3. Create `.codex/config.toml` locally using the template above (substituting `<PINNED_VERSION>` with verified releases).
+4. Verify `.codex/config.toml` is ignored by Git (`git status` must not list it).
+5. Run `codex mcp list` to verify both servers load cleanly.
 
 ### Mandatory Rules
 - **NEVER commit `.codex/config.toml` or any file containing GitHub PATs or secrets.**
@@ -539,4 +555,5 @@ args = ["-y", "@upstash/context7-mcp@latest"]
 ---
 
 *Read `ARCHITECTURE.md`, `SECURITY.md`, `MCP_SECURITY.md`, and `AGENTS.md` alongside this document.*
+
 

@@ -36,7 +36,7 @@ The following uses are prohibited without explicit approval and a formal risk as
 |---|---|
 | Using AI as the sole authority for issuing or revoking a credential | Violates the foundational rule. Cryptographic verification must remain the authority. |
 | Inferring sensitive attributes (race, religion, health status, political views) | Discriminatory and a serious privacy violation. |
-| Making fully automated decisions that affect individual rights without human review | Violates responsible-AI principles and may violate GDPR / Cambodia PDPA Article 22 equivalent. |
+| Making fully automated decisions that affect individual rights without human review | Violates responsible-AI principles and applicable privacy standards (e.g. GDPR Art 22 where applicable or developing Cambodian legal framework). |
 | Using a public LLM API to process real personal data | Data leaves the platform's control. Violates privacy rules. |
 | Training on real personal data without documented consent and legal basis | Violates data governance and privacy law. |
 | Using AI to bypass or override security controls | Violates the security model. |

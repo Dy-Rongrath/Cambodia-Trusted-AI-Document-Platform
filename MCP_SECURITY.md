@@ -19,9 +19,9 @@ Used incorrectly, MCP can:
 - Expose credential material if MCP configuration files are committed to the repository.
 - Become a vector for prompt injection if tool outputs are not treated as untrusted input.
 
-This document defines the security rules for all MCP integrations on this project.
+This document defines the security rules for all MCP integrations on this project. Full threat scenarios are documented in `docs/threat-model.md` across 15 MCP threat categories (`T-MCP-001` through `T-MCP-015`).
 
-**Foundational principle:** MCP is an AI development tool. It is not the application's primary architecture, not a replacement for REST APIs, and not a production runtime component for Phase 1 through Phase 10.
+**Foundational principle:** MCP is an AI development tool. It is not the application's primary architecture, not a replacement for REST APIs, and not a production runtime component for Phase 1 through Phase 14.
 
 ---
 
@@ -46,8 +46,8 @@ The following servers are approved for immediate use by individual developers. T
 
 | Server | Package / Image | Purpose | Network access | Credentials required | Authentication method |
 |---|---|---|---|---|---|
-| **GitHub MCP server** | `ghcr.io/github/github-mcp-server` (Docker, local) | Read-only access to repository structure, issues, PRs, and file content — scoped to this repository only | External (api.github.com) | GitHub Personal Access Token — scoped read-only to this repository | PAT stored in `.codex/config.toml` (gitignored) |
-| **Context7** | `npx -y @upstash/context7-mcp@latest` (stdio) | Fetches up-to-date, version-specific official documentation for NestJS, Prisma, FastAPI, Angular, Hugging Face | External (context7.com / Upstash) | None (anonymous read-only) | None |
+| **GitHub MCP server** | `ghcr.io/github/github-mcp-server:<PINNED_VERSION>` (Docker, local) | Read-only access to repository structure, issues, PRs, and file content — scoped to this repository only | External (api.github.com) | GitHub Personal Access Token — scoped read-only to this repository | PAT exported via environment variable `GITHUB_PERSONAL_ACCESS_TOKEN` |
+| **Context7** | `npx -y @upstash/context7-mcp@<PINNED_VERSION>` (stdio) | Fetches up-to-date, version-specific official documentation for NestJS, Prisma, FastAPI, Angular, Hugging Face | External (context7.com / Upstash) | None (anonymous read-only) | None |
 
 ### Team sharing — GitHub managed remote endpoint (after Phase 1)
 
@@ -299,7 +299,8 @@ The review must cover:
 | Rule | Detail |
 |---|---|
 | MCP SDK version | Pin the MCP SDK (in Codex CLI or relevant package) to a specific version. Review release notes before upgrading. |
-| MCP server versions | Pin Docker image tags and npm package versions. Do not use `@latest` in production tooling. |
+| MCP server versions | Pin Docker image tags (`:<PINNED_VERSION>`) and npm package versions (`@<PINNED_VERSION>`). Do not use `@latest` or unpinned tags. |
+| Version verification | Before Phase 2 MCP installation, verify the current stable Codex MCP configuration schema, GitHub MCP server release, Context7 release, and MCP protocol compatibility using official documentation. Record the selected versions in `ADR-0007` or an ADR amendment. |
 | Updates | Review changelog and security advisories before any MCP server or SDK upgrade. |
 | Protocol version | Use the current stable MCP specification. Do not use draft, experimental, or prerelease extensions. |
 

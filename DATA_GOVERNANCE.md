@@ -72,16 +72,15 @@ Violating these rules constitutes a serious data breach. Any suspected violation
 ## 5. Consent and Lawful Use
 
 - The platform must not process personal data without a documented lawful basis.
-- For Cambodia: compliance with the PDPA (Personal Data Protection Act) is required.
-- For cross-border data sharing involving European organisations: GDPR compliance may be required.
-- For each personal data processing activity, document:
+- **Cambodian Legal Framework:** The platform must comply with all applicable Cambodian laws and regulations. Cambodia’s developing personal-data-protection legal framework, including the Draft Law on Personal Data Protection, must be monitored. Legal counsel must confirm applicable obligations before the platform processes real personal data.
+- **International Frameworks:** European standards (e.g. GDPR) apply only when their specific territorial or material processing conditions are met (e.g. cross-border data sharing involving EU entities).
+- **Legal Disclaimer:** This repository documentation is for technical governance only and does not constitute formal legal advice. A qualified Cambodian legal specialist must review system data flows before real personal data is processed.
+- For each personal data processing activity, document in a data-processing register (Phase 3):
   - The category of personal data.
   - The purpose of processing.
   - The lawful basis.
   - The data retention period.
   - The data subjects' rights and how they are fulfilled.
-
-This documentation will be maintained in a data-processing register (to be created in Phase 2).
 
 ---
 
@@ -257,8 +256,50 @@ Before any new dataset is used for training or evaluation:
 4. **Approve**: The reviewer approves the pull request.
 5. **Register**: DVC tracks the dataset. The dataset card is committed.
 
-No dataset may be used for training without a completed and approved dataset card.
+---
+
+## 18. Model Context Protocol (MCP) Data Governance Rules
+
+Model Context Protocol (MCP) integrations used for development context or future product features must strictly adhere to the following data governance rules:
+
+### Data Minimisation
+- MCP tool requests must specify the narrowest possible scope required to fulfill a query.
+- Whole-repository or full-database exports via MCP tools are strictly prohibited.
+- Document content, personal data, and confidential identifiers must not be included in MCP tool arguments or prompt payloads.
+
+### Prohibited Data Exposure
+MCP tools must never expose or transmit:
+- Real Cambodian government documents or official seals.
+- National Social Security Fund (NSSF) records or worker data.
+- Real personal identification documents (national IDs, passports, driver's licences).
+- Production database contents or live connection strings.
+- Production logs containing personal data or operational secrets.
+- Private key material, JWT signing keys, or authentication tokens.
+- Confidential datasets or unapproved raw training data.
+
+### MCP-Derived Data Retention
+- Information retrieved via MCP tools must not be persisted locally unless required for a specific, approved development task.
+- Full MCP tool response outputs must not be copied into long-term system logs. Log entries must contain only sanitised summaries (e.g. tool name, target document ID, success status).
+- Retained summaries must comply with source system retention schedules and licensing terms.
+
+### Lineage and Provenance Tracking
+When information retrieved via MCP tools is used to inform:
+- Architectural decisions or ADRs,
+- AI evaluation benchmark definitions,
+- Dataset selection or model architecture choices, or
+- Security and threat model updates,
+
+the developer must record the provenance metadata:
+- **MCP Server:** Server name and digest (`ghcr.io/github/github-mcp-server:<PINNED_VERSION>` or `@upstash/context7-mcp@<PINNED_VERSION>`)
+- **Source System & Document:** Target repository file, issue URL, or Context7 library version
+- **Retrieval Timestamp:** ISO 8601 timestamp
+- **Validating Reviewer:** Developer / Architect who verified the retrieved information
+
+### AI Training Restriction
+- Data retrieved via MCP tools must **never** automatically enter a model training, validation, or test dataset.
+- Any candidate dataset discovered or retrieved via MCP tools must undergo the standard 5-step Data Review Process (Section 17), including a completed Dataset Card, licensing check, duplicate detection, and privacy review, before entering DVC tracking.
 
 ---
 
 *This document must be reviewed and updated before any new data source is introduced or any training activity begins.*
+

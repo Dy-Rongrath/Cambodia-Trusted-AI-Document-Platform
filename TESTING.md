@@ -248,15 +248,37 @@ Every feature must be verifiable without a production environment. Tests are not
 
 ### 2.14 Model Context Protocol (MCP) Security and Tool Testing
 
-**Scope:** Verify that MCP tools, permissions, input sanitisation, and security boundaries operate as intended.
+**Scope:** Verify that MCP tools, permissions, input sanitisation, and security boundaries operate as intended across all phases.
 
-**What to test:**
-- **MCP Tool Permission Enforcement:** Verify that read-only MCP tools reject write attempts and restricted path access.
-- **MCP Input Validation:** Verify that MCP tools validate input schemas and reject malformed or out-of-bounds parameters.
-- **MCP Prompt Injection Resilience:** Test agent behaviour when retrieved tool outputs contain adversarial prompt injection instructions (e.g. injected instructions in repository files or GitHub issues). Verify the agent treats output strictly as untrusted data.
-- **MCP Audit Logging:** Verify that all stateful MCP operations and external server calls generate structured audit log entries.
-- **MCP Failure Modes:** Test agent graceful degradation when an MCP server times out or disconnects (agent must continue working without crashing).
-- **MCP Configuration Validation:** Run pre-commit checks to verify `.codex/config.toml` and `.mcp-credentials` are present in `.gitignore` and not committed.
+#### Applicable Now — Phase 0 Documentation Checks
+- **Gitignore Rule Verification:** Verify `.codex/config.toml`, `.codex/`, `.mcp-credentials`, `mcp-server-config.json`, and `.cursor/mcp.json` are in `.gitignore`.
+- **Secret Scan:** Confirm no real GitHub PATs, access tokens, or private keys are committed in documentation files.
+- **Link & Reference Validation:** Confirm all MCP documentation links and references resolve.
+- **Config Syntax Check:** Confirm all MCP configuration examples use `mcp_servers` (Codex-compatible TOML) and environment-variable forwarding (`env_vars = ["GITHUB_PERSONAL_ACCESS_TOKEN"]`).
+- **Version Pinning Check:** Confirm no `@latest` or unpinned Docker image tags are used in configuration examples (`<PINNED_VERSION>` placeholders required).
+- **Security Flag Verification:** Confirm GitHub MCP configuration examples explicitly enable read-only (`GITHUB_READ_ONLY=1`) and lockdown (`GITHUB_LOCKDOWN_MODE=1`) modes.
+- **Runtime Isolation Verification:** Confirm no application runtime files or production database connections are enabled for MCP tools.
+
+#### Deferred to Phase 2 — Development MCP Integration Tests
+- **MCP Client & Server Startup:** Test that Codex CLI loads approved local MCP servers (`ghcr.io/github/github-mcp-server`, `@upstash/context7-mcp`) without errors.
+- **MCP Authentication & Credential Handling:** Verify credentials are read exclusively from environment variables (`GITHUB_PERSONAL_ACCESS_TOKEN`) and never logged or exposed in tool metadata.
+- **Read-Only Tool Allowlist Enforcement:** Verify read-only tools accept valid queries and reject any write attempts (`create_pull_request`, `push_files`).
+- **Path Traversal & Restricted Access Rejection:** Verify filesystem tools reject attempts to access paths outside the workspace root (`../`).
+- **Tool Input Schema Validation:** Verify tools validate parameters against strict schemas and reject malformed arguments.
+- **MCP Prompt Injection Resilience:** Test agent behaviour when retrieved tool outputs contain adversarial instructions. Verify the agent treats output strictly as untrusted data.
+- **MCP Tool-Output Injection Protection:** Verify tool output content cannot hijack agent control flow or self-approve write operations.
+- **Untrusted Server & Impersonation Rejection:** Test client rejection of unvetted servers or spoofed endpoints.
+- **Timeout & Retry Limit Enforcement:** Test agent graceful degradation when an MCP server times out (30s limit) or disconnects.
+- **Rate-Limit & Exhaustion Handling:** Test handling when API rate limits (e.g. GitHub API quota) are reached.
+- **Audit Event Generation:** Verify stateful or external MCP tool invocations emit structured audit logs.
+
+#### Deferred to Phase 15 — Product-Facing MCP Tests
+- **OAuth 2.1 Authentication & Scope Validation:** Test external client authentication and token scope validation.
+- **Tool-Level Authorisation & User Context:** Verify tools execute under the authenticated user's context and role permissions.
+- **Tenant Isolation Boundaries:** Verify product-facing MCP tools strictly enforce tenant ID filtering and PostgreSQL Row-Level Security (RLS). Cross-tenant queries must fail with 403.
+- **Output Data Minimisation & Sanitisation:** Verify tool responses filter out sensitive document content, personal identity data, and system internals.
+- **Application Business-Rule Enforcement:** Verify MCP tools delegate to internal application services and cannot bypass validation or business logic.
+- **Product MCP Audit Logging & Revocation:** Verify tool invocations are recorded in the central `audit_events` table and client revocation immediately disables tool access.
 
 ---
 

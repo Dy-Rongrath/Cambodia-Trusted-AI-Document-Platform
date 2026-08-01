@@ -549,6 +549,108 @@ This threat model covers the platform as it will exist at the end of Phase 3 (se
 
 ---
 
+#### T-MCP-010 — MCP Server Impersonation
+
+| Field | Detail |
+|---|---|
+| **Asset** | Developer workstation, repository context |
+| **Entry point** | Local process command pipe or remote endpoint |
+| **STRIDE category** | Spoofing |
+| **Threat** | A fake or substituted MCP server process or spoofed remote endpoint impersonates an approved MCP server. |
+| **Impact** | Exfiltration of query parameters, injection of fake tool outputs. |
+| **Likelihood** | Low |
+| **Prevention** | Strict server process invocation rules, pinned package versions/Docker tags, TLS endpoint verification. |
+| **Detection** | Process monitoring, network endpoint verification. |
+| **Remaining risk** | Low. |
+| **Owner** | DevSecOps Engineer |
+
+---
+
+#### T-MCP-011 — MCP Data Exfiltration
+
+| Field | Detail |
+|---|---|
+| **Asset** | Local codebase, environment context, sensitive files |
+| **Entry point** | Outbound network calls made by MCP servers |
+| **STRIDE category** | Information Disclosure |
+| **Threat** | An MCP server collects and exfiltrates local file contents or codebase context to unapproved external servers. |
+| **Impact** | Intellectual property leakage, source code exposure. |
+| **Likelihood** | Medium |
+| **Prevention** | Mandatory 16-point review, network destination allowlisting, output data minimisation. |
+| **Detection** | Workstation network egress monitoring, audit logs. |
+| **Remaining risk** | Low-medium. |
+| **Owner** | Cybersecurity Reviewer |
+
+---
+
+#### T-MCP-012 — MCP Audit-Log Tampering
+
+| Field | Detail |
+|---|---|
+| **Asset** | MCP invocation audit records |
+| **Entry point** | MCP audit logging system |
+| **STRIDE category** | Repudiation, Tampering |
+| **Threat** | An attacker or compromised tool alters or deletes local MCP tool invocation log records to hide unauthorized actions. |
+| **Impact** | Inability to attribute tool execution actions, lost forensic evidence. |
+| **Likelihood** | Low |
+| **Prevention** | Append-only audit logging, correlation IDs per invocation session. |
+| **Detection** | Log gap detection, correlation ID validation. |
+| **Remaining risk** | Low. |
+| **Owner** | Lead Software Architect |
+
+---
+
+#### T-MCP-013 — MCP Denial of Service
+
+| Field | Detail |
+|---|---|
+| **Asset** | Developer IDE, external API quotas |
+| **Entry point** | Automated MCP tool invocation loops |
+| **STRIDE category** | Denial of Service |
+| **Threat** | Excessive or looping tool calls exhaust developer CPU/memory or exceed API rate limits (e.g. GitHub API quota). |
+| **Impact** | Developer workstation slowdown, API rate-limit lockout. |
+| **Likelihood** | Medium |
+| **Prevention** | Tool call execution timeouts (30s max), startup timeouts (20s max), retry limits. |
+| **Detection** | Tool invocation rate monitoring, execution timeout alerts. |
+| **Remaining risk** | Low. |
+| **Owner** | QA Engineer |
+
+---
+
+#### T-MCP-014 — MCP Authentication or Session Compromise
+
+| Field | Detail |
+|---|---|
+| **Asset** | GitHub Personal Access Token (PAT), OAuth sessions |
+| **Entry point** | Environment variables, local shell history, process memory |
+| **STRIDE category** | Spoofing, Elevation of Privilege |
+| **Threat** | An attacker steals the developer's `GITHUB_PERSONAL_ACCESS_TOKEN` environment variable or OAuth session. |
+| **Impact** | Unauthorized access to repository read scopes. |
+| **Likelihood** | Medium |
+| **Prevention** | Read-only PAT scopes (`GITHUB_READ_ONLY=1`), lockdown mode (`GITHUB_LOCKDOWN_MODE=1`), short-lived tokens. |
+| **Detection** | GitHub security alerts, token usage monitoring. |
+| **Remaining risk** | Low when tokens are strictly read-only. |
+| **Owner** | DevSecOps Engineer |
+
+---
+
+#### T-MCP-015 — Direct MCP Prompt Injection
+
+| Field | Detail |
+|---|---|
+| **Asset** | AI Agent control flow |
+| **Entry point** | User prompt or local file content containing prompt injection |
+| **STRIDE category** | Tampering, Elevation of Privilege |
+| **Threat** | A user or document includes direct prompt injection instructions attempting to force the AI agent to invoke unauthorized MCP tools. |
+| **Impact** | Agent attempts unapproved tool execution or bypasses human review. |
+| **Likelihood** | Medium |
+| **Prevention** | Strict approval boundaries (`AGENTS.md`), instruction hierarchy, mandatory confirmation for state-changing actions. |
+| **Detection** | Agent trace logs, monitoring anomalous tool call attempts. |
+| **Remaining risk** | Low-medium. |
+| **Owner** | AI/ML Engineer |
+
+---
+
 ## Residual Risk Summary
 
 | Risk ID | Threat | Residual Risk | Mitigation Status |
@@ -566,9 +668,15 @@ This threat model covers the platform as it will exist at the end of Phase 3 (se
 | T-DATA-002 | Secret leakage | Low | Gitleaks + comprehensive .gitignore |
 | T-CRED-002 | Credential replay | Medium | Revocation required in Phase 10 |
 | T-MCP-001 | Untrusted MCP server | Low | 16-point review + stdio/Docker isolation |
-| T-MCP-005 | MCP prompt injection | Medium | Tool output treated as untrusted data |
+| T-MCP-005 | MCP tool-output prompt injection | Medium | Tool output treated as untrusted data |
 | T-MCP-006 | MCP credential leak | Low | Gitignore `.codex/config.toml` + Gitleaks |
 | T-MCP-008 | Unauthorized MCP write | Low | Mandatory human approval boundary |
+| T-MCP-010 | MCP server impersonation | Low | Pinned versions + TLS verification |
+| T-MCP-011 | MCP data exfiltration | Low-medium | Network allowlisting + 16-point review |
+| T-MCP-012 | MCP audit log tampering | Low | Append-only logging + session IDs |
+| T-MCP-013 | MCP denial of service | Low | Timeouts (30s) + retry limits |
+| T-MCP-014 | MCP auth/session compromise | Low | Read-only PAT + lockdown mode |
+| T-MCP-015 | Direct MCP prompt injection | Low-medium | AGENTS.md approval boundaries |
 
 ---
 

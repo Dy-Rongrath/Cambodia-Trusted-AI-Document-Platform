@@ -11,49 +11,45 @@ The platform is built in 16 phases. Each phase builds on the previous and delive
 
 ---
 
-## Phase 0 — Engineering Foundation (Documentation)
+## Phase 0 — Documentation and Governance Foundation
 
-**Status:** 🟡 In progress
+**Status:** Complete
 
 ### Objective
-Establish all foundation documents, repository structure, and toolchain before any feature code is written.
+Establish all foundation documents, repository structure, and governance rules before any feature code or application scaffolding is written.
 
 ### Prerequisites
 - Empty repository with Git initialised.
 
 ### Scope
-- All foundation documents (this file and its siblings).
-- Repository structure defined.
-- Git repository with `.gitignore`, `.gitattributes`, `.nvmrc`.
-- AI-agent guardrails (`AGENTS.md`).
-- Architecture documentation and initial ADRs.
-- Security policy (`SECURITY.md`, `MCP_SECURITY.md`) and threat model.
+- All foundation documents (`AGENTS.md`, `PROJECT_CONTEXT.md`, `ARCHITECTURE.md`, `SECURITY.md`, `MCP_SECURITY.md`, `DEVELOPMENT.md`, `TESTING.md`, `DATA_GOVERNANCE.md`, `AI_GOVERNANCE.md`, `ROADMAP.md`, `CONTRIBUTING.md`, `README.md`).
+- Repository configuration files (`.gitignore`, `.gitattributes`, `.nvmrc`).
+- Architecture documentation and initial ADRs (ADR-0001 through ADR-0007).
+- STRIDE threat model including 15 MCP threat categories.
 - Development and testing standards.
 - Data and AI governance policies.
-- Roadmap and task templates.
-- Role-specific AI agent instructions.
+- Reusable task templates and specialist role instructions.
 
 ### Out of scope
-- Any application code.
-- Any Docker configuration.
+- Any application source code (`apps/`, `packages/`).
+- Any Docker Compose configuration (`infra/docker/`).
 - Any CI/CD pipeline.
+- Any database schema or migration.
 
 ### Acceptance criteria
-- All foundation documents created and reviewed.
-- Git repository initialised with proper `.gitignore`.
+- All foundation documents created, aligned, and reviewed.
+- Repository initialised with proper `.gitignore`, `.gitattributes`, `.nvmrc`.
 - Remote repository connected.
-
-### Risks
-- Document quality insufficient to guide Phase 1. Mitigation: review each document before proceeding.
+- Zero application code, secrets, or real data present.
 
 ### Deliverables
-- All foundation documents committed to `main`.
+- All foundation documents committed to repository.
 
 ---
 
-## Phase 1 — Engineering Foundation (Code)
+## Phase 1 — Engineering Scaffold and Tooling
 
-**Status:** 🔜 Next
+**Status:** Next
 
 ### Objective
 Create the monorepo scaffold, application skeletons, local Docker Compose environment, and CI/CD basics. No business logic yet.
@@ -82,7 +78,7 @@ Create the monorepo scaffold, application skeletons, local Docker Compose enviro
 - Any AI model (Phase 6).
 
 ### Security requirements
-- Docker Compose must not expose any service other than the frontend and backend on external ports.
+- Docker Compose may expose the frontend, backend, and Keycloak login endpoint to localhost for development. PostgreSQL, MinIO administration, the AI service, and internal infrastructure must remain on the private Docker network unless a documented development need requires otherwise.
 - `.env.example` must contain placeholder values only.
 - `docker-compose.yml` must not contain any secrets (use `${ENV_VAR}` references).
 

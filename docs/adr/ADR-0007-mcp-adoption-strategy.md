@@ -6,7 +6,7 @@
 
 ## Decision Owner / Approved By
 
-Dy Rongrath (Project Owner) — Explicit user selection in prompt questionnaire: Codex CLI, GitHub MCP + Context7, gitignored local config, local dev / remote team sharing.
+Dy Rongrath, Project Owner — approved through review and merge of PR #1 on 2026-08-01.
 
 ## Date
 
@@ -32,9 +32,9 @@ Specific decision choices:
 
 1. **MCP Client (D-MCP-1):** OpenAI Codex CLI using `.codex/config.toml` (gitignored) for per-project workspace configuration.
 2. **Initial Stage 1 MCP Servers (D-MCP-2):**
-   - **GitHub MCP Server** (Docker container `ghcr.io/github/github-mcp-server`) with a read-only Personal Access Token (PAT) scoped exclusively to `Dy-Rongrath/Cambodia-Trusted-AI-Document-Platform`.
-   - **Context7 MCP Server** (`@upstash/context7-mcp` via stdio) for version-specific official library documentation (NestJS, Prisma, FastAPI, Angular, PyTorch).
-3. **Credential Management (D-MCP-3):** Credentials (such as GitHub PAT) are stored in `.codex/config.toml` on the developer's local workstation. The file is strictly **gitignored** and scanned by pre-commit and Gitleaks rules. No MCP credentials are committed to source control or `.env` files.
+   - **GitHub MCP Server** (Docker container `ghcr.io/github/github-mcp-server:<PINNED_VERSION>`) with fine-grained read-only Personal Access Token (PAT) forwarded via `GITHUB_PERSONAL_ACCESS_TOKEN`, with `GITHUB_READ_ONLY=1` and `GITHUB_LOCKDOWN_MODE=1` explicitly enabled.
+   - **Context7 MCP Server** (`@upstash/context7-mcp@<PINNED_VERSION>` via stdio) for version-specific official library documentation (NestJS, Prisma, FastAPI, Angular, PyTorch).
+3. **Credential Management (D-MCP-3):** Credentials (such as GitHub PAT) are exported as environment variables in the developer's local shell profile and referenced via `env_vars` in `.codex/config.toml` (`mcp_servers` block). The config file is strictly **gitignored**. No credentials or tokens are stored in configuration files, source control, or `.env` files.
 4. **Hosting Model (D-MCP-4):**
    - **Stages 1–3:** Local-only stdio and Docker processes running on the developer's machine.
    - **Post-Phase 1 Team Sharing:** Transition GitHub server to GitHub's managed remote endpoint (`https://api.githubcopilot.com/mcp/`) after Phase 1 code is validated, leveraging GitHub Copilot OAuth authentication for team access.
@@ -67,9 +67,9 @@ Specific decision choices:
 ## Security Impact
 
 - See `MCP_SECURITY.md` for full security controls.
-- 9 MCP threat categories added to `docs/threat-model.md` (T-MCP-001 through T-MCP-009).
+- 15 MCP threat categories added to `docs/threat-model.md` (T-MCP-001 through T-MCP-015).
 - `.gitignore` updated to block `.codex/config.toml`, `.codex/`, `.mcp-credentials`, and `mcp-server-config.json`.
-- Gitleaks secret scanning rules configured in pre-commit and CI/CD.
+- Gitleaks secret scanning and pre-commit secret checks must be configured in Phase 1 before code or credentials are introduced.
 
 ## Operational Impact
 

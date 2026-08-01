@@ -143,6 +143,12 @@ graph TB
     AIService -.->|NO DIRECT ACCESS| ObjectStorage
 ```
 
+### Keycloak Network Exposure Architecture
+
+- **Local Development:** Keycloak is accessible to the user's browser via `http://localhost:<keycloak-port>` to enable the OpenID Connect (OIDC) Authorization Code with PKCE login redirect flow. Other infrastructure services (PostgreSQL, MinIO admin, AI service) remain bound to the internal Docker network.
+- **Staging & Production:** The user browser communicates exclusively via the HTTPS Reverse Proxy (`https://<domain>/auth` routing to internal Keycloak). Keycloak is never exposed directly to the public internet without TLS reverse-proxy termination. Administrative endpoints (`/admin`) are restricted. Internal service-to-service communication stays within the private network.
+
+
 **Trust rules:**
 - The reverse proxy terminates TLS. All internal traffic is on a private Docker network.
 - The AI service is not exposed externally. It is reachable only by the backend.

@@ -6,7 +6,7 @@
 
 ## Decision Owner / Approved By
 
-Dy Rongrath (Project Owner) — Explicit user requirement: "Keycloak 26 (IdP)"
+Dy Rongrath, Project Owner — approved through review and merge of PR #1 on 2026-08-01.
 
 ## Date
 
