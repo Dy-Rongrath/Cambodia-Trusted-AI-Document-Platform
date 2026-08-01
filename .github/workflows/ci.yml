@@ -1,0 +1,58 @@
+name: Phase 1 CI
+
+on:
+  push:
+    branches: [main, 'chore/**', 'feat/**']
+  pull_request:
+    branches: [main]
+
+permissions:
+  contents: read
+
+jobs:
+  validate:
+    name: Validate Phase 1 Scaffold
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Validate Docker Compose config
+        run: docker compose config
+
+      - name: Build Docker images
+        run: docker compose build
+
+      - name: Start services
+        run: docker compose up -d
+
+      - name: Wait for services health
+        run: |
+          echo "Waiting for postgres and backend health..."
+          timeout 60s sh -c 'until [ "$(docker inspect --format="{{.State.Health.Status}}" trusted-ai-postgres)" = "healthy" ]; do sleep 2; done'
+          timeout 60s sh -c 'until [ "$(docker inspect --format="{{.State.Health.Status}}" trusted-ai-backend)" = "healthy" ]; do sleep 2; done'
+
+      - name: Verify Backend Health Endpoint
+        run: |
+          curl --fail http://127.0.0.1:3000/health
+
+      - name: Verify AI Service Health Endpoint (Internal)
+        run: |
+          docker exec trusted-ai-service python -c 'import urllib.request; resp = urllib.request.urlopen("http://localhost:8000/health"); print(resp.read().decode())'
+
+      - name: Verify Frontend HTTP response
+        run: |
+          curl --fail http://127.0.0.1:4200/
+
+      - name: Run Backend Tests in Container
+        run: |
+          docker run --rm -v ${{ github.workspace }}:/app -w /app node:24.15.0-alpine3.21 sh -c "npm ci && npm run test --workspace=apps/backend"
+
+      - name: Run AI Service Ruff & mypy & pytest in Container
+        run: |
+          docker run --rm -v ${{ github.workspace }}/apps/ai-service:/app -w /app ghcr.io/astral-sh/uv:0.5-python3.12-alpine sh -c "uv sync --frozen --extra dev && uv run ruff check . && uv run mypy src && uv run pytest"
+
+      - name: Stop services
+        run: docker compose down
