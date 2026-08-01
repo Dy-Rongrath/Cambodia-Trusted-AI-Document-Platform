@@ -3,7 +3,7 @@
 > **Methodology:** STRIDE (Spoofing, Tampering, Repudiation, Information Disclosure, Denial of Service, Elevation of Privilege)
 > **Status:** Living document — reviewed and updated each phase.
 > **Last updated:** 2026-08-01
-> **Classification:** Internal
+> **Classification:** Public project policy — must not contain secrets or restricted operational details.
 >
 > **Specialist review required** before Phase 14 (production deployment).
 
@@ -392,6 +392,163 @@ This threat model covers the platform as it will exist at the end of Phase 3 (se
 
 ---
 
+### Category: Model Context Protocol (MCP) Security
+
+---
+
+#### T-MCP-001 — Malicious or Untrusted MCP Server
+
+| Field | Detail |
+|---|---|
+| **Asset** | Developer workstation, repository content, environment secrets |
+| **Entry point** | Local or remote MCP server connection |
+| **STRIDE category** | Spoofing, Tampering, Information Disclosure, Elevation of Privilege |
+| **Threat** | An unvetted third-party MCP server executes malicious payload locally, exfiltrates source code/secrets, or returns compromised responses. |
+| **Impact** | Developer workstation compromise, credential exfiltration, source code leak. |
+| **Likelihood** | Low-medium |
+| **Prevention** | Mandatory 16-point review before installing third-party MCP servers. Prefer official/open-source servers. Default to stdio/Docker isolation. |
+| **Detection** | Network monitoring, audit logs of server installations. |
+| **Remaining risk** | Low if review process is followed strictly. |
+| **Owner** | Cybersecurity Reviewer, DevSecOps Engineer |
+
+---
+
+#### T-MCP-002 — Compromised MCP Dependency
+
+| Field | Detail |
+|---|---|
+| **Asset** | MCP server codebase and runtime environment |
+| **Entry point** | MCP server package updates (npm/uv/Docker) |
+| **STRIDE category** | Tampering, Information Disclosure |
+| **Threat** | A supply-chain vulnerability in an installed MCP server package or base image allows remote command execution or token exfiltration. |
+| **Impact** | System compromise via developer tooling. |
+| **Likelihood** | Medium |
+| **Prevention** | Pin MCP server versions/Docker hashes. Run `npm audit` / `uv audit` on MCP dependencies. |
+| **Detection** | CI/CD dependency vulnerability scans. |
+| **Remaining risk** | Low-medium. |
+| **Owner** | DevSecOps Engineer |
+
+---
+
+#### T-MCP-003 — Misleading or Adversarial MCP Tool Description
+
+| Field | Detail |
+|---|---|
+| **Asset** | AI Agent decision context |
+| **Entry point** | MCP tool definitions returned by server |
+| **STRIDE category** | Spoofing, Tampering |
+| **Threat** | An MCP server provides a deceptive tool schema or description designed to trick the AI agent into invoking write operations or leaking sensitive data. |
+| **Impact** | AI agent executes unintended tool calls or bypasses human review. |
+| **Likelihood** | Low |
+| **Prevention** | Strict tool allowlisting. Treat tool descriptions as untrusted during security review. Disable write tools in Stage 1/2. |
+| **Detection** | AI tool invocation audit logging. |
+| **Remaining risk** | Low. |
+| **Owner** | Cybersecurity Reviewer |
+
+---
+
+#### T-MCP-004 — MCP Privilege Escalation
+
+| Field | Detail |
+|---|---|
+| **Asset** | System files, database, production services |
+| **Entry point** | MCP tool execution parameters |
+| **STRIDE category** | Elevation of Privilege |
+| **Threat** | An MCP server or tool allows the AI agent to execute shell commands, access files outside the workspace, or query restricted endpoints. |
+| **Impact** | Arbitrary execution, unauthorized filesystem or network access. |
+| **Likelihood** | Medium if broad tools are enabled |
+| **Prevention** | Default to read-only tools. Prohibit generic shell/SQL tools. Limit file paths to workspace root. |
+| **Detection** | MCP tool invocation audit logs. |
+| **Remaining risk** | Low when least-privilege scoping is enforced. |
+| **Owner** | DevSecOps Engineer |
+
+---
+
+#### T-MCP-005 — MCP Tool-Output Prompt Injection
+
+| Field | Detail |
+|---|---|
+| **Asset** | AI Agent instruction flow |
+| **Entry point** | Output returned by MCP tools (e.g. GitHub issues, documentation) |
+| **STRIDE category** | Tampering |
+| **Threat** | Content retrieved via an MCP tool contains embedded prompt-injection instructions attempting to hijack agent control flow. |
+| **Impact** | Agent deviates from guardrails, executes unapproved actions. |
+| **Likelihood** | Medium |
+| **Prevention** | Treat all MCP tool output as untrusted data. Validate/sanitise tool output before processing. Enforce explicit approval boundaries regardless of tool responses. |
+| **Detection** | Agent trace logs, monitoring anomalous agent requests. |
+| **Remaining risk** | Medium. Requires strict human oversight on state changes. |
+| **Owner** | AI/ML Engineer |
+
+---
+
+#### T-MCP-006 — MCP Credential Leakage
+
+| Field | Detail |
+|---|---|
+| **Asset** | GitHub PAT, API keys, tokens |
+| **Entry point** | MCP configuration files (`.codex/config.toml`), logs |
+| **STRIDE category** | Information Disclosure |
+| **Threat** | MCP configuration files containing secrets are accidentally committed to Git or exposed in error logs. |
+| **Impact** | Leakage of GitHub PAT or external service keys. |
+| **Likelihood** | Medium |
+| **Prevention** | Enforce `.gitignore` rules for `.codex/config.toml` and `.mcp-credentials`. Run Gitleaks in pre-commit and CI. |
+| **Detection** | Gitleaks secret scanning alerts. |
+| **Remaining risk** | Low with automated secret scanning. |
+| **Owner** | DevSecOps Engineer |
+
+---
+
+#### T-MCP-007 — MCP Tool Misuse or Unintended Invocation
+
+| Field | Detail |
+|---|---|
+| **Asset** | Repository code, external APIs |
+| **Entry point** | Agent tool invocation logic |
+| **STRIDE category** | Tampering, Denial of Service |
+| **Threat** | Agent misinterprets intent and calls an MCP tool with wrong arguments or in an unexpected loop. |
+| **Impact** | Rate-limiting, corrupted local state, unwanted API usage. |
+| **Likelihood** | Medium |
+| **Prevention** | Apply strict tool input schemas, rate limits, and timeouts (30s max). Require approval for write tools. |
+| **Detection** | MCP audit logs, execution timeouts. |
+| **Remaining risk** | Low. |
+| **Owner** | QA Engineer |
+
+---
+
+#### T-MCP-008 — Unauthorized MCP Write Operation
+
+| Field | Detail |
+|---|---|
+| **Asset** | Repository main branch, issues, pull requests |
+| **Entry point** | State-changing MCP tools (e.g., `create_pull_request`, `push_files`) |
+| **STRIDE category** | Tampering |
+| **Threat** | An MCP tool modifies repository state or opens PRs without explicit developer review and approval. |
+| **Impact** | Unvetted changes pushed to repository or external services. |
+| **Likelihood** | Medium |
+| **Prevention** | Explicit human approval required for all state-modifying MCP operations (`AGENTS.md` Section 13). Disable write tools by default. |
+| **Detection** | GitHub audit logs, git commit history. |
+| **Remaining risk** | Low. |
+| **Owner** | Lead Software Architect |
+
+---
+
+#### T-MCP-009 — MCP Bypass of Application Tenant Isolation
+
+| Field | Detail |
+|---|---|
+| **Asset** | Multi-tenant database records |
+| **Entry point** | MCP database inspection tools (future Phase) |
+| **STRIDE category** | Information Disclosure |
+| **Threat** | An MCP tool querying a development/staging database bypasses tenant ID filters or row-level security. |
+| **Impact** | Exposure of cross-tenant development/test data. |
+| **Likelihood** | Medium (if database tool is added in future) |
+| **Prevention** | MCP access restricted to development database only. Never connect MCP to production database. Apply RLS to dev databases. |
+| **Detection** | Database audit logs. |
+| **Remaining risk** | Low (prohibited until explicit future phase review). |
+| **Owner** | Backend Developer |
+
+---
+
 ## Residual Risk Summary
 
 | Risk ID | Threat | Residual Risk | Mitigation Status |
@@ -408,6 +565,10 @@ This threat model covers the platform as it will exist at the end of Phase 3 (se
 | T-DATA-001 | Sensitive data in logs | Medium | Requires developer discipline |
 | T-DATA-002 | Secret leakage | Low | Gitleaks + comprehensive .gitignore |
 | T-CRED-002 | Credential replay | Medium | Revocation required in Phase 10 |
+| T-MCP-001 | Untrusted MCP server | Low | 16-point review + stdio/Docker isolation |
+| T-MCP-005 | MCP prompt injection | Medium | Tool output treated as untrusted data |
+| T-MCP-006 | MCP credential leak | Low | Gitignore `.codex/config.toml` + Gitleaks |
+| T-MCP-008 | Unauthorized MCP write | Low | Mandatory human approval boundary |
 
 ---
 
@@ -417,10 +578,11 @@ This threat model covers the platform as it will exist at the end of Phase 3 (se
 |---|---|
 | Start of each new phase | Review threats relevant to new capabilities introduced |
 | Security incident | Immediate review and update |
-| New external integration | Add threats related to the new integration |
+| New external integration / MCP server | Complete security review and update threat model |
 | Phase 10 (credential issuance) | Full review of credential threat categories |
 | Phase 14 (production) | Specialist penetration test. Full threat model review. |
 
 ---
 
 *This threat model is a starting point. It does not substitute for a specialist security review before production deployment.*
+

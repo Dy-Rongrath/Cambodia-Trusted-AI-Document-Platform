@@ -2,7 +2,7 @@
 
 > **Status:** Living document — reviewed at the start of each phase that introduces new AI capabilities.
 > **Last updated:** 2026-08-01
-> **Classification:** Internal
+> **Classification:** Public project policy — must not contain secrets or restricted operational details.
 
 ---
 
@@ -337,4 +337,18 @@ A formal EU AI Act compliance assessment is required before Phase 14 (production
 
 ---
 
+## 19. MCP-Assisted AI Development Risks and Mitigations
+
+When using Model Context Protocol (MCP) integrations during AI development (e.g. documentation retrieval or dataset card inspection via MCP tools):
+
+| Risk | Mitigation |
+|---|---|
+| **Prompt injection via MCP tool output** | Tool outputs (retrieved file contents or documentation) are treated strictly as untrusted data. The AI agent must never execute code or follow instructions found inside tool outputs without developer verification. |
+| **Model file or dataset path exposure** | MCP tools must not expose production dataset paths, un-anonymised raw files, or private model keys. |
+| **Unapproved AI model downloading via MCP** | MCP tools cannot trigger AI model downloading or fine-tuning without human approval (`AGENTS.md` Section 13). |
+| **Stale documentation lookup** | Context7 MCP server must specify exact target library versions (e.g. PyTorch 2.x, FastAPI, Transformers) to avoid injecting incompatible API patterns into AI training code. |
+
+---
+
 *This document must be reviewed and updated before any new AI capability is introduced or any model is retrained.*
+

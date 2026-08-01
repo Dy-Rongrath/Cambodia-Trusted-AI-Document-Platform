@@ -6,27 +6,30 @@
 
 ## Project status
 
-**Phase 0 — Engineering Foundation (complete)**
+- **Phase 0 — Documentation and Governance Foundation:** Complete
+- **Phase 1 — Engineering Scaffold and Tooling:** Next (Scaffolding NestJS, FastAPI, Angular, Docker Compose, CI)
 
-All foundation documents have been created. The platform is ready for Phase 1 (code implementation).
+*Note: The repository currently contains pure documentation and governance rules. No application source code, Docker Compose files, or database schemas exist in Phase 0.*
 
 ## Documentation
 
 | Document | Purpose |
 |---|---|
 | [PROJECT_CONTEXT.md](PROJECT_CONTEXT.md) | Product purpose, users, scope, glossary, and success criteria |
-| [ARCHITECTURE.md](ARCHITECTURE.md) | System design, module responsibilities, trust boundaries, and data flows |
+| [ARCHITECTURE.md](ARCHITECTURE.md) | System design, module responsibilities, trust boundaries, data flows, and MCP boundary |
 | [SECURITY.md](SECURITY.md) | Security policy, controls, and incident response |
-| [DEVELOPMENT.md](DEVELOPMENT.md) | Local setup, coding standards, and definition of done |
-| [TESTING.md](TESTING.md) | Testing strategy, quality gates, and coverage thresholds |
+| [MCP_SECURITY.md](MCP_SECURITY.md) | Model Context Protocol security rules, tool governance, and client setup |
+| [DEVELOPMENT.md](DEVELOPMENT.md) | Local setup, coding standards, MCP dev workflow, definition of done |
+| [TESTING.md](TESTING.md) | Testing strategy, quality gates, coverage thresholds, MCP security testing |
 | [DATA_GOVERNANCE.md](DATA_GOVERNANCE.md) | Data sourcing rules, lineage, retention, and governance |
-| [AI_GOVERNANCE.md](AI_GOVERNANCE.md) | Permitted AI uses, human oversight, model governance, and responsible-AI commitments |
-| [ROADMAP.md](ROADMAP.md) | 14-phase implementation plan |
-| [docs/adr/](docs/adr/) | Architecture Decision Records |
-| [docs/threat-model.md](docs/threat-model.md) | STRIDE threat model |
-| [docs/templates/](docs/templates/) | Reusable task templates |
+| [AI_GOVERNANCE.md](AI_GOVERNANCE.md) | Permitted AI uses, human oversight, model governance, responsible-AI commitments |
+| [CONTRIBUTING.md](CONTRIBUTING.md) | Contribution guidelines, PR requirements, and security rules |
+| [ROADMAP.md](ROADMAP.md) | 16-phase implementation plan |
+| [docs/adr/](docs/adr/) | Architecture Decision Records (ADR-0001 through ADR-0007) |
+| [docs/threat-model.md](docs/threat-model.md) | STRIDE threat model (including 15 MCP threat categories) |
+| [docs/templates/](docs/templates/) | Reusable task templates (feature, bug-fix, mcp-integration, mcp-review, etc.) |
 | [docs/roles/](docs/roles/) | Specialist AI agent role instructions |
-| [.agents/AGENTS.md](.agents/AGENTS.md) | AI-agent guardrails and approval boundaries |
+| [AGENTS.md](AGENTS.md) | Primary AI-agent guardrails, navigation pointers, and approval boundaries |
 
 ## Technology stack
 
@@ -35,11 +38,39 @@ All foundation documents have been created. The platform is ready for Phase 1 (c
 | Backend | Node.js 24 · TypeScript · NestJS · PostgreSQL 17 · Prisma |
 | AI Service | Python 3.12 · FastAPI · PyTorch · Hugging Face Transformers · uv |
 | Frontend | Angular · TypeScript · Angular Signals |
-| Mobile | Flutter (Phase 11) |
+| Mobile | Flutter (Phase 12) |
+| AI Development | Model Context Protocol (MCP) · OpenAI Codex CLI · GitHub MCP · Context7 |
 | Authentication | Keycloak 26 · OAuth 2.1 · OIDC · WebAuthn / Passkeys |
-| Infrastructure | Docker · Docker Compose · (Kubernetes in Phase 14) |
+| Infrastructure | Docker · Docker Compose · (Kubernetes in Phase 16) |
 
-## Repository structure
+
+## Current Repository Structure (Phase 0)
+
+```
+trusted-ai-platform/
+├── AGENTS.md                 # Primary AI agent instructions & entry point
+├── PROJECT_CONTEXT.md        # Product purpose, scope, glossary
+├── ARCHITECTURE.md           # System design & MCP integration boundary
+├── SECURITY.md               # Security policy & data classification
+├── MCP_SECURITY.md           # Model Context Protocol security policy
+├── DEVELOPMENT.md            # Technical standards & local setup
+├── TESTING.md                # Testing strategy & quality gates
+├── DATA_GOVERNANCE.md        # Data sourcing, lineage & retention
+├── AI_GOVERNANCE.md          # Permitted/prohibited AI uses & oversight
+├── ROADMAP.md                # 16-phase implementation roadmap
+├── CONTRIBUTING.md           # Contribution guidelines & PR rules
+├── README.md                 # Repository overview
+├── .gitignore                # Ignore rules (including secrets & MCP config)
+├── .gitattributes           # Line-ending normalisation
+├── .nvmrc                    # Pinned Node.js 24.15.0 version
+└── docs/
+    ├── adr/                  # ADR-0000 through ADR-0007
+    ├── threat-model.md       # STRIDE threat model (including MCP threats)
+    ├── templates/            # Task templates
+    └── roles/                # Specialist AI agent role instructions
+```
+
+## Planned Application Structure (Target Phase 1 Scaffolding)
 
 ```
 trusted-ai-platform/
@@ -48,14 +79,9 @@ trusted-ai-platform/
 │   ├── ai-service/       # FastAPI AI inference service
 │   └── frontend/         # Angular web application
 ├── packages/
-│   └── shared-types/     # Shared TypeScript types
+│   └── shared-types/     # Shared TypeScript types & OpenAPI client
 ├── infra/
-│   └── docker/           # Docker Compose files
-├── docs/
-│   ├── adr/              # Architecture Decision Records
-│   ├── templates/        # Task templates
-│   ├── roles/            # AI agent role instructions
-│   └── threat-model.md
+│   └── docker/           # Docker Compose infrastructure
 └── [Foundation documents]
 ```
 
@@ -63,7 +89,9 @@ trusted-ai-platform/
 
 See [DEVELOPMENT.md](DEVELOPMENT.md) for complete setup instructions.
 
-**Quick reference:**
+> **Notice:** Application setup commands below apply after the Phase 1 engineering scaffold has been merged. Currently, no application source code exists in Phase 0.
+
+**Future Phase 1 Quick Reference:**
 ```bash
 nvm use                          # Activate Node 24.15.0
 npm install                      # Install workspace dependencies
@@ -71,9 +99,10 @@ cd apps/ai-service && uv sync    # Set up Python environment
 docker compose -f infra/docker/docker-compose.yml up -d  # Start infrastructure
 ```
 
+
 ## Security
 
-This platform processes sensitive documents. All contributors must read [SECURITY.md](SECURITY.md) and [AGENTS.md](.agents/AGENTS.md) before contributing.
+This platform processes sensitive documents. All contributors must read [SECURITY.md](SECURITY.md) and [AGENTS.md](AGENTS.md) before contributing.
 
 **Critical rules:**
 - Never use real personal, government, or production data in development.

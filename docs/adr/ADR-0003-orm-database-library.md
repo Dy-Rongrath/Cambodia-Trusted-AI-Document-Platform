@@ -4,6 +4,10 @@
 
 `Accepted`
 
+## Decision Owner / Approved By
+
+Dy Rongrath (Project Owner) — Explicit user requirement: "Prisma (ORM)"
+
 ## Date
 
 2026-08-01

@@ -1,15 +1,31 @@
-# DEVELOPMENT.md — Cambodia Trusted AI Document Platform
-
-> **Status:** Living document — updated as the project evolves.
-> **Last updated:** 2026-08-01
+> **Phase Status:** Phase 0 — Documentation and Governance Foundation: Complete
+> **Next Phase:** Phase 1 — Engineering Scaffold and Tooling: Next
 
 ---
 
 ## 1. Local Setup
 
-### Prerequisites
+> **Notice:** Setup commands involving `npm install`, `apps/backend`, `apps/frontend`, `apps/ai-service`, `uv sync`, `docker compose`, and `.env.example` apply after the Phase 1 engineering scaffold has been merged. The current Phase 0 repository contains documentation only.
 
-Install the following tools on your machine before cloning the repository:
+### Current Phase 0 Setup (Documentation Only)
+
+1. Clone the repository:
+   ```bash
+   git clone git@github.com:Dy-Rongrath/Cambodia-Trusted-AI-Document-Platform.git
+   cd Cambodia-Trusted-AI-Document-Platform
+   ```
+2. Activate pinned Node version (optional for doc verification):
+   ```bash
+   nvm use                    # activates Node 24.15.0 from .nvmrc
+   ```
+3. Read project governance and architecture policies starting from [AGENTS.md](AGENTS.md) and [README.md](README.md).
+4. Verify local developer tools (see Prerequisites below).
+
+---
+
+### Prerequisites (Host Machine Tooling)
+
+Install the following tools on your machine before commencing Phase 1 scaffolding:
 
 | Tool | Version | Install command |
 |---|---|---|
@@ -23,7 +39,7 @@ Install the following tools on your machine before cloning the repository:
 | Docker Desktop | Latest | https://www.docker.com/products/docker-desktop/ |
 | Docker Compose | v5 (bundled with Docker Desktop) | — |
 
-Verify your setup:
+Verify your local prerequisites:
 
 ```bash
 node --version       # should print 24.15.0
@@ -35,11 +51,14 @@ docker compose version  # should print v5.x.x
 git --version        # any recent version
 ```
 
-### Clone and set up
+---
+
+### Future Phase 1 Application Setup (After Scaffold Merge)
+
+> These commands apply once Phase 1 code scaffolding is created.
 
 ```bash
-git clone git@github.com:Dy-Rongrath/Cambodia-Trusted-AI-Document-Platform.git
-cd Cambodia-Trusted-AI-Document-Platform
+# Clone and setup workspaces
 nvm use                    # activates Node 24.15.0 from .nvmrc
 npm install                # installs root workspace dependencies
 
@@ -60,7 +79,7 @@ cp .env.example .env
 cd ../..
 ```
 
-### Start local services
+### Future Phase 1 Local Infrastructure Services
 
 ```bash
 # Start all infrastructure (database, Keycloak, MinIO, etc.)
@@ -75,6 +94,7 @@ cd apps/ai-service && uv run uvicorn main:app --reload
 # Start frontend (in a separate terminal)
 cd apps/frontend && npm run start
 ```
+
 
 ---
 
@@ -471,4 +491,52 @@ A feature task is considered complete only when all of the following are true:
 
 ---
 
-*Read `ARCHITECTURE.md`, `SECURITY.md`, and `AGENTS.md` alongside this document.*
+## 17. Model Context Protocol (MCP) Local Setup
+
+Model Context Protocol (MCP) connects the OpenAI Codex CLI agent to approved local development context and tools.
+
+### Approved Client & Servers (Stage 1)
+- **Client:** OpenAI Codex CLI
+- **Servers:**
+  1. **GitHub MCP Server** (Docker stdio): `ghcr.io/github/github-mcp-server` (Read-only repository access)
+  2. **Context7 MCP Server** (npx stdio): `@upstash/context7-mcp` (Official documentation lookup)
+
+### Configuration Setup
+
+Project-specific configuration is maintained in `.codex/config.toml` in the repository root (gitignored).
+
+```toml
+# .codex/config.toml (DO NOT COMMIT THIS FILE)
+
+[mcpServers.github]
+command = "docker"
+args = [
+  "run",
+  "-i",
+  "--rm",
+  "-e", "GITHUB_PERSONAL_ACCESS_TOKEN",
+  "ghcr.io/github/github-mcp-server"
+]
+[mcpServers.github.env]
+GITHUB_PERSONAL_ACCESS_TOKEN = "your_read_only_github_pat_here"
+
+[mcpServers.context7]
+command = "npx"
+args = ["-y", "@upstash/context7-mcp@latest"]
+```
+
+### Setup Steps
+1. Generate a GitHub Personal Access Token (PAT) with read-only repository permissions for `Dy-Rongrath/Cambodia-Trusted-AI-Document-Platform`.
+2. Create `.codex/config.toml` locally and paste the template above with your PAT.
+3. Verify `.codex/config.toml` is ignored by Git (`git status` must not list it).
+4. Run `codex mcp list` to verify both servers load cleanly.
+
+### Mandatory Rules
+- **NEVER commit `.codex/config.toml` or any file containing GitHub PATs or secrets.**
+- All MCP tools in Stage 1 are read-only. Do not enable write parameters without approval.
+- See `MCP_SECURITY.md` for full governance rules.
+
+---
+
+*Read `ARCHITECTURE.md`, `SECURITY.md`, `MCP_SECURITY.md`, and `AGENTS.md` alongside this document.*
+
