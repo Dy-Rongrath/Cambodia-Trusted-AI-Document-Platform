@@ -56,13 +56,13 @@ Examples of representing our community include using an official e-mail address,
 posting via an official social media account, or acting as an appointed
 representative at an online or offline event.
 
-## Enforcement
+## Enforcement & Reporting
 
-Instances of abusive, harassing, or otherwise unacceptable behavior may be
-reported to the project maintainer through a private GitHub security or maintainer
-contact channel where available.
+Instances of abusive, harassing, or otherwise unacceptable behavior should be reported confidentially to project maintainers.
 
-Enforcement Contact: `[PROJECT CONDUCT CONTACT TO BE ADDED]`
+> **Conduct Reporting Status Notice:** A dedicated private conduct reporting channel (e.g. `conduct@trusted-ai.example`) has not yet been established. Outside contributor onboarding remains limited until a private conduct channel is configured by the project owner. Do not report ordinary conduct complaints in public GitHub issues.
+
+*Note: Security vulnerability disclosures are strictly separated from Code of Conduct reporting. For security vulnerabilities, follow [SECURITY.md](SECURITY.md).*
 
 All complaints will be reviewed and investigated promptly and fairly.
 
