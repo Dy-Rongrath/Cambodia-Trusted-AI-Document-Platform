@@ -2,7 +2,8 @@
 
 > **Status:** Living document — updated as the project evolves.
 > **Last updated:** 2026-08-01
-> **Phase:** Phase 0 — Engineering Foundation
+> **Phase:** Phase 0 — Documentation and Governance Foundation: Complete
+> **Next Phase:** Phase 1 — Engineering Scaffold and Tooling: Next
 
 ---
 
@@ -43,7 +44,7 @@ The platform is designed to support Cambodia's digital transformation while resp
 ### Out-of-scope users (Phase 0–3)
 
 - Members of the general public with self-service access.
-- External API consumers (Phase 12+).
+- External API consumers (Phase 13+).
 
 ---
 
@@ -51,13 +52,13 @@ The platform is designed to support Cambodia's digital transformation while resp
 
 | # | Capability | Target phase |
 |---|---|---|
-| 1 | Secure document upload with file-type and malware validation | Phase 3 |
-| 2 | Khmer and English document classification | Phase 5 |
-| 3 | Human review workflow for uncertain AI predictions | Phase 6 |
-| 4 | AI-assisted document explanation | Phase 8 |
-| 5 | Structured information extraction | Phase 7 |
-| 6 | Digitally signed certificate issuance | Phase 10 |
-| 7 | Verifiable credential issuance (OpenID4VCI / SD-JWT VC) | Phase 10 |
+| 1 | Secure document upload with file-type and malware validation | Phase 4 |
+| 2 | Khmer and English document classification | Phase 6 |
+| 3 | Human review workflow for uncertain AI predictions | Phase 7 |
+| 4 | AI-assisted document explanation | Phase 9 |
+| 5 | Structured information extraction | Phase 8 |
+| 6 | Digitally signed certificate issuance | Phase 11 |
+| 7 | Verifiable credential issuance (OpenID4VCI / SD-JWT VC) | Phase 11 |
 | 8 | Credential verification and QR-code scanning | Phase 10 |
 | 9 | Mobile credential wallet (Flutter) | Phase 11 |
 | 10 | Organisation-to-organisation verified data exchange | Phase 12 |
@@ -181,32 +182,38 @@ The following are explicitly out of scope until a later phase:
 
 ## 10. Success Criteria
 
-### Phase 0 (Engineering Foundation)
+### Phase 0 (Documentation and Governance Foundation: Complete)
 
-- All foundation documents created and approved.
-- Repository structure defined.
-- Local Docker Compose environment boots cleanly.
-- Git repository with branch protection configured.
+- Foundation documents created, reviewed, and aligned (`PROJECT_CONTEXT.md`, `ARCHITECTURE.md`, `SECURITY.md`, `MCP_SECURITY.md`, `DEVELOPMENT.md`, `TESTING.md`, `DATA_GOVERNANCE.md`, `AI_GOVERNANCE.md`, `ROADMAP.md`, `AGENTS.md`, `README.md`, `CONTRIBUTING.md`).
+- System architecture and MCP integration boundary documented with Mermaid diagrams.
+- Initial ADRs recorded (ADR-0001 through ADR-0007).
+- Security policy and STRIDE threat model created (including 15 MCP threat categories).
+- Development and testing standards created.
+- Data and AI governance policies created.
+- Repository-level AI-agent instructions (`AGENTS.md`) created.
+- MCP security policy (`MCP_SECURITY.md`) created.
+- No application code, secrets, or real data introduced.
 
-### Phase 1 (First Vertical Slice)
+### Phase 1 (Engineering Scaffold and Tooling: Next)
 
-- An authenticated organisation user can upload a safe synthetic Khmer or English document.
-- The backend validates, stores metadata, and records an audit event.
-- The AI service classifies the document and returns a prediction with a confidence score.
-- The frontend displays the predicted document type and confidence.
-- Predictions below the confidence threshold enter the human-review workflow.
-- All important actions are recorded in the audit log.
-- All unit, integration, and security tests pass.
+- Monorepo scaffold (`apps/backend`, `apps/frontend`, `apps/ai-service`, `packages/shared-types`) created.
+- Root `package.json` with npm workspaces initialized.
+- Local Docker Compose environment boots cleanly with PostgreSQL 17, Keycloak 26, MinIO.
+- NestJS backend and FastAPI AI service health endpoints operational.
+- Angular frontend placeholder builds and runs cleanly.
+- Basic GitHub Actions CI pipeline passes (lint, type-check, unit test).
+- Git repository branch protection configured.
+- Local code-quality tooling (ESLint, Prettier, Ruff, mypy) operational.
 
-### Production readiness (Phase 14)
+### Production readiness (Phase 16)
 
-- All 14 roadmap phases completed and validated.
-- Security audit completed.
-- Threat model reviewed by a specialist.
-- Data-governance controls verified.
+- All 16 roadmap phases completed and validated.
+- Security audit completed by an external specialist.
+- STRIDE threat model reviewed and mitigated.
+- Data-governance and privacy controls verified.
 - Performance and load tests completed.
-- Kubernetes deployment documented and tested.
-- GDPR/PDPA compliance review completed.
+- Kubernetes deployment, Helm charts, and Argo CD GitOps tested.
+- ALTAI self-assessment and EU AI Act compliance review completed.
 
 ---
 

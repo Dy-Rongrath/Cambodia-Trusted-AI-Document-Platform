@@ -9,7 +9,7 @@ This document outlines the workflow, coding standards, and security requirements
 ## 1. Core Principles
 
 Before writing any code or documentation, read the foundational documents:
-- [AGENTS.md](.agents/AGENTS.md) — Mandatory AI agent & developer guardrails.
+- [AGENTS.md](AGENTS.md) — Mandatory AI agent & developer guardrails.
 - [SECURITY.md](SECURITY.md) — Core security policies and data classification.
 - [MCP_SECURITY.md](MCP_SECURITY.md) — Model Context Protocol security rules.
 - [DEVELOPMENT.md](DEVELOPMENT.md) — Technical coding standards and setup guide.

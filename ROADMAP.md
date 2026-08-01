@@ -275,9 +275,13 @@ Train, evaluate, and deploy the first document classification model.
 - FastAPI classification endpoint.
 - Integration between NestJS backend and AI service.
 - Classification result storage.
-- Confidence threshold configuration.
-- Frontend: display predicted document type and confidence score.
+- Confidence threshold evaluation.
+- Set document classification status to `REVIEW_REQUIRED` when confidence < threshold.
+- Frontend: display predicted document type, confidence score, and status.
 - `ai.prediction` audit event.
+
+### Out of scope
+- Full review-task queue workflow, `ReviewModule`, or `review_tasks` tables (deferred to Phase 7).
 
 ### Security requirements
 - AI service endpoint authenticated with internal API key.
@@ -292,7 +296,7 @@ Train, evaluate, and deploy the first document classification model.
 ### Acceptance criteria
 - Model achieves defined accuracy thresholds on the test set.
 - Khmer documents evaluated separately and meet the Khmer threshold.
-- Predictions below the threshold create a human-review task.
+- Predictions below threshold reliably set document status to `REVIEW_REQUIRED`.
 - `ai.prediction` audit event recorded for every inference.
 
 ---
@@ -300,7 +304,7 @@ Train, evaluate, and deploy the first document classification model.
 ## Phase 7 — Human Review Workflow
 
 ### Objective
-Build the human-review workflow for uncertain AI predictions.
+Build the human-review workflow for uncertain AI predictions marked `REVIEW_REQUIRED`.
 
 ### Prerequisites
 - Phase 6 complete.
@@ -308,11 +312,11 @@ Build the human-review workflow for uncertain AI predictions.
 ### Scope
 - `ReviewModule` in NestJS.
 - Prisma schema: `review_tasks`, `review_decisions` tables.
-- Review task creation when confidence < threshold.
+- Automatic creation of review tasks for documents with `REVIEW_REQUIRED` status.
 - Review task queue API.
 - Review decision API.
-- Frontend: reviewer dashboard with document view and prediction.
-- Frontend: ability to confirm or override AI prediction.
+- Frontend: reviewer dashboard with document view, AI prediction, and decision buttons.
+- Frontend: ability for authorised reviewers to confirm or override AI prediction.
 - Audit events: `review.task.created`, `review.decision.submitted`.
 - Override rate monitoring metric.
 
@@ -322,9 +326,9 @@ Build the human-review workflow for uncertain AI predictions.
 - Audit event tests.
 
 ### Acceptance criteria
-- Documents below the confidence threshold appear in the reviewer dashboard.
+- Documents marked `REVIEW_REQUIRED` appear as actionable tasks in the reviewer queue.
 - Reviewers can confirm or override AI predictions.
-- Override rate is tracked as a metric.
+- Override rate is tracked as a operational metric.
 
 ---
 
