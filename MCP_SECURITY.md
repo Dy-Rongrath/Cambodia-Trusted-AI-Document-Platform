@@ -310,7 +310,7 @@ The review must cover:
 
 | Rule | Detail |
 |---|---|
-| MCP is a **development tool only** for Phases 1–14 | No MCP server is connected to, or aware of, production infrastructure during development phases. Product-facing MCP capabilities are introduced in Phase 15. |
+| MCP is a **development integration tool for Phases 2–14** | Phase 0 defines governance. Phase 1 creates the engineering scaffold without installing or configuring MCP servers. Phase 2 installs and validates approved development MCP servers. Phases 2–14 use MCP only as an approved development integration. No MCP server is connected to, or aware of, production infrastructure during development phases. Product-facing MCP capabilities are introduced in Phase 15. |
 | Separate credentials for development and production | If an MCP server is ever used in production (Phase 15+), it must use credentials that are completely separate from development credentials. |
 | Production MCP requires separate approval | Enabling any MCP capability that touches production requires explicit approval, a security review, and a separate ADR amendment. |
 

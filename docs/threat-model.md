@@ -147,7 +147,7 @@ This threat model covers the platform as it will exist at the end of Phase 3 (se
 
 ---
 
-#### T-INJ-002 — Prompt Injection (Phase 8+)
+#### T-INJ-002 — Prompt Injection (Phase 9+)
 
 | Field | Detail |
 |---|---|
@@ -157,14 +157,14 @@ This threat model covers the platform as it will exist at the end of Phase 3 (se
 | **Threat** | A malicious document contains instructions embedded in text that cause the LLM to deviate from its intended behaviour — for example, to reveal other users' documents, to produce harmful output, or to exfiltrate data. |
 | **Impact** | AI system produces unintended output. Potential data leakage via model output. |
 | **Likelihood** | High for LLM-based features (prompt injection is a well-documented class of LLM attack) |
-| **Prevention** | Separate system prompt from user-supplied content. Sanitise document content before including in prompt. Validate and sanitise LLM output before returning to users. Monitor LLM outputs for anomalies. Apply output filtering. Never include personal data from other users in LLM context. |
+| **Prevention** | Separate system prompt from user-supplied content. Sanitise document content before including in prompt. Validate and sanitise LLM output before returning to users. Monitor LLM outputs for anomalies. Apply output filtering. Never include personal data from other users in LLM context. Phase 9 introduces the LLM assistant where controls are mandatory. If Phase 8 introduces any generative model or prompt-driven extraction component, these controls must be introduced earlier through an approved architecture decision. |
 | **Detection** | Output monitoring. Structured output validation that rejects unexpected formats. |
 | **Remaining risk** | Medium — prompt injection is difficult to fully prevent. Mitigations reduce but do not eliminate risk. |
 | **Owner** | AI/ML engineer |
 
 ---
 
-#### T-INJ-003 — Indirect Prompt Injection via Document Content (Phase 8+)
+#### T-INJ-003 — Indirect Prompt Injection via Document Content (Phase 9+)
 
 | Field | Detail |
 |---|---|
@@ -658,8 +658,8 @@ This threat model covers the platform as it will exist at the end of Phase 3 (se
 | T-AUTH-001 | JWT misuse | Low | Controlled by Keycloak + passport-jwt |
 | T-AUTH-002 | Token theft | Low-medium | Controlled by short lifetime + rotation |
 | T-AC-001 | Cross-tenant access | **Medium** (critical if exploited) | Dual-layer control required — **must be tested** |
-| T-INJ-002 | Prompt injection | Medium | Phase 8+ — mitigations reduce but don't eliminate |
-| T-INJ-003 | Indirect prompt injection | Medium | Phase 8+ |
+| T-INJ-002 | Prompt injection | Medium | Phase 9+ — mitigations reduce but don't eliminate |
+| T-INJ-003 | Indirect prompt injection | Medium | Phase 9+ |
 | T-FILE-001 | Malicious upload | Low-medium | ClamAV integration in Phase 4 |
 | T-INT-001 | Audit log tampering | Medium | Tamper-evident log deferred to Phase 16 |
 | T-AI-001 | Malicious model file | Low | Hash verification mandatory |

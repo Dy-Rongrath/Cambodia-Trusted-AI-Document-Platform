@@ -401,9 +401,9 @@ Introduced incrementally. See `ROADMAP.md` for phase targets.
 
 | Phase | Capability |
 |---|---|
-| Phase 1 | Structured JSON logging (Pino/Winston in NestJS, Python logging in FastAPI) |
-| Phase 4 | OpenTelemetry SDK integration. Prometheus metrics endpoint. |
-| Phase 4 | Grafana + Loki + Tempo stack in Docker Compose. |
+| Phase 1 | Structured JSON logging foundations (Pino/Winston in NestJS, Python logging in FastAPI) |
+| Phase 5 | OpenTelemetry SDK integration and Prometheus metrics endpoint. |
+| Phase 5 | Grafana + Loki + Tempo stack in Docker Compose. |
 | Phase 16 | Production observability in Kubernetes. |
 
 **Logging standards:**
@@ -418,7 +418,8 @@ Introduced incrementally. See `ROADMAP.md` for phase targets.
 
 | Integration | Purpose | Phase | Notes |
 |---|---|---|---|
-| Keycloak | Authentication and authorisation | Phase 1 | Self-hosted |
+| Keycloak | Keycloak infrastructure and local-development configuration | Phase 1 | Self-hosted Docker container, realm bootstrap configuration placeholder |
+| Authentication and authorisation | User login flow, JWT validation, roles, tenant-context middleware | Phase 3 | Keycloak JWKS, AuthModule, OrganisationModule |
 | Object storage (MinIO locally, S3-compatible in production) | Document storage | Phase 4 | Encrypted at rest |
 | ClamAV | Malware scanning of uploaded files | Phase 4 | Integration point defined in Phase 1 |
 | MLflow | ML experiment tracking and model registry | Phase 6 | Self-hosted |

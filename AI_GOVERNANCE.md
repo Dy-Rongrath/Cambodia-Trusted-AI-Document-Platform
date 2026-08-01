@@ -302,8 +302,8 @@ When the platform uses LLMs to generate explanations or process document content
 | Tampered model weights | Verify SHA-256 hash of model files before loading. Pin Hugging Face model commit hashes. |
 | Malicious model file (pickle) | Use `safetensors` format. Never use `pickle.loads()` on untrusted model files. |
 | Poisoned training data | Dataset lineage and versioning (DVC). Dataset review process. |
-| Compromised Python packages | `uv.lock` pins all dependencies. `uv audit` in CI. |
-| Compromised Docker image | Trivy scan. Pin base image versions. Cosign verification or equivalent image-signing controls are planned for Phase 16 production hardening, unless introduced earlier through an approved ADR. |
+| Compromised Python packages | Phase 1 will introduce Python dependency locking through `uv.lock`. Dependency auditing will be added to CI after the Python dependency configuration exists. |
+| Compromised Docker image | Phase 1 will pin explicit base-image versions when container definitions are created. Trivy scanning is a planned Phase 2-or-later control after container images exist. Cosign verification or an equivalent image-signing control is planned for Phase 16 production hardening unless introduced earlier through an approved ADR. |
 
 ---
 
