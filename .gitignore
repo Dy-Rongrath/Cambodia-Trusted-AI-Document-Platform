@@ -66,10 +66,9 @@ venv/
 env/
 ENV/
 .env/
-# uv
+# uv / pyenv
 .python-version
-# pyenv
-.python-version
+!apps/ai-service/.python-version
 # Byte-compiled / optimised
 __pycache__/
 *.py[cod]
