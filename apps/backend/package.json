@@ -12,7 +12,7 @@
     "typecheck": "tsc --noEmit",
     "test": "jest --passWithNoTests",
     "test:ci": "jest --ci --coverage --passWithNoTests",
-    "prisma:generate": "prisma generate",
+    "prisma:generate": "prisma generate --allow-no-models",
     "db:check": "ts-node src/db-check.ts"
   },
   "dependencies": {
@@ -35,6 +35,6 @@
     "prisma": "6.3.1",
     "ts-jest": "29.2.5",
     "ts-node": "10.9.2",
-    "typescript": "5.7.3"
+    "typescript": "5.8.3"
   }
 }
