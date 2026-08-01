@@ -13,6 +13,10 @@ ADR-NNNN — [Short, imperative description of the decision]
 
 `Proposed` | `Accepted` | `Deprecated` | `Superseded by ADR-NNNN`
 
+## Decision Owner / Approved By
+
+[Project Owner / Lead Architect — Date]
+
 ## Date
 
 YYYY-MM-DD

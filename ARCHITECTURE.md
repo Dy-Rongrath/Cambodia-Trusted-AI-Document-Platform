@@ -73,8 +73,8 @@ See [ADR-0001](docs/adr/ADR-0001-monorepo-strategy.md). A modular monolith keeps
 | `OrganisationModule` | `organisations` table | Tenant management, organisation CRUD, tenant-context middleware. |
 | `UserModule` | `users` table | User profile management, role assignments within a tenant. |
 | `DocumentModule` | `documents`, `document_files` tables | Document upload, metadata storage, file-lifecycle management. |
-| `ClassificationModule` | `classification_results` table | Communicates with AI service, stores predictions, triggers human review. |
-| `ReviewModule` | `review_tasks`, `review_decisions` tables | Human-review workflow management. |
+| `ClassificationModule` | `classification_results` table | Communicates with AI service, stores predictions, evaluates confidence, sets `REVIEW_REQUIRED` status. (Phase 6) |
+| `ReviewModule` | `review_tasks`, `review_decisions` tables | Human-review workflow management: queue, reviewer UI, decision submission, override metrics. (Phase 7) |
 | `CredentialModule` | `credentials`, `credential_revocations` tables | Credential issuance (SD-JWT VC), signing, revocation. |
 | `AuditModule` | `audit_events` table | Append-only audit event recording. Shared service used by all other modules. |
 | `HealthModule` | — | `/health` endpoint for Docker and Kubernetes health checks. |
@@ -308,7 +308,7 @@ sequenceDiagram
     participant Frontend
     participant AuditService
 
-    ClassificationJob->>ReviewModule: Confidence < threshold → create review task
+    ClassificationJob->>ReviewModule: Status is REVIEW_REQUIRED → create review task (Phase 7)
     ReviewModule->>Frontend: Task appears in reviewer dashboard
     Reviewer->>Frontend: Open task — view document and AI prediction
     Reviewer->>Frontend: Select correct document type (confirm or override AI)

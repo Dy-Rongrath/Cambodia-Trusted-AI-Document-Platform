@@ -2,7 +2,7 @@
 
 > **Status:** Living document — reviewed when any MCP integration changes.
 > **Last updated:** 2026-08-01
-> **Classification:** Internal
+> **Classification:** Public project policy — must not contain secrets or restricted operational details
 > **Supersedes:** Any generic MCP guidance that conflicts with this document.
 
 Read this document completely before proposing, reviewing, or implementing any MCP integration.

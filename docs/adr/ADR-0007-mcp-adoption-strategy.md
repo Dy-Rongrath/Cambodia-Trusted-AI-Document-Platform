@@ -4,6 +4,10 @@
 
 `Accepted`
 
+## Decision Owner / Approved By
+
+Dy Rongrath (Project Owner) — Explicit user selection in prompt questionnaire: Codex CLI, GitHub MCP + Context7, gitignored local config, local dev / remote team sharing.
+
 ## Date
 
 2026-08-01
@@ -22,7 +26,7 @@ Clear architectural and governance decisions are required to define how MCP is a
 
 ## Decision
 
-We adopt a **phased, read-only-first Model Context Protocol (MCP) adoption strategy** governed by `MCP_SECURITY.md` and `.agents/AGENTS.md`.
+We adopt a **phased, read-only-first Model Context Protocol (MCP) adoption strategy** governed by `MCP_SECURITY.md` and `AGENTS.md`.
 
 Specific decision choices:
 

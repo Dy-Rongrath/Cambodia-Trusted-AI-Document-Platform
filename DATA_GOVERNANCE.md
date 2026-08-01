@@ -2,7 +2,7 @@
 
 > **Status:** Living document — reviewed at the start of each phase that introduces new data sources.
 > **Last updated:** 2026-08-01
-> **Classification:** Internal
+> **Classification:** Public project policy — must not contain secrets or restricted operational details.
 
 ---
 

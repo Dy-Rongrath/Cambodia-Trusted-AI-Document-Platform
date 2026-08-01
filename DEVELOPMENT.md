@@ -1,15 +1,31 @@
-# DEVELOPMENT.md — Cambodia Trusted AI Document Platform
-
-> **Status:** Living document — updated as the project evolves.
-> **Last updated:** 2026-08-01
+> **Phase Status:** Phase 0 — Documentation and Governance Foundation: Complete
+> **Next Phase:** Phase 1 — Engineering Scaffold and Tooling: Next
 
 ---
 
 ## 1. Local Setup
 
-### Prerequisites
+> **Notice:** Setup commands involving `npm install`, `apps/backend`, `apps/frontend`, `apps/ai-service`, `uv sync`, `docker compose`, and `.env.example` apply after the Phase 1 engineering scaffold has been merged. The current Phase 0 repository contains documentation only.
 
-Install the following tools on your machine before cloning the repository:
+### Current Phase 0 Setup (Documentation Only)
+
+1. Clone the repository:
+   ```bash
+   git clone git@github.com:Dy-Rongrath/Cambodia-Trusted-AI-Document-Platform.git
+   cd Cambodia-Trusted-AI-Document-Platform
+   ```
+2. Activate pinned Node version (optional for doc verification):
+   ```bash
+   nvm use                    # activates Node 24.15.0 from .nvmrc
+   ```
+3. Read project governance and architecture policies starting from [AGENTS.md](AGENTS.md) and [README.md](README.md).
+4. Verify local developer tools (see Prerequisites below).
+
+---
+
+### Prerequisites (Host Machine Tooling)
+
+Install the following tools on your machine before commencing Phase 1 scaffolding:
 
 | Tool | Version | Install command |
 |---|---|---|
@@ -23,7 +39,7 @@ Install the following tools on your machine before cloning the repository:
 | Docker Desktop | Latest | https://www.docker.com/products/docker-desktop/ |
 | Docker Compose | v5 (bundled with Docker Desktop) | — |
 
-Verify your setup:
+Verify your local prerequisites:
 
 ```bash
 node --version       # should print 24.15.0
@@ -35,11 +51,14 @@ docker compose version  # should print v5.x.x
 git --version        # any recent version
 ```
 
-### Clone and set up
+---
+
+### Future Phase 1 Application Setup (After Scaffold Merge)
+
+> These commands apply once Phase 1 code scaffolding is created.
 
 ```bash
-git clone git@github.com:Dy-Rongrath/Cambodia-Trusted-AI-Document-Platform.git
-cd Cambodia-Trusted-AI-Document-Platform
+# Clone and setup workspaces
 nvm use                    # activates Node 24.15.0 from .nvmrc
 npm install                # installs root workspace dependencies
 
@@ -60,7 +79,7 @@ cp .env.example .env
 cd ../..
 ```
 
-### Start local services
+### Future Phase 1 Local Infrastructure Services
 
 ```bash
 # Start all infrastructure (database, Keycloak, MinIO, etc.)
@@ -75,6 +94,7 @@ cd apps/ai-service && uv run uvicorn main:app --reload
 # Start frontend (in a separate terminal)
 cd apps/frontend && npm run start
 ```
+
 
 ---
 

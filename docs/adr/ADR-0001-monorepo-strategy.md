@@ -4,6 +4,10 @@
 
 `Accepted`
 
+## Decision Owner / Approved By
+
+Dy Rongrath (Project Owner) — Explicit user requirement: "Monorepo (npm workspaces)"
+
 ## Date
 
 2026-08-01

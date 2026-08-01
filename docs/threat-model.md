@@ -3,7 +3,7 @@
 > **Methodology:** STRIDE (Spoofing, Tampering, Repudiation, Information Disclosure, Denial of Service, Elevation of Privilege)
 > **Status:** Living document — reviewed and updated each phase.
 > **Last updated:** 2026-08-01
-> **Classification:** Internal
+> **Classification:** Public project policy — must not contain secrets or restricted operational details.
 >
 > **Specialist review required** before Phase 14 (production deployment).
 

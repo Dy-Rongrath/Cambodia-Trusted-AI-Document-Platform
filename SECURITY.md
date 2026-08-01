@@ -2,7 +2,7 @@
 
 > **Status:** Living document — reviewed and updated each phase.
 > **Last updated:** 2026-08-01
-> **Classification:** Internal — do not include secret values in this document.
+> **Classification:** Public project policy — must not contain secrets or restricted operational details.
 
 ---
 
