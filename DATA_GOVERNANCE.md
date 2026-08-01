@@ -30,7 +30,7 @@ Every team member and AI agent operating on this repository must follow these ru
 | **Openly licensed document datasets** | ✅ Allowed (with review) | Licence verification required. No personal data. Source documented in dataset card. |
 | **Anonymised or pseudonymised data (formally approved)** | ✅ Allowed (with formal approval) | Requires documented anonymisation process, legal basis, and approval from a designated reviewer before use. |
 | **Real government documents** | 🔴 PROHIBITED | Not permitted in any environment during development. |
-| **Real NSSF documents or records** | 🔴 PROHIBITED | Not permitted in any environment during development. |
+| **Real sensitive government or social-protection records** | 🔴 PROHIBITED | Not permitted in any environment during development. |
 | **Real personal identification documents** | 🔴 PROHIBITED | Not permitted in any environment during development. |
 | **Production database exports** | 🔴 PROHIBITED | Not permitted in any environment during development. |
 | **Data scraped without permission** | 🔴 PROHIBITED | Scraping data without the source owner's permission is not permitted. |
@@ -44,7 +44,7 @@ The following are **absolutely prohibited** without exception:
 
 - Real personal data from individuals without explicit, documented consent and a legal basis.
 - Real government-issued identification documents.
-- Real NSSF records or social insurance data.
+- Real social-protection, employment, insurance, healthcare, or other sensitive government records.
 - Real medical records.
 - Real financial records.
 - Production database dumps or backups.
@@ -270,7 +270,7 @@ Model Context Protocol (MCP) integrations used for development context or future
 ### Prohibited Data Exposure
 MCP tools must never expose or transmit:
 - Real Cambodian government documents or official seals.
-- National Social Security Fund (NSSF) records or worker data.
+- Sensitive social-protection, employment, insurance, healthcare, or worker records.
 - Real personal identification documents (national IDs, passports, driver's licences).
 - Production database contents or live connection strings.
 - Production logs containing personal data or operational secrets.

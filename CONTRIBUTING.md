@@ -16,7 +16,7 @@ Before writing code or documentation:
 4. Search existing GitHub Issues and Pull Requests to avoid duplicate work.
 5. Review [docs/open-source-dependency-policy.md](docs/open-source-dependency-policy.md) before proposing any new third-party dependency.
 
-> **Privacy & Security Rule:** Never submit real personal identification, government, NSSF, client, or production data. Always use synthetic test data fixtures.
+> **Privacy & Security Rule:** Never submit real personal identification, government, client, organisational, confidential, or production data. Always use synthetic test data fixtures.
 
 ---
 

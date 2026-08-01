@@ -21,6 +21,8 @@ The **Cambodia Trusted AI Document Platform** is a privacy-first, security-by-de
 
 The platform is designed to support Cambodia's digital transformation while respecting the privacy rights of individuals and the data-sovereignty requirements of participating organisations.
 
+This is an independent open-source project. It is not affiliated with, endorsed by, commissioned by, or operated by any Cambodian government institution or public agency.
+
 ---
 
 ## 2. Target Users
@@ -151,7 +153,7 @@ The following are explicitly out of scope until a later phase:
 
 | # | Constraint | Source |
 |---|---|---|
-| C-1 | **No real personal, government, NSSF, or confidential data** during development. | Security and privacy policy. |
+| C-1 | **No real personal, government, client, organisational, confidential, or production data** during development. | Security and privacy policy. |
 | C-2 | **No secrets in source code**, logs, tests, or documentation. | Security policy. |
 | C-3 | **No model is the final authority for credential authenticity.** Cryptographic verification is the source of truth. | AI governance policy. |
 | C-4 | **Open-Source Licensing:** Application code, infrastructure code, and documentation are licensed under the Apache License 2.0 (`SPDX-License-Identifier: Apache-2.0`). Every dependency and third-party asset must have a known licence and complete the project dependency-review process ([docs/open-source-dependency-policy.md](docs/open-source-dependency-policy.md)). Generally approved permissive licences may use normal maintainer review. Copyleft, weak-copyleft, source-available, custom, unlicensed, or commercially restricted terms require explicit maintainer and legal review before adoption. | Open-source policy. |
@@ -189,7 +191,7 @@ The following are explicitly out of scope until a later phase:
 | **DVC** | Data Version Control — a tool for versioning datasets and ML models alongside source code. |
 | **pgvector** | A PostgreSQL extension that adds vector similarity search, required for semantic search and embedding-based retrieval. |
 | **Row-level security (RLS)** | A PostgreSQL feature that enforces data-access policies at the database row level, used for tenant isolation. |
-| **NSSF** | National Social Security Fund — a Cambodian government agency. Data from NSSF is classified as sensitive and prohibited in development environments. |
+| **Social-protection record** | Employment, insurance, healthcare, or social-welfare records issued by a public-sector agency. Classified as sensitive data and prohibited in development environments. |
 
 ---
 

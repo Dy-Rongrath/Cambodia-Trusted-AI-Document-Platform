@@ -23,7 +23,7 @@
 
 | Classification | Description | Examples | Controls |
 |---|---|---|---|
-| **Restricted** | Data that, if disclosed, would cause serious harm to individuals or the organisation. | Real government-issued documents, NSSF records, personal identity data, private keys, production secrets. | **Prohibited in development environments.** Encrypted at rest and in transit. Access logged. Strict need-to-know. |
+| **Restricted** | Data that, if disclosed, would cause serious harm to individuals or the organisation. | Real government-issued documents, social-protection or employment records, personal identity data, private keys, production secrets. | **Prohibited in development environments.** Encrypted at rest and in transit. Access logged. Strict need-to-know. |
 | **Confidential** | Business-sensitive data. Harm if disclosed but not catastrophic. | Organisation data, document metadata, classification results, user accounts, audit logs. | Encrypted in transit (TLS). Access controlled by role. Logged. |
 | **Internal** | Operational data for internal use only. | Service configuration, non-sensitive logs, health metrics. | Not exposed externally. Accessible to platform staff. |
 | **Public** | Intentionally public data. | Public API documentation, credential verification endpoints, public credential schemas. | No special controls beyond availability. |
@@ -32,7 +32,7 @@
 
 **CRITICAL:** Real data from any of these sources is **prohibited** in development, staging, or test environments:
 - Cambodian government documents
-- NSSF records
+- Social-protection, employment, insurance, healthcare, or other sensitive government records
 - Real personal identification documents
 - Production database dumps
 - Client or organisation confidential documents

@@ -23,7 +23,7 @@ The **Cambodia Trusted AI Document Platform** is an open-source project maintain
 
 ## 3. Security & Sensitive Information
 
-- **Never post sensitive data publicly.** Do not include API keys, credentials, tokens, real personal data, NSSF numbers, or government document contents in issue reports or public discussions.
+- **Never post sensitive data publicly.** Do not include API keys, credentials, tokens, real personal data, national identity numbers, social-protection identifiers, or government document contents in issue reports or public discussions.
 - All logs, configuration snippets, and error tracebacks attached to support requests must be thoroughly sanitized.
 
 ---

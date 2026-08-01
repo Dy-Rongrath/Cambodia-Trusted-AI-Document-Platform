@@ -111,7 +111,7 @@ This file (`AGENTS.md`) is the primary entry point and source of navigation for 
 5. **Human Review Mandatory:** Any AI prediction below the configured confidence threshold must be flagged with `REVIEW_REQUIRED` for human review.
 6. **Tenant Isolation Non-Negotiable:** Every database query touching tenant data must include an explicit tenant ID filter. PostgreSQL RLS enforces this as a second layer.
 7. **Strict Input Validation:** All external HTTP inputs must go through DTOs with `class-validator` (NestJS) or Pydantic models (FastAPI). File uploads must validate size limits, Content-Type, and file magic bytes.
-8. **No Secrets or Production Data:** Never use real government, NSSF, client, or personal data. Never commit `.env` files, `.codex/config.toml`, private keys, or API tokens.
+8. **No Secrets or Production Data:** Never use real personal, government, client, organisational, confidential, or production data. Never commit `.env` files, `.codex/config.toml`, private keys, or API tokens.
 
 ---
 
@@ -185,7 +185,7 @@ You must never, under any circumstances:
 - Delete production data.
 - Disable, skip, or comment out security controls, linting rules, or tests to make a build pass.
 - Bypass approval requirements.
-- Use real personal, government, NSSF, or confidential data with any AI service.
+- Use real personal, government, client, organisational, confidential, or production data with any AI service.
 - Approve your own security-sensitive changes.
 - Hide command failures or test errors.
 - Claim work is completed when it is not.

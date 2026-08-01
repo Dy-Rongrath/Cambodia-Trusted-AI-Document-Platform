@@ -8,7 +8,7 @@
 
 > **Notice:** This project is under active pre-release development.
 >
-> Phase 1 creates the engineering scaffold and local development tooling. It is **not yet suitable for processing real personal, government, NSSF, client, or production data**. Synthetic test data must be used for all development and testing.
+> Phase 1 creates the engineering scaffold and local development tooling. It is **not yet suitable for processing real personal, government, client, organisational, confidential, or production data**. Synthetic test data must be used for all development and testing.
 
 ---
 
@@ -34,6 +34,8 @@ The project may be called production-ready only after evidence exists for all 16
 - **Phase 0 — Documentation and Governance Foundation:** Complete
 - **Phase 1 — Engineering Scaffold and Tooling:** Next (Scaffolding NestJS, FastAPI, Angular, Docker Compose, CI)
 - **Maintainer:** Dy Rongrath (Solo project owner & maintainer)
+
+> **Independence Notice:** This is an independent open-source project. It is not affiliated with, endorsed by, commissioned by, or operated by any Cambodian government institution or public agency.
 
 ---
 
