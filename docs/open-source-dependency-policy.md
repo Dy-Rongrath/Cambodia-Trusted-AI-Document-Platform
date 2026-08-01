@@ -44,14 +44,14 @@ Licences in the generally approved list below may be accepted through normal mai
 
 The following permissive open-source licences are generally approved for runtime and development use:
 
-| Licence | SPDX Identifier | Status |
-|---|---|---|
-| **Apache License 2.0** | `Apache-2.0` | Preferred |
-| **MIT License** | `MIT` | Approved |
-| **BSD 2-Clause / 3-Clause** | `BSD-2-Clause` / `BSD-3-Clause` | Approved |
-| **ISC License** | `ISC` | Approved |
-| **PostgreSQL License** | `PostgreSQL` | Approved |
-| **Python Software Foundation License** | `PSF-2.0` | Approved |
+| Licence                                | SPDX Identifier                 | Status    |
+| -------------------------------------- | ------------------------------- | --------- |
+| **Apache License 2.0**                 | `Apache-2.0`                    | Preferred |
+| **MIT License**                        | `MIT`                           | Approved  |
+| **BSD 2-Clause / 3-Clause**            | `BSD-2-Clause` / `BSD-3-Clause` | Approved  |
+| **ISC License**                        | `ISC`                           | Approved  |
+| **PostgreSQL License**                 | `PostgreSQL`                    | Approved  |
+| **Python Software Foundation License** | `PSF-2.0`                       | Approved  |
 
 ---
 
@@ -59,12 +59,12 @@ The following permissive open-source licences are generally approved for runtime
 
 Dependencies or assets using the following licences require explicit maintainer and legal review before adoption:
 
-| Licence Family | Examples | Review Focus |
-|---|---|---|
-| Weak Copyleft | LGPL-2.1 / LGPL-3.0, MPL-2.0, EPL-2.0, CDDL-1.0 | Dynamic vs static linking, modification disclosure obligations. |
-| Strong Copyleft | GPL-2.0 / GPL-3.0, AGPL-3.0 | Source disclosure requirements for application code or hosted SaaS. |
-| Source-Available / Non-Open-Source | SSPL, BSL / BUSL, Elastic License, Commons Clause | Commercial deployment restrictions and license compatibility. |
-| Custom / Unlicensed | Proprietary or missing licence files | Cannot be used without explicit legal clarification. |
+| Licence Family                     | Examples                                          | Review Focus                                                        |
+| ---------------------------------- | ------------------------------------------------- | ------------------------------------------------------------------- |
+| Weak Copyleft                      | LGPL-2.1 / LGPL-3.0, MPL-2.0, EPL-2.0, CDDL-1.0   | Dynamic vs static linking, modification disclosure obligations.     |
+| Strong Copyleft                    | GPL-2.0 / GPL-3.0, AGPL-3.0                       | Source disclosure requirements for application code or hosted SaaS. |
+| Source-Available / Non-Open-Source | SSPL, BSL / BUSL, Elastic License, Commons Clause | Commercial deployment restrictions and license compatibility.       |
+| Custom / Unlicensed                | Proprietary or missing licence files              | Cannot be used without explicit legal clarification.                |
 
 ---
 
@@ -72,17 +72,17 @@ Dependencies or assets using the following licences require explicit maintainer 
 
 To maintain clear legal boundaries across the project:
 
-| Asset Category | Licensing Policy |
-|---|---|
-| **Application & Infra Code** | Licensed under [Apache License 2.0](../LICENSE). Project copyright recorded in [NOTICE](../NOTICE). |
-| **Documentation** | Licensed under [Apache License 2.0](../LICENSE). |
-| **Training Code** | Licensed under [Apache License 2.0](../LICENSE) (unless upstream dependency requires copyleft). |
+| Asset Category                 | Licensing Policy                                                                                                                                                                |
+| ------------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **Application & Infra Code**   | Licensed under [Apache License 2.0](../LICENSE). Project copyright recorded in [NOTICE](../NOTICE).                                                                             |
+| **Documentation**              | Licensed under [Apache License 2.0](../LICENSE).                                                                                                                                |
+| **Training Code**              | Licensed under [Apache License 2.0](../LICENSE) (unless upstream dependency requires copyleft).                                                                                 |
 | **Third-Party Standard Texts** | DCO 1.1 and Contributor Covenant 2.1 retain their upstream copyrights and terms in [THIRD_PARTY_NOTICES.md](../THIRD_PARTY_NOTICES.md) and are NOT relicensed under Apache-2.0. |
-| **Datasets** | Subject to individual dataset licences. Documented via Dataset Cards. Apache-2.0 does not automatically apply. |
-| **Model Weights** | Subject to individual model weight licences (e.g. Hugging Face OpenRAIL, Llama license, etc.). Documented via Model Cards. |
-| **Third-Party Models** | Original upstream licence applies. Must be reviewed for commercial and privacy compatibility. |
-| **Fonts, Icons & Media** | Original asset licence applies (e.g. SIL Open Font License, Creative Commons). |
-| **User-Uploaded Documents** | Private tenant data — strictly excluded from open-source distribution. |
+| **Datasets**                   | Subject to individual dataset licences. Documented via Dataset Cards. Apache-2.0 does not automatically apply.                                                                  |
+| **Model Weights**              | Subject to individual model weight licences (e.g. Hugging Face OpenRAIL, Llama license, etc.). Documented via Model Cards.                                                      |
+| **Third-Party Models**         | Original upstream licence applies. Must be reviewed for commercial and privacy compatibility.                                                                                   |
+| **Fonts, Icons & Media**       | Original asset licence applies (e.g. SIL Open Font License, Creative Commons).                                                                                                  |
+| **User-Uploaded Documents**    | Private tenant data — strictly excluded from open-source distribution.                                                                                                          |
 
 ---
 

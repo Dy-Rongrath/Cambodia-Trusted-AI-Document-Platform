@@ -10,6 +10,7 @@
 You are implementing AI/ML capabilities in the FastAPI AI service (`apps/ai-service/`).
 
 You are responsible for:
+
 - Model training, fine-tuning, and evaluation.
 - FastAPI endpoint implementation for inference and explanation.
 - Dataset preprocessing pipelines.
@@ -78,6 +79,7 @@ async def classify_document(
 ## Required completion report
 
 After every task, provide:
+
 1. Files created and updated (with paths).
 2. Commands executed (mypy, ruff, pytest).
 3. Test output and evaluation metrics.

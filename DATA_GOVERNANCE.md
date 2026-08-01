@@ -22,19 +22,19 @@ Every team member and AI agent operating on this repository must follow these ru
 
 ## 2. Allowed Data Sources
 
-| Source | Status | Conditions |
-|---|---|---|
-| **Synthetically generated documents** | ✅ Allowed | Must be clearly labelled as synthetic. Must not resemble real individuals or real government documents. Must be reviewed before use. |
-| **Publicly available Khmer text corpora** | ✅ Allowed (with review) | Licence must permit use for AI training. Source must be documented. No personal data. |
-| **Publicly available English text corpora** | ✅ Allowed (with review) | Same conditions as Khmer corpora. |
-| **Openly licensed document datasets** | ✅ Allowed (with review) | Licence verification required. No personal data. Source documented in dataset card. |
-| **Anonymised or pseudonymised data (formally approved)** | ✅ Allowed (with formal approval) | Requires documented anonymisation process, legal basis, and approval from a designated reviewer before use. |
-| **Real government documents** | 🔴 PROHIBITED | Not permitted in any environment during development. |
-| **Real sensitive government or social-protection records** | 🔴 PROHIBITED | Not permitted in any environment during development. |
-| **Real personal identification documents** | 🔴 PROHIBITED | Not permitted in any environment during development. |
-| **Production database exports** | 🔴 PROHIBITED | Not permitted in any environment during development. |
-| **Data scraped without permission** | 🔴 PROHIBITED | Scraping data without the source owner's permission is not permitted. |
-| **Data with unknown provenance** | 🔴 PROHIBITED | All data sources must be documented and traceable. |
+| Source                                                     | Status                            | Conditions                                                                                                                           |
+| ---------------------------------------------------------- | --------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------ |
+| **Synthetically generated documents**                      | ✅ Allowed                        | Must be clearly labelled as synthetic. Must not resemble real individuals or real government documents. Must be reviewed before use. |
+| **Publicly available Khmer text corpora**                  | ✅ Allowed (with review)          | Licence must permit use for AI training. Source must be documented. No personal data.                                                |
+| **Publicly available English text corpora**                | ✅ Allowed (with review)          | Same conditions as Khmer corpora.                                                                                                    |
+| **Openly licensed document datasets**                      | ✅ Allowed (with review)          | Licence verification required. No personal data. Source documented in dataset card.                                                  |
+| **Anonymised or pseudonymised data (formally approved)**   | ✅ Allowed (with formal approval) | Requires documented anonymisation process, legal basis, and approval from a designated reviewer before use.                          |
+| **Real government documents**                              | 🔴 PROHIBITED                     | Not permitted in any environment during development.                                                                                 |
+| **Real sensitive government or social-protection records** | 🔴 PROHIBITED                     | Not permitted in any environment during development.                                                                                 |
+| **Real personal identification documents**                 | 🔴 PROHIBITED                     | Not permitted in any environment during development.                                                                                 |
+| **Production database exports**                            | 🔴 PROHIBITED                     | Not permitted in any environment during development.                                                                                 |
+| **Data scraped without permission**                        | 🔴 PROHIBITED                     | Scraping data without the source owner's permission is not permitted.                                                                |
+| **Data with unknown provenance**                           | 🔴 PROHIBITED                     | All data sources must be documented and traceable.                                                                                   |
 
 ---
 
@@ -56,16 +56,16 @@ Violating these rules constitutes a serious data breach. Any suspected violation
 
 ## 4. Data Ownership
 
-| Data Type | Owner | Notes |
-|---|---|---|
-| Uploaded documents | The uploading organisation (tenant) | The platform holds the data as a processor, not a controller. |
-| Extracted text and metadata | The uploading organisation (tenant) | Derived from the document — same ownership as the source. |
-| AI classification results | The platform | Results are generated by the platform's AI service. |
-| Human review decisions | The reviewing organisation (tenant) | Decisions are made by staff of the reviewing organisation. |
-| Training datasets | The platform / data provider | Documented per dataset in the dataset card. |
-| AI models | The platform | Models trained by the platform. |
-| Audit events | The platform | Operational records owned by the platform. |
-| User accounts | The respective organisation (tenant) | Managed within Keycloak. |
+| Data Type                   | Owner                                | Notes                                                         |
+| --------------------------- | ------------------------------------ | ------------------------------------------------------------- |
+| Uploaded documents          | The uploading organisation (tenant)  | The platform holds the data as a processor, not a controller. |
+| Extracted text and metadata | The uploading organisation (tenant)  | Derived from the document — same ownership as the source.     |
+| AI classification results   | The platform                         | Results are generated by the platform's AI service.           |
+| Human review decisions      | The reviewing organisation (tenant)  | Decisions are made by staff of the reviewing organisation.    |
+| Training datasets           | The platform / data provider         | Documented per dataset in the dataset card.                   |
+| AI models                   | The platform                         | Models trained by the platform.                               |
+| Audit events                | The platform                         | Operational records owned by the platform.                    |
+| User accounts               | The respective organisation (tenant) | Managed within Keycloak.                                      |
 
 ---
 
@@ -88,9 +88,9 @@ Violating these rules constitutes a serious data breach. Any suspected violation
 
 ### Definitions
 
-| Term | Definition |
-|---|---|
-| **Anonymisation** | The irreversible removal of all information that could identify an individual. Truly anonymised data is no longer personal data. |
+| Term                 | Definition                                                                                                                                                                                                     |
+| -------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **Anonymisation**    | The irreversible removal of all information that could identify an individual. Truly anonymised data is no longer personal data.                                                                               |
 | **Pseudonymisation** | Replacing direct identifiers with a pseudonym (e.g., replacing a name with a UUID). The pseudonym can be re-linked to the original data if the mapping is retained. Pseudonymised data is still personal data. |
 
 ### Rules for AI training data
@@ -109,23 +109,23 @@ Violating these rules constitutes a serious data breach. Any suspected violation
 
 Every dataset used for training, validation, or evaluation must have a **dataset card** that records:
 
-| Field | Description |
-|---|---|
-| `name` | Human-readable dataset name |
-| `version` | Semantic version (e.g., `1.0.0`) |
-| `dvc_path` | DVC path and remote location |
-| `source` | Origin of the data (URL, organisation, collection method) |
-| `licence` | Licence under which the data may be used |
-| `data_types` | Types of documents or records included |
-| `languages` | Languages present (Khmer, English, mixed) |
-| `size` | Number of examples, file count, total size |
-| `split` | Train / validation / test split ratios and sizes |
-| `personal_data` | Yes / No. If Yes: how it was anonymised |
-| `collection_date` | When the data was collected |
-| `reviewed_by` | Who reviewed and approved the dataset |
-| `review_date` | When the review was completed |
-| `known_biases` | Known distribution biases or limitations |
-| `prohibited_uses` | Any restrictions on how this dataset may be used |
+| Field             | Description                                               |
+| ----------------- | --------------------------------------------------------- |
+| `name`            | Human-readable dataset name                               |
+| `version`         | Semantic version (e.g., `1.0.0`)                          |
+| `dvc_path`        | DVC path and remote location                              |
+| `source`          | Origin of the data (URL, organisation, collection method) |
+| `licence`         | Licence under which the data may be used                  |
+| `data_types`      | Types of documents or records included                    |
+| `languages`       | Languages present (Khmer, English, mixed)                 |
+| `size`            | Number of examples, file count, total size                |
+| `split`           | Train / validation / test split ratios and sizes          |
+| `personal_data`   | Yes / No. If Yes: how it was anonymised                   |
+| `collection_date` | When the data was collected                               |
+| `reviewed_by`     | Who reviewed and approved the dataset                     |
+| `review_date`     | When the review was completed                             |
+| `known_biases`    | Known distribution biases or limitations                  |
+| `prohibited_uses` | Any restrictions on how this dataset may be used          |
 
 Dataset cards are stored in `docs/datasets/` alongside the DVC data files.
 
@@ -146,16 +146,16 @@ Dataset cards are stored in `docs/datasets/` alongside the DVC data files.
 
 Before a dataset is approved for training:
 
-| Check | Description |
-|---|---|
-| Completeness | All required label fields are populated. No unlabelled examples used for training. |
-| Correctness | A sample of labels is reviewed by a human for accuracy. |
-| Consistency | Labels use a consistent label schema (see AI_GOVERNANCE.md). |
-| Balance | Class distribution is reviewed. Severe imbalance is documented and addressed (oversampling, class weights). |
-| Duplicates | Duplicate examples are detected and removed. Near-duplicates are flagged. |
-| Language verification | Documents labelled as Khmer are actually in the Khmer script. |
-| Encoding verification | All text is valid UTF-8. No legacy Khmer font encodings (e.g., Limon font). |
-| Metadata integrity | File names, document types, and associated metadata are consistent. |
+| Check                 | Description                                                                                                 |
+| --------------------- | ----------------------------------------------------------------------------------------------------------- |
+| Completeness          | All required label fields are populated. No unlabelled examples used for training.                          |
+| Correctness           | A sample of labels is reviewed by a human for accuracy.                                                     |
+| Consistency           | Labels use a consistent label schema (see AI_GOVERNANCE.md).                                                |
+| Balance               | Class distribution is reviewed. Severe imbalance is documented and addressed (oversampling, class weights). |
+| Duplicates            | Duplicate examples are detected and removed. Near-duplicates are flagged.                                   |
+| Language verification | Documents labelled as Khmer are actually in the Khmer script.                                               |
+| Encoding verification | All text is valid UTF-8. No legacy Khmer font encodings (e.g., Limon font).                                 |
+| Metadata integrity    | File names, document types, and associated metadata are consistent.                                         |
 
 ---
 
@@ -169,25 +169,26 @@ Before a dataset is approved for training:
 
 ## 11. Bias Risks
 
-| Risk | Description | Mitigation |
-|---|---|---|
-| **Document type imbalance** | Certain document types are over- or under-represented in training data. | Document class distribution in the dataset card. Use class-weighted loss during training. |
-| **Language imbalance** | English documents dominate training data, reducing Khmer performance. | Ensure Khmer documents represent at least 50% of the training set. Evaluate Khmer performance separately. |
-| **Regional bias** | Documents from Phnom Penh may not represent provincial document formats. | Collect documents from diverse regional sources. Document known regional coverage. |
-| **Historical bias** | Older document formats may not match current formats. | Document the date range of training data. Evaluate on recent documents. |
-| **Annotator bias** | Human annotators may apply labels inconsistently. | Use a written label guide. Measure inter-annotator agreement. Review disagreements. |
+| Risk                        | Description                                                              | Mitigation                                                                                                |
+| --------------------------- | ------------------------------------------------------------------------ | --------------------------------------------------------------------------------------------------------- |
+| **Document type imbalance** | Certain document types are over- or under-represented in training data.  | Document class distribution in the dataset card. Use class-weighted loss during training.                 |
+| **Language imbalance**      | English documents dominate training data, reducing Khmer performance.    | Ensure Khmer documents represent at least 50% of the training set. Evaluate Khmer performance separately. |
+| **Regional bias**           | Documents from Phnom Penh may not represent provincial document formats. | Collect documents from diverse regional sources. Document known regional coverage.                        |
+| **Historical bias**         | Older document formats may not match current formats.                    | Document the date range of training data. Evaluate on recent documents.                                   |
+| **Annotator bias**          | Human annotators may apply labels inconsistently.                        | Use a written label guide. Measure inter-annotator agreement. Review disagreements.                       |
 
 ---
 
 ## 12. Train-Validation-Test Separation
 
-| Split | Purpose | Contamination rule |
-|---|---|---|
-| **Training set** | Used to train the model. | Never used for evaluation. |
-| **Validation set** | Used during training for hyperparameter tuning and early stopping. | Never used for final evaluation. |
-| **Test set** | Used once for final model evaluation before deployment. | **Never used during training or hyperparameter tuning.** Documents from the test set must not appear in the training set. |
+| Split              | Purpose                                                            | Contamination rule                                                                                                        |
+| ------------------ | ------------------------------------------------------------------ | ------------------------------------------------------------------------------------------------------------------------- |
+| **Training set**   | Used to train the model.                                           | Never used for evaluation.                                                                                                |
+| **Validation set** | Used during training for hyperparameter tuning and early stopping. | Never used for final evaluation.                                                                                          |
+| **Test set**       | Used once for final model evaluation before deployment.            | **Never used during training or hyperparameter tuning.** Documents from the test set must not appear in the training set. |
 
 Split ratios (starting point — adjust based on dataset size):
+
 - Training: 70%
 - Validation: 15%
 - Test: 15%
@@ -198,14 +199,14 @@ Splits are stratified by document class and language to ensure representative di
 
 ## 13. Data Retention
 
-| Data type | Retention period | Deletion method |
-|---|---|---|
-| Uploaded documents | As long as the organisation holds an active account, unless earlier deletion is requested. | Secure deletion from object storage. Database record updated to indicate deletion. |
-| Document metadata | Same as uploaded documents. | Database row deletion. |
-| Classification results | Retained as long as the source document is retained. | Cascade deletion. |
-| Audit events | 7 years minimum (or as required by applicable law). | Not deleted during normal operation. |
-| Training datasets | Retained for as long as the trained model is in production use. | DVC remote deletion + DVC pointer removal. |
-| User accounts | Until the user requests deletion or the organisation account is closed. | Keycloak account deletion. Pseudonymisation of user references in audit logs. |
+| Data type              | Retention period                                                                           | Deletion method                                                                    |
+| ---------------------- | ------------------------------------------------------------------------------------------ | ---------------------------------------------------------------------------------- |
+| Uploaded documents     | As long as the organisation holds an active account, unless earlier deletion is requested. | Secure deletion from object storage. Database record updated to indicate deletion. |
+| Document metadata      | Same as uploaded documents.                                                                | Database row deletion.                                                             |
+| Classification results | Retained as long as the source document is retained.                                       | Cascade deletion.                                                                  |
+| Audit events           | 7 years minimum (or as required by applicable law).                                        | Not deleted during normal operation.                                               |
+| Training datasets      | Retained for as long as the trained model is in production use.                            | DVC remote deletion + DVC pointer removal.                                         |
+| User accounts          | Until the user requests deletion or the organisation account is closed.                    | Keycloak account deletion. Pseudonymisation of user references in audit logs.      |
 
 ---
 
@@ -221,12 +222,12 @@ Splits are stratified by document class and language to ensure representative di
 
 ## 15. Access Control to Datasets
 
-| Role | Access |
-|---|---|
-| AI/ML engineer | Read/write access to approved training, validation, and test datasets (via DVC remote). |
-| Platform administrator | Read access to all datasets for compliance purposes. |
-| Developers (backend, frontend) | No access to training datasets. |
-| External parties | No access to any datasets. |
+| Role                           | Access                                                                                  |
+| ------------------------------ | --------------------------------------------------------------------------------------- |
+| AI/ML engineer                 | Read/write access to approved training, validation, and test datasets (via DVC remote). |
+| Platform administrator         | Read access to all datasets for compliance purposes.                                    |
+| Developers (backend, frontend) | No access to training datasets.                                                         |
+| External parties               | No access to any datasets.                                                              |
 
 Access to the DVC remote is controlled by object storage bucket policies. Access changes require approval.
 
@@ -235,6 +236,7 @@ Access to the DVC remote is controlled by object storage bucket policies. Access
 ## 16. Dataset Cards
 
 All dataset cards are stored in `docs/datasets/` as Markdown files named after the dataset:
+
 ```
 docs/datasets/
 ├── DATASET-001-synthetic-khmer-administrative.md
@@ -263,12 +265,15 @@ Before any new dataset is used for training or evaluation:
 Model Context Protocol (MCP) integrations used for development context or future product features must strictly adhere to the following data governance rules:
 
 ### Data Minimisation
+
 - MCP tool requests must specify the narrowest possible scope required to fulfill a query.
 - Whole-repository or full-database exports via MCP tools are strictly prohibited.
 - Document content, personal data, and confidential identifiers must not be included in MCP tool arguments or prompt payloads.
 
 ### Prohibited Data Exposure
+
 MCP tools must never expose or transmit:
+
 - Real Cambodian government documents or official seals.
 - Sensitive social-protection, employment, insurance, healthcare, or worker records.
 - Real personal identification documents (national IDs, passports, driver's licences).
@@ -278,28 +283,32 @@ MCP tools must never expose or transmit:
 - Confidential datasets or unapproved raw training data.
 
 ### MCP-Derived Data Retention
+
 - Information retrieved via MCP tools must not be persisted locally unless required for a specific, approved development task.
 - Full MCP tool response outputs must not be copied into long-term system logs. Log entries must contain only sanitised summaries (e.g. tool name, target document ID, success status).
 - Retained summaries must comply with source system retention schedules and licensing terms.
 
 ### Lineage and Provenance Tracking
+
 When information retrieved via MCP tools is used to inform:
+
 - Architectural decisions or ADRs,
 - AI evaluation benchmark definitions,
 - Dataset selection or model architecture choices, or
 - Security and threat model updates,
 
 the developer must record the provenance metadata:
+
 - **MCP Server:** Server name and digest (`ghcr.io/github/github-mcp-server:<PINNED_VERSION>` or `@upstash/context7-mcp@<PINNED_VERSION>`)
 - **Source System & Document:** Target repository file, issue URL, or Context7 library version
 - **Retrieval Timestamp:** ISO 8601 timestamp
 - **Validating Reviewer:** Developer / Architect who verified the retrieved information
 
 ### AI Training Restriction
+
 - Data retrieved via MCP tools must **never** automatically enter a model training, validation, or test dataset.
 - Any candidate dataset discovered or retrieved via MCP tools must undergo the standard 5-step Data Review Process (Section 17), including a completed Dataset Card, licensing check, duplicate detection, and privacy review, before entering DVC tracking.
 
 ---
 
-*This document must be reviewed and updated before any new data source is introduced or any training activity begins.*
-
+_This document must be reviewed and updated before any new data source is introduced or any training activity begins._

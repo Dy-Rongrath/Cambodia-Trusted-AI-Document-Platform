@@ -1,7 +1,7 @@
 name: Feature Request
 description: Propose a new feature, capability, or architectural enhancement.
-title: "[FEAT]: "
-labels: ["enhancement"]
+title: '[FEAT]: '
+labels: ['enhancement']
 body:
   - type: markdown
     attributes:
@@ -67,7 +67,7 @@ body:
     attributes:
       label: Willingness to Contribute
       options:
-        - "Yes, I am willing to submit a pull request for this feature."
-        - "No, I am only requesting this feature for the community."
+        - 'Yes, I am willing to submit a pull request for this feature.'
+        - 'No, I am only requesting this feature for the community.'
     validations:
       required: false

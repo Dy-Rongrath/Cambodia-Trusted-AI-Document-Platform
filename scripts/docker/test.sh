@@ -5,7 +5,15 @@ SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
 REPO_ROOT="$(cd "$SCRIPT_DIR/../.." && pwd)"
 
 cd "$REPO_ROOT"
-echo "Running unit tests inside containers..."
-docker run --rm -v "$REPO_ROOT":/app -w /app node:24.15.0-alpine3.21 sh -c "npm ci && npm run test"
-docker run --rm -v "$REPO_ROOT/apps/ai-service":/app -w /app ghcr.io/astral-sh/uv:0.5-python3.12-alpine sh -c "uv sync --frozen --extra dev && uv run pytest"
-echo "All unit tests completed successfully."
+echo "Running test stages for all services inside Docker..."
+
+echo "[1/3] Backend test stage..."
+docker build --target test -f apps/backend/Dockerfile .
+
+echo "[2/3] Frontend test stage..."
+docker build --target test -f apps/frontend/Dockerfile .
+
+echo "[3/3] AI service test stage..."
+docker build --target test -f apps/ai-service/Dockerfile .
+
+echo "All service test stages completed successfully."

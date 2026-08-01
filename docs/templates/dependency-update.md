@@ -17,16 +17,16 @@ Update [dependency name] from [current version] to [target version].
 
 ## Dependency details
 
-| Field | Value |
-|---|---|
-| **Package name** | |
-| **Current version** | |
-| **Target version** | |
-| **Package manager** | npm / uv |
-| **Affected workspace** | apps/backend / apps/ai-service / apps/frontend / packages/shared-types |
-| **Licence** | [Confirm licence has not changed] |
-| **Changelog** | [Link to CHANGELOG or release notes] |
-| **Known breaking changes** | Yes / No — describe if yes |
+| Field                      | Value                                                                  |
+| -------------------------- | ---------------------------------------------------------------------- |
+| **Package name**           |                                                                        |
+| **Current version**        |                                                                        |
+| **Target version**         |                                                                        |
+| **Package manager**        | npm / uv                                                               |
+| **Affected workspace**     | apps/backend / apps/ai-service / apps/frontend / packages/shared-types |
+| **Licence**                | [Confirm licence has not changed]                                      |
+| **Changelog**              | [Link to CHANGELOG or release notes]                                   |
+| **Known breaking changes** | Yes / No — describe if yes                                             |
 
 ## Vulnerability details (if security-driven)
 

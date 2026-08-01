@@ -13,6 +13,7 @@ Read this file completely before taking any action on the codebase.
 Build a production-grade, privacy-first platform that combines secure software engineering, AI-assisted document processing, digital identity (verifiable credentials), cybersecurity-by-design, European interoperability standards, and Model Context Protocol (MCP) governance.
 
 The platform processes Khmer and English documents on behalf of multiple organisations. Every design decision must consider:
+
 - Multi-tenant data isolation.
 - Privacy by design.
 - Human oversight of AI decisions.
@@ -53,6 +54,7 @@ This file (`AGENTS.md`) is the primary entry point and source of navigation for 
 ## 3. Approved Technology Stack
 
 ### Backend
+
 - **Runtime:** Node.js 24.15.0 (pinned in `.nvmrc`)
 - **Language:** TypeScript (strict mode mandatory)
 - **Framework:** NestJS (latest stable)
@@ -64,6 +66,7 @@ This file (`AGENTS.md`) is the primary entry point and source of navigation for 
 - **Logging:** Structured JSON (Pino)
 
 ### AI/ML Service
+
 - **Runtime:** Python 3.12 (via pyenv)
 - **Dependency manager:** uv
 - **Framework:** FastAPI (latest stable)
@@ -74,24 +77,29 @@ This file (`AGENTS.md`) is the primary entry point and source of navigation for 
 - **Serving:** vLLM (when justified for production inference)
 
 ### Frontend
+
 - **Framework:** Angular (latest stable LTS)
 - **State:** Angular Signals + RxJS
 - **API client:** OpenAPI-generated TypeScript client
 
 ### Mobile
+
 - **Framework:** Flutter (latest stable)
 - **Platform:** iOS and Android
 
 ### AI Development Integration
+
 - **Protocol:** Model Context Protocol (MCP) — stable specification
 - **Client:** OpenAI Codex CLI (`.codex/config.toml`, gitignored)
 - **Approved Stage 1 Servers:** GitHub MCP server (`ghcr.io/github/github-mcp-server` read-only) and Context7 (`@upstash/context7-mcp` for official documentation)
 
 ### Infrastructure (local development)
+
 - **Containers:** Docker 29 + Docker Compose v5
 - **Kubernetes:** NOT YET — only in Phase 16 after platform is validated in Docker Compose
 
 ### DO NOT introduce without explicit approval
+
 - Kafka, RabbitMQ, or any event broker
 - Open Policy Agent
 - Istio or any service mesh
@@ -221,32 +229,38 @@ For every task:
 After every approved task, produce a report containing:
 
 ### Work completed
+
 - Summary of changes.
 - Files created (path and purpose).
 - Files updated (path, changes, and rationale).
 - Files moved or removed (path and rationale).
 
 ### ADR status review (if ADRs were modified)
+
 - Status review table (ADR ID, previous status, final status, evidence/reason).
 
 ### Decisions & Assumptions
+
 - Decisions made and decisions awaiting approval.
 - Key assumptions identified.
 
 ### Verification
+
 - Commands executed.
 - Tests passed / failed.
 - Checks skipped and rationale.
 
 ### Security, Privacy, and MCP Review
+
 - Public repository safety check (no secrets or restricted operational details).
 - MCP risks addressed.
 - Security and privacy findings.
 
 ### Remaining Work & Next Task
+
 - Known limitations and unresolved risks.
 - Recommended next task.
 
 ---
 
-*All AI agents operating on this repository must strictly comply with this file.*
+_All AI agents operating on this repository must strictly comply with this file._

@@ -10,6 +10,7 @@
 You are implementing features in the NestJS backend (`apps/backend/`).
 
 You are responsible for:
+
 - API endpoint implementation.
 - NestJS module, service, controller, and DTO design.
 - Prisma schema changes and migrations.
@@ -74,6 +75,7 @@ src/<module>/
 ## Required completion report
 
 After every task, provide:
+
 1. Files created and updated (with paths).
 2. Commands executed (lint, type-check, tests).
 3. Test output (passed / failed count).

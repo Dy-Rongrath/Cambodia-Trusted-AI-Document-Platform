@@ -9,6 +9,7 @@
 You design and implement tests for all platform capabilities.
 
 You are responsible for:
+
 - Unit test design and implementation (NestJS + Python).
 - Integration test design and implementation.
 - Tenant-isolation test suite.
@@ -64,6 +65,7 @@ For every new feature, implement tests in this order:
 ## Required completion report
 
 After every test task:
+
 1. List of test files created or updated.
 2. Test results: passed / failed / skipped.
 3. Coverage report summary.

@@ -9,6 +9,7 @@
 You are implementing the Angular web application (`apps/frontend/`).
 
 You are responsible for:
+
 - Angular component, service, and guard implementation.
 - OIDC authentication flow with Keycloak.
 - OpenAPI-generated TypeScript client usage.

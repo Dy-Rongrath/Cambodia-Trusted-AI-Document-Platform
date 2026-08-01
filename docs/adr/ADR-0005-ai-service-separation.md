@@ -31,6 +31,7 @@ We will run AI inference and training as a **separate Python FastAPI service** (
 This is not a microservice in the distributed systems sense. During Phase 0–9, it runs as a single Docker Compose service on the same machine as the backend. The HTTP boundary is a clean architectural separation — not a performance optimisation.
 
 Internal communication:
+
 - The NestJS backend sends classification requests to the FastAPI service via HTTP POST.
 - The FastAPI service returns predictions, confidence scores, and explanations.
 - The FastAPI service does not call back to the NestJS backend — it is stateless from the backend's perspective.
@@ -42,16 +43,17 @@ Authentication between backend and AI service: The backend sends a shared intern
 
 ## Alternatives Considered
 
-| Option | Description | Why rejected |
-|---|---|---|
-| Child process from Node.js | Spawn Python as a child process from the NestJS backend | Brittle. Process lifecycle management in Node.js is error-prone. No independent scaling. Log management is complex. Cannot use a Python virtual environment cleanly. Rejected. |
-| Python native modules in Node.js | Use `node-gyp` or WebAssembly-compiled ML libraries | No meaningful PyTorch support via this path. ONNX Runtime for Node.js exists but does not support training or fine-tuning. Only partial inference support. Insufficient for this platform. |
-| Node.js ML libraries only (TensorFlow.js, ONNX Runtime) | Use JavaScript-native ML libraries | TensorFlow.js and ONNX Runtime for Node.js cannot replace PyTorch for training and fine-tuning. The Hugging Face Transformers ecosystem is Python-first. Rejected. |
-| Separate deployed microservice from day one | Deploy the AI service independently on a separate machine | Premature. Docker Compose on a single machine is sufficient for Phase 0–9. Independent deployment can be enabled in Phase 14 by extracting the service from the Compose file. |
+| Option                                                  | Description                                               | Why rejected                                                                                                                                                                               |
+| ------------------------------------------------------- | --------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| Child process from Node.js                              | Spawn Python as a child process from the NestJS backend   | Brittle. Process lifecycle management in Node.js is error-prone. No independent scaling. Log management is complex. Cannot use a Python virtual environment cleanly. Rejected.             |
+| Python native modules in Node.js                        | Use `node-gyp` or WebAssembly-compiled ML libraries       | No meaningful PyTorch support via this path. ONNX Runtime for Node.js exists but does not support training or fine-tuning. Only partial inference support. Insufficient for this platform. |
+| Node.js ML libraries only (TensorFlow.js, ONNX Runtime) | Use JavaScript-native ML libraries                        | TensorFlow.js and ONNX Runtime for Node.js cannot replace PyTorch for training and fine-tuning. The Hugging Face Transformers ecosystem is Python-first. Rejected.                         |
+| Separate deployed microservice from day one             | Deploy the AI service independently on a separate machine | Premature. Docker Compose on a single machine is sufficient for Phase 0–9. Independent deployment can be enabled in Phase 14 by extracting the service from the Compose file.              |
 
 ## Consequences
 
 ### Positive consequences
+
 - Clean language and runtime separation. Python dependencies never conflict with Node.js dependencies.
 - The FastAPI service can be independently upgraded, replaced, or scaled without touching the NestJS backend.
 - Python's ML ecosystem (PyTorch, Hugging Face, scikit-learn) is available without compromise.
@@ -60,6 +62,7 @@ Authentication between backend and AI service: The backend sends a shared intern
 - Deployment scaling: the AI service can be independently scaled to GPU instances when needed.
 
 ### Negative consequences / trade-offs
+
 - Two services to start locally (`backend` + `ai-service` in Docker Compose).
 - Two sets of logs, two healthcheck endpoints.
 - A network hop between backend and AI service (negligible latency for document classification — typically milliseconds on a local network).
@@ -67,6 +70,7 @@ Authentication between backend and AI service: The backend sends a shared intern
 - The internal API contract must be maintained carefully — breaking changes require coordinated updates.
 
 ### Neutral consequences
+
 - The AI service is developed in `apps/ai-service/` with its own `pyproject.toml` and `uv.lock`.
 - The FastAPI service exposes an internal-only API (not accessible from outside Docker Compose).
 - A shared OpenAPI schema for the internal AI API will be maintained in `packages/shared-types/` as a reference.
@@ -74,6 +78,7 @@ Authentication between backend and AI service: The backend sends a shared intern
 ## Security Impact
 
 The AI service must:
+
 - Not be reachable from outside the Docker network.
 - Validate the internal API key on every request.
 - Validate all input received from the backend (treat the backend as untrusted — defence in depth).
@@ -86,6 +91,7 @@ A future improvement (Phase 14): Replace the shared API key with mTLS between th
 ## Privacy Impact
 
 The AI service processes document content for classification. Document content must:
+
 - Never be logged.
 - Never be stored by the AI service.
 - Be held in memory only for the duration of a single inference request.

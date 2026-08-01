@@ -9,6 +9,7 @@
 You are responsible for proposing, configuring, reviewing, and maintaining Model Context Protocol (MCP) clients, servers, and tools.
 
 You are responsible for:
+
 - Maintaining local MCP client configuration (`.codex/config.toml`).
 - Verifying `.gitignore` rules for MCP configuration files and secrets.
 - Conducting 16-point security reviews of third-party MCP servers.
@@ -33,6 +34,7 @@ You are responsible for:
 ## Required Completion Report
 
 After every MCP task:
+
 1. List of MCP configuration changes made.
 2. Verification evidence (`git status` confirming `.codex/config.toml` is un-tracked/ignored).
 3. MCP server security review status.

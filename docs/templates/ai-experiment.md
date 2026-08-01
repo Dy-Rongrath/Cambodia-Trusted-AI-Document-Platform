@@ -56,12 +56,12 @@ seed: 42
 
 ## Success criteria
 
-| Metric | Minimum to proceed |
-|---|---|
+| Metric           | Minimum to proceed                  |
+| ---------------- | ----------------------------------- |
 | Overall accuracy | ≥ [threshold from AI_GOVERNANCE.md] |
-| Khmer accuracy | ≥ [threshold from AI_GOVERNANCE.md] |
-| Macro F1 | ≥ [threshold] |
-| Latency P95 | < 5 seconds |
+| Khmer accuracy   | ≥ [threshold from AI_GOVERNANCE.md] |
+| Macro F1         | ≥ [threshold]                       |
+| Latency P95      | < 5 seconds                         |
 
 ## Resource requirements
 

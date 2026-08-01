@@ -3,19 +3,27 @@ name = "trusted-ai-service"
 version = "0.1.0"
 description = "FastAPI AI service skeleton for Cambodia Trusted AI Document Platform"
 readme = "README.md"
-requires-python = ">=3.12"
+requires-python = "==3.12.*"
 dependencies = [
-    "fastapi>=0.115.8",
-    "uvicorn[standard]>=0.34.0",
-    "pydantic>=2.10.6",
+    "fastapi==0.115.8",
+    "uvicorn[standard]==0.34.0",
+    "pydantic==2.10.6",
 ]
 
 [project.optional-dependencies]
 dev = [
-    "pytest>=8.3.4",
-    "httpx>=0.28.1",
-    "ruff>=0.9.6",
-    "mypy>=1.15.0",
+    "pytest==8.3.4",
+    "httpx==0.28.1",
+    "ruff==0.9.6",
+    "mypy==1.15.0",
+]
+
+[dependency-groups]
+dev = [
+    "pytest==8.3.4",
+    "httpx==0.28.1",
+    "ruff==0.9.6",
+    "mypy==1.15.0",
 ]
 
 [build-system]

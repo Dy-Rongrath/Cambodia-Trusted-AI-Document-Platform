@@ -23,6 +23,7 @@ The project uses a **maintainer-led governance model**:
 We welcome community contributions from developers, security researchers, AI specialists, and documentation contributors!
 
 ### How decisions are made during solo/early development:
+
 - **Small improvements and bug fixes:** Reviewed and merged directly by the maintainer via GitHub Pull Requests.
 - **Architectural or security changes:** Require prior discussion in GitHub Issues or an ADR proposal before implementation.
 - **Growing the maintainer team:** As contribution volume increases, sustained contributors who demonstrate high-quality code, security awareness, and reliable collaboration may be invited to join as topic reviewers or co-maintainers.

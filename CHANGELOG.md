@@ -12,6 +12,7 @@ The project is currently in **pre-release development**. `0.x` versions represen
 ## [Unreleased]
 
 ### Added
+
 - **Phase 1 Engineering Scaffold & Tooling:** Scaffolding NestJS backend (`apps/backend`), FastAPI AI service (`apps/ai-service`), standalone Angular frontend (`apps/frontend`), shared TypeScript types (`packages/shared-types`), root npm workspaces, multi-stage Dockerfiles, local Docker Compose environment (`compose.yaml`), POSIX helper scripts (`scripts/docker/`), and Docker-based GitHub Actions CI pipeline (`.github/workflows/ci.yml`).
 - **Prisma & Database Connectivity:** Initialized Prisma in NestJS backend with postgresql provider and `SELECT 1` connectivity script (`npm run db:check`).
 - **Dependency Inventory:** Created [docs/dependency-inventory.md](docs/dependency-inventory.md) auditing Node, Python, and container image dependencies, licenses, and ARM64 compatibility.

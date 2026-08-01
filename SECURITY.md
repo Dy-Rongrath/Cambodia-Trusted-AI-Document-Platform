@@ -8,29 +8,30 @@
 
 ## 1. Security Objectives
 
-| Objective | Description |
-|---|---|
+| Objective           | Description                                                                                                                         |
+| ------------------- | ----------------------------------------------------------------------------------------------------------------------------------- |
 | **Confidentiality** | Sensitive document content, personal data, and credentials are accessible only to authorised users within the correct organisation. |
-| **Integrity** | Documents, classifications, audit records, and credentials cannot be tampered with by unauthorised parties. |
-| **Availability** | The platform remains available to legitimate users under normal operating conditions and degrades gracefully under failures. |
-| **Authenticity** | Issued credentials are cryptographically verifiable. AI is never the final authority for credential authenticity. |
-| **Non-repudiation** | All important actions are recorded in an immutable audit log that attributes actions to specific actors. |
-| **Privacy** | Personal data is collected and processed in accordance with applicable privacy laws. Unnecessary data is not collected. |
+| **Integrity**       | Documents, classifications, audit records, and credentials cannot be tampered with by unauthorised parties.                         |
+| **Availability**    | The platform remains available to legitimate users under normal operating conditions and degrades gracefully under failures.        |
+| **Authenticity**    | Issued credentials are cryptographically verifiable. AI is never the final authority for credential authenticity.                   |
+| **Non-repudiation** | All important actions are recorded in an immutable audit log that attributes actions to specific actors.                            |
+| **Privacy**         | Personal data is collected and processed in accordance with applicable privacy laws. Unnecessary data is not collected.             |
 
 ---
 
 ## 2. Data Classifications
 
-| Classification | Description | Examples | Controls |
-|---|---|---|---|
-| **Restricted** | Data that, if disclosed, would cause serious harm to individuals or the organisation. | Real government-issued documents, social-protection or employment records, personal identity data, private keys, production secrets. | **Prohibited in development environments.** Encrypted at rest and in transit. Access logged. Strict need-to-know. |
-| **Confidential** | Business-sensitive data. Harm if disclosed but not catastrophic. | Organisation data, document metadata, classification results, user accounts, audit logs. | Encrypted in transit (TLS). Access controlled by role. Logged. |
-| **Internal** | Operational data for internal use only. | Service configuration, non-sensitive logs, health metrics. | Not exposed externally. Accessible to platform staff. |
-| **Public** | Intentionally public data. | Public API documentation, credential verification endpoints, public credential schemas. | No special controls beyond availability. |
+| Classification   | Description                                                                           | Examples                                                                                                                             | Controls                                                                                                          |
+| ---------------- | ------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------ | ----------------------------------------------------------------------------------------------------------------- |
+| **Restricted**   | Data that, if disclosed, would cause serious harm to individuals or the organisation. | Real government-issued documents, social-protection or employment records, personal identity data, private keys, production secrets. | **Prohibited in development environments.** Encrypted at rest and in transit. Access logged. Strict need-to-know. |
+| **Confidential** | Business-sensitive data. Harm if disclosed but not catastrophic.                      | Organisation data, document metadata, classification results, user accounts, audit logs.                                             | Encrypted in transit (TLS). Access controlled by role. Logged.                                                    |
+| **Internal**     | Operational data for internal use only.                                               | Service configuration, non-sensitive logs, health metrics.                                                                           | Not exposed externally. Accessible to platform staff.                                                             |
+| **Public**       | Intentionally public data.                                                            | Public API documentation, credential verification endpoints, public credential schemas.                                              | No special controls beyond availability.                                                                          |
 
 ### Development data policy
 
 **CRITICAL:** Real data from any of these sources is **prohibited** in development, staging, or test environments:
+
 - Cambodian government documents
 - Social-protection, employment, insurance, healthcare, or other sensitive government records
 - Real personal identification documents
@@ -43,16 +44,16 @@ Only synthetic, anonymised, pseudonymised, or explicitly approved datasets may b
 
 ## 3. Trust Boundaries
 
-| Boundary | Between | Control |
-|---|---|---|
-| **External ↔ Reverse Proxy** | Public internet and the platform | TLS termination, rate limiting, WAF (Phase 16). |
-| **Reverse Proxy ↔ Backend** | DMZ and internal network | Internal HTTP only. No direct external access to backend. |
-| **Backend ↔ AI Service** | Backend and AI inference | Private Docker network. Internal API key authentication. |
-| **Backend ↔ Database** | Application and data layer | TLS database connection. Least-privilege database role. RLS. |
-| **Backend ↔ Object Storage** | Application and file storage | TLS. Short-lived pre-signed URLs for file access. |
-| **Backend ↔ Keycloak** | Application and identity provider | OIDC. JWKS-based JWT validation (no shared secrets). |
-| **User ↔ Application** | User browser and the application | TLS. HTTPS enforced. HSTS. |
-| **Tenant ↔ Tenant** | Organisation A and Organisation B | `organisation_id` filter in every query. PostgreSQL RLS. Separate encryption keys per tenant (Phase 16). |
+| Boundary                      | Between                           | Control                                                                                                  |
+| ----------------------------- | --------------------------------- | -------------------------------------------------------------------------------------------------------- |
+| **External ↔ Reverse Proxy** | Public internet and the platform  | TLS termination, rate limiting, WAF (Phase 16).                                                          |
+| **Reverse Proxy ↔ Backend**  | DMZ and internal network          | Internal HTTP only. No direct external access to backend.                                                |
+| **Backend ↔ AI Service**     | Backend and AI inference          | Private Docker network. Internal API key authentication.                                                 |
+| **Backend ↔ Database**       | Application and data layer        | TLS database connection. Least-privilege database role. RLS.                                             |
+| **Backend ↔ Object Storage** | Application and file storage      | TLS. Short-lived pre-signed URLs for file access.                                                        |
+| **Backend ↔ Keycloak**       | Application and identity provider | OIDC. JWKS-based JWT validation (no shared secrets).                                                     |
+| **User ↔ Application**       | User browser and the application  | TLS. HTTPS enforced. HSTS.                                                                               |
+| **Tenant ↔ Tenant**          | Organisation A and Organisation B | `organisation_id` filter in every query. PostgreSQL RLS. Separate encryption keys per tenant (Phase 16). |
 
 ---
 
@@ -67,6 +68,7 @@ Only synthetic, anonymised, pseudonymised, or explicitly approved datasets may b
 - **Logout:** Keycloak backchannel logout for session termination on all clients.
 
 **Prohibited:**
+
 - Basic authentication for user-facing endpoints.
 - Long-lived API keys for user authentication.
 - Storing passwords in the application database.
@@ -85,6 +87,7 @@ Only synthetic, anonymised, pseudonymised, or explicitly approved datasets may b
 - **Super-admin access:** Platform admin role has access across tenants for operational purposes only. All platform-admin actions are logged.
 
 **Prohibited:**
+
 - Trusting `organisation_id` from query parameters or request body.
 - Skipping authorisation checks in any protected endpoint.
 - Hard-coded role checks in business logic (use decorators/guards).
@@ -96,6 +99,7 @@ Only synthetic, anonymised, pseudonymised, or explicitly approved datasets may b
 Tenant isolation is a critical security requirement. See `ARCHITECTURE.md` Section 8 for the full isolation architecture.
 
 **Verification requirements:**
+
 - Dedicated integration tests that attempt cross-tenant access and verify rejection.
 - PostgreSQL RLS policies must be tested independently of application-layer checks.
 - Cross-tenant access attempts must produce `tenant.isolation.violation` audit events.
@@ -120,23 +124,24 @@ Tenant isolation is a critical security requirement. See `ARCHITECTURE.md` Secti
 
 File uploads are a high-risk attack surface. All of the following controls are mandatory:
 
-| Control | Implementation | Phase |
-|---|---|---|
-| File size limit | Reject files exceeding the limit before reading content. Applied at the reverse proxy and NestJS middleware. | Phase 4 |
-| Content-Type validation | Reject unexpected Content-Type headers. | Phase 4 |
-| Magic byte verification | Read file magic bytes (file signature) and verify against the declared type. Reject mismatches. | Phase 4 |
-| Allowed file types | Allowlist: PDF, JPEG, PNG, TIFF (document images). All other types rejected. | Phase 4 |
-| Quarantine storage | Store uploaded files in a quarantine bucket before processing. | Phase 4 |
-| Malware scanning | Scan with ClamAV before moving to permanent storage. Malware-scanning integration is implemented with secure document upload in Phase 4. | Phase 4 |
-| No execution | Uploaded files are never executed, imported, or included in any code path. | Phase 4 |
-| Secure URLs | Files served via short-lived pre-signed URLs — never exposed directly from storage. | Phase 4 |
-| Content-Disposition | File downloads served with `Content-Disposition: attachment` to prevent browser execution. | Phase 4 |
+| Control                 | Implementation                                                                                                                           | Phase   |
+| ----------------------- | ---------------------------------------------------------------------------------------------------------------------------------------- | ------- |
+| File size limit         | Reject files exceeding the limit before reading content. Applied at the reverse proxy and NestJS middleware.                             | Phase 4 |
+| Content-Type validation | Reject unexpected Content-Type headers.                                                                                                  | Phase 4 |
+| Magic byte verification | Read file magic bytes (file signature) and verify against the declared type. Reject mismatches.                                          | Phase 4 |
+| Allowed file types      | Allowlist: PDF, JPEG, PNG, TIFF (document images). All other types rejected.                                                             | Phase 4 |
+| Quarantine storage      | Store uploaded files in a quarantine bucket before processing.                                                                           | Phase 4 |
+| Malware scanning        | Scan with ClamAV before moving to permanent storage. Malware-scanning integration is implemented with secure document upload in Phase 4. | Phase 4 |
+| No execution            | Uploaded files are never executed, imported, or included in any code path.                                                               | Phase 4 |
+| Secure URLs             | Files served via short-lived pre-signed URLs — never exposed directly from storage.                                                      | Phase 4 |
+| Content-Disposition     | File downloads served with `Content-Disposition: attachment` to prevent browser execution.                                               | Phase 4 |
 
 ---
 
 ## 9. Secrets Management
 
 ### Development
+
 - All secrets are stored in `.env` files.
 - `.env` files are excluded from Git via `.gitignore`.
 - `.env.example` files with placeholder values are committed to the repository.
@@ -144,42 +149,47 @@ File uploads are a high-risk attack surface. All of the following controls are m
 - Secrets must never appear in source code, test files, logs, comments, or documentation.
 
 ### CI/CD
+
 - Secrets are stored as GitHub Actions encrypted secrets.
 - Secrets are injected as environment variables into CI jobs.
 - CI logs must not echo secret values.
 
 ### Production
+
 - Production secrets management solution to be decided in Phase 16.
 - Candidates: HashiCorp Vault (self-hosted), AWS Secrets Manager, Azure Key Vault.
 - Rotation: All secrets must be rotatable without service downtime.
 
 ### Required secrets (by service)
 
-| Secret | Service | Notes |
-|---|---|---|
-| `DATABASE_URL` | Backend | PostgreSQL connection string with credentials |
-| `KEYCLOAK_CLIENT_SECRET` | Backend | Keycloak confidential client secret |
-| `INTERNAL_AI_API_KEY` | Backend + AI service | Shared key for internal service-to-service authentication |
-| `OBJECT_STORAGE_ACCESS_KEY` | Backend | Object storage access key |
-| `OBJECT_STORAGE_SECRET_KEY` | Backend | Object storage secret key |
-| `CREDENTIAL_SIGNING_PRIVATE_KEY` | Backend | Private key for credential issuance (Phase 11+) |
+| Secret                           | Service              | Notes                                                     |
+| -------------------------------- | -------------------- | --------------------------------------------------------- |
+| `DATABASE_URL`                   | Backend              | PostgreSQL connection string with credentials             |
+| `KEYCLOAK_CLIENT_SECRET`         | Backend              | Keycloak confidential client secret                       |
+| `INTERNAL_AI_API_KEY`            | Backend + AI service | Shared key for internal service-to-service authentication |
+| `OBJECT_STORAGE_ACCESS_KEY`      | Backend              | Object storage access key                                 |
+| `OBJECT_STORAGE_SECRET_KEY`      | Backend              | Object storage secret key                                 |
+| `CREDENTIAL_SIGNING_PRIVATE_KEY` | Backend              | Private key for credential issuance (Phase 11+)           |
 
 ---
 
 ## 10. Encryption
 
 ### In transit
+
 - TLS 1.3 for all external traffic.
 - TLS for all internal service-to-database communication.
 - HTTPS enforced via HSTS.
 
 ### At rest
+
 - Database encryption at the filesystem level (managed service) or via pgcrypto for specific sensitive columns.
 - Object storage: server-side encryption (AES-256) enabled for all buckets.
 - Model weights and datasets: encrypted at rest in object storage.
 - Encryption keys managed separately from encrypted data.
 
 ### Cryptographic standards
+
 - Symmetric: AES-256-GCM or ChaCha20-Poly1305.
 - Asymmetric: ECDSA P-256 / P-384 or Ed25519 for signatures.
 - Hashing: SHA-256 or SHA-3 for integrity. SHA-512 for password hashing contexts.
@@ -203,6 +213,7 @@ File uploads are a high-risk attack surface. All of the following controls are m
 Mandatory audit events are defined in `ARCHITECTURE.md` Section 13.
 
 Additional security-specific logging requirements:
+
 - All authentication events (success and failure).
 - All authorisation failures (403 responses).
 - All file upload rejections (with rejection reason — without document content).
@@ -212,6 +223,7 @@ Additional security-specific logging requirements:
 - All AI model deployment events.
 
 **Prohibited in logs:**
+
 - Document content or extracted text.
 - Personal data (name, ID numbers, addresses).
 - Passwords, tokens, or keys.
@@ -224,19 +236,19 @@ Additional security-specific logging requirements:
 - All dependencies pinned in lock files (`package-lock.json`, `uv.lock`) after Phase 1 scaffolding creates manifests.
 - License compliance checks for all new dependencies before adoption ([docs/open-source-dependency-policy.md](docs/open-source-dependency-policy.md)).
 
-| Control | Current status | Intended phase |
-|---|---|---:|
-| Dependency locking | Planned | Phase 1 |
-| npm dependency audit | Planned after package manifests exist | Phase 1 or 2 |
-| Python dependency audit | Planned after Python dependencies exist | Phase 1 or 2 |
-| Gitleaks secret scanning | Planned | Phase 1 or 2 |
-| Semgrep SAST | Planned | Phase 2 |
-| Trivy container scanning | Planned after container images exist | Phase 2 |
-| Syft/SBOM generation | Planned | Phase 16 |
-| Cosign signing | Planned | Phase 16 |
-| Automated DCO check | Not configured | Future contributor-governance improvement |
+| Control                  | Current status                          |                            Intended phase |
+| ------------------------ | --------------------------------------- | ----------------------------------------: |
+| Dependency locking       | Planned                                 |                                   Phase 1 |
+| npm dependency audit     | Planned after package manifests exist   |                              Phase 1 or 2 |
+| Python dependency audit  | Planned after Python dependencies exist |                              Phase 1 or 2 |
+| Gitleaks secret scanning | Planned                                 |                              Phase 1 or 2 |
+| Semgrep SAST             | Planned                                 |                                   Phase 2 |
+| Trivy container scanning | Planned after container images exist    |                                   Phase 2 |
+| Syft/SBOM generation     | Planned                                 |                                  Phase 16 |
+| Cosign signing           | Planned                                 |                                  Phase 16 |
+| Automated DCO check      | Not configured                          | Future contributor-governance improvement |
 
-*Note: Python dependency vulnerability auditing will be implemented using an approved Python security audit tool once Python dependencies are introduced.*
+_Note: Python dependency vulnerability auditing will be implemented using an approved Python security audit tool once Python dependencies are introduced._
 
 ---
 
@@ -268,6 +280,7 @@ Additional security-specific logging requirements:
 ## 16. Vulnerability Management & Open-Source Security Disclosure
 
 ### Reporting Vulnerabilities Privately
+
 - **Public Repository Notice:** This repository is public. Vulnerabilities must **never** be reported via public GitHub issues, pull requests, or public discussions.
 - **Documented Reporting Route:** Use the repository’s **"Report a vulnerability"** option under the **Security** tab (`Security -> Advisories -> Report a vulnerability` / `/security/advisories/new`) to submit a private security advisory directly to project maintainers.
 - **Verified Enabled Repository Feature Status:** GitHub Private Vulnerability Reporting is enabled at the repository level. The non-maintainer reporter flow has not yet been independently tested from a separate GitHub account.
@@ -275,30 +288,31 @@ Additional security-specific logging requirements:
 - **Response Timeline:** Vulnerability reports are reviewed on a **best-effort basis**. Acknowledgement is targeted within 72 hours where feasible.
 
 ### Vulnerability & Dependency Scanning Schedule (Planned Gates)
-| Activity | Planned Frequency | Target Phase / Owner |
-|---|---|---|
-| `npm audit` / Python dependency audit | Planned for CI after manifests exist | Phase 1 / Phase 2 (Developer) |
-| Open-source licence check | Every dependency addition | Phase 1+ ([docs/open-source-dependency-policy.md](docs/open-source-dependency-policy.md)) |
-| Trivy container scan | Every image build (in CI) | Phase 2+ (DevSecOps) |
-| Gitleaks secret scan | Every push (in CI) | Phase 1+ (Developer) |
-| Semgrep SAST | Every push (in CI) | Phase 2+ (DevSecOps) |
-| Dependency update review | Weekly | Developer |
-| OWASP ZAP API scan | Every major release | Phase 4+ |
-| Manual security review | Each phase milestone | Developer + specialist reviewer |
-| Full penetration test | Before Phase 16 (production) | External specialist (Phase 16) |
+
+| Activity                              | Planned Frequency                    | Target Phase / Owner                                                                      |
+| ------------------------------------- | ------------------------------------ | ----------------------------------------------------------------------------------------- |
+| `npm audit` / Python dependency audit | Planned for CI after manifests exist | Phase 1 / Phase 2 (Developer)                                                             |
+| Open-source licence check             | Every dependency addition            | Phase 1+ ([docs/open-source-dependency-policy.md](docs/open-source-dependency-policy.md)) |
+| Trivy container scan                  | Every image build (in CI)            | Phase 2+ (DevSecOps)                                                                      |
+| Gitleaks secret scan                  | Every push (in CI)                   | Phase 1+ (Developer)                                                                      |
+| Semgrep SAST                          | Every push (in CI)                   | Phase 2+ (DevSecOps)                                                                      |
+| Dependency update review              | Weekly                               | Developer                                                                                 |
+| OWASP ZAP API scan                    | Every major release                  | Phase 4+                                                                                  |
+| Manual security review                | Each phase milestone                 | Developer + specialist reviewer                                                           |
+| Full penetration test                 | Before Phase 16 (production)         | External specialist (Phase 16)                                                            |
 
 ---
 
 ## 17. Incident Response (Pre-Production)
 
-| Step | Action |
-|---|---|
-| 1. Detect | Automated scan alert, audit log alert, or private security report. |
-| 2. Contain | Rotate affected secrets. Revoke affected tokens in Keycloak. Block affected accounts. |
-| 3. Assess | Determine scope. Identify affected tenants, data, and systems. |
-| 4. Remediate | Apply patches. Deploy fix. Verify fix. |
-| 5. Document | Record the incident, timeline, impact, and remediation. |
-| 6. Review | Post-incident review. Update threat model and security controls. |
+| Step         | Action                                                                                |
+| ------------ | ------------------------------------------------------------------------------------- |
+| 1. Detect    | Automated scan alert, audit log alert, or private security report.                    |
+| 2. Contain   | Rotate affected secrets. Revoke affected tokens in Keycloak. Block affected accounts. |
+| 3. Assess    | Determine scope. Identify affected tenants, data, and systems.                        |
+| 4. Remediate | Apply patches. Deploy fix. Verify fix.                                                |
+| 5. Document  | Record the incident, timeline, impact, and remediation.                               |
+| 6. Review    | Post-incident review. Update threat model and security controls.                      |
 
 A formal enterprise incident response plan is required before Phase 16 (production deployment).
 
@@ -309,6 +323,7 @@ A formal enterprise incident response plan is required before Phase 16 (producti
 For complete MCP security details, see `MCP_SECURITY.md`.
 
 Key security controls for MCP integrations:
+
 - **Phase Status:** MCP governance is documented in Phase 0. MCP servers are not installed as part of Phase 1. Approved development MCP tools are introduced in Phase 2, and product-facing MCP tools in Phase 15.
 - **Audit Logging Status:** Formal MCP audit logs do not currently record tool activity during Phase 0. Informal traceability uses commit messages and pull-request descriptions until application audit logging is implemented.
 - **Default Read-Only Access:** MCP tool access is restricted to read-only capabilities in Stage 1–3 development integrations.
@@ -344,5 +359,4 @@ AI agents must not self-approve any of the above changes.
 
 ---
 
-*This document must be reviewed at the start of each phase and updated to reflect the current security posture.*
-
+_This document must be reviewed at the start of each phase and updated to reflect the current security posture._
