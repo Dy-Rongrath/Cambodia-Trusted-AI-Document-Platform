@@ -23,6 +23,7 @@ services:
     build:
       context: ../..
       dockerfile: apps/backend/Dockerfile
+      target: development
     container_name: trusted-ai-backend
     restart: unless-stopped
     ports:
@@ -40,6 +41,8 @@ services:
           target: /app/apps/backend/src
         - action: rebuild
           path: ../../apps/backend/package.json
+        - action: rebuild
+          path: ../../package-lock.json
     healthcheck:
       test: ["CMD-SHELL", "wget --no-verbose --tries=1 --spider http://localhost:3000/health || exit 1"]
       interval: 10s
@@ -52,16 +55,18 @@ services:
     build:
       context: ../..
       dockerfile: apps/ai-service/Dockerfile
-      target: runtime
+      target: development
     container_name: trusted-ai-service
     restart: unless-stopped
     develop:
       watch:
         - action: sync
           path: ../../apps/ai-service/src
-          target: /app/src
+          target: /app/apps/ai-service/src
         - action: rebuild
           path: ../../apps/ai-service/pyproject.toml
+        - action: rebuild
+          path: ../../apps/ai-service/uv.lock
     healthcheck:
       test: ["CMD-SHELL", "python -c 'import urllib.request; urllib.request.urlopen(\"http://localhost:8000/health\")' || exit 1"]
       interval: 10s
@@ -74,10 +79,11 @@ services:
     build:
       context: ../..
       dockerfile: apps/frontend/Dockerfile
+      target: development
     container_name: trusted-ai-frontend
     restart: unless-stopped
     ports:
-      - "127.0.0.1:${FRONTEND_PORT:-4200}:80"
+      - "127.0.0.1:${FRONTEND_PORT:-4200}:4200"
     develop:
       watch:
         - action: sync
@@ -85,6 +91,8 @@ services:
           target: /app/apps/frontend/src
         - action: rebuild
           path: ../../apps/frontend/package.json
+        - action: rebuild
+          path: ../../package-lock.json
     networks:
       - internal-net
 
