@@ -4,6 +4,7 @@
     "module": "CommonJS",
     "moduleResolution": "node",
     "declaration": false,
+    "declarationMap": false,
     "removeComments": true,
     "emitDecoratorMetadata": true,
     "experimentalDecorators": true,
