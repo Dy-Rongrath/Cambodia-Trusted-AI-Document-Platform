@@ -67,9 +67,7 @@ scan_runtime_image() {
     --exit-code 1 \
     --no-progress \
     --skip-version-check \
-    --quiet \
-    --format json \
-    --output /tmp/trivy-results.json; then
+    --quiet; then
     echo "PASS: $image_name has no fixable High or Critical vulnerabilities."
     return 0
   fi

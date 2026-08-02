@@ -9,6 +9,11 @@
 
 datasource db {
   provider = "postgresql"
+  // No `url` field: the @prisma/adapter-pg driver adapter reads DATABASE_URL
+  // directly in application code (DatabaseHealthService, PrismaService).
+  // `prisma generate` and `prisma migrate` both work without a datasource url
+  // when using the driver-adapter pattern. Adding a url here is not required
+  // and would be misleading.
 }
 
 generator client {

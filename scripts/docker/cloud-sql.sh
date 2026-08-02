@@ -31,12 +31,18 @@ compose() {
 case "$ACTION" in
   start)
     echo "Starting application services with the opt-in Cloud SQL connection..."
+    echo "(Caddy TLS proxy started via 'web' profile — ensure DNS records point to this host.)"
     compose config --quiet
-    compose up -d cloud-sql-proxy backend ai-service frontend
+    compose --profile web up -d cloud-sql-proxy backend ai-service frontend caddy
     ;;
   stop)
-    echo "Stopping the Cloud SQL development stack..."
-    compose down
+    # Suspends containers without destroying them. Use `down` for a full teardown.
+    echo "Suspending the Cloud SQL development stack (containers preserved)..."
+    compose --profile web stop
+    ;;
+  down)
+    echo "Stopping and removing the Cloud SQL development stack..."
+    compose --profile web down
     ;;
   check)
     echo "Checking backend connectivity through the Cloud SQL Auth Proxy..."
@@ -50,7 +56,7 @@ case "$ACTION" in
     echo "Cloud SQL Compose configuration is valid."
     ;;
   *)
-    echo "Usage: $0 {start|stop|check|logs|config}" >&2
+    echo "Usage: $0 {start|stop|down|check|logs|config}" >&2
     exit 2
     ;;
 esac

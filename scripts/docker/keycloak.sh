@@ -17,7 +17,13 @@ if [ "$ACTION" = "start" ]; then
       printf "."
       sleep 5
     done
-  '
+  ' || {
+    echo ""
+    echo "FAIL: Keycloak did not become healthy within 120 seconds."
+    echo "=== Keycloak container logs ==="
+    docker compose --profile auth logs keycloak --tail=50 || true
+    exit 1
+  }
   echo ""
   echo "Keycloak is ready."
 elif [ "$ACTION" = "stop" ]; then

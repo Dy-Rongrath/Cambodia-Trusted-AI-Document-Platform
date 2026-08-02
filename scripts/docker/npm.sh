@@ -15,6 +15,11 @@ if [ "$#" -eq 0 ]; then
   exit 2
 fi
 
+# The --volume /workspace/node_modules anonymous volume shadows the host
+# node_modules directory so Alpine-compiled binaries in the container never
+# overwrite macOS-native binaries on the host. Every run starts with a cold
+# node_modules; the npm cache volume (trusted-ai-platform-npm-cache) warms
+# repeated installs so subsequent calls are faster.
 docker run --rm \
   --volume "$REPO_ROOT:/workspace" \
   --volume /workspace/node_modules \

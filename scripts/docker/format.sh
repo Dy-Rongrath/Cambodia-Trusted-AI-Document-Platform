@@ -17,5 +17,7 @@ docker run --rm \
   --volume "$REPO_ROOT:/workspace" \
   --workdir /workspace \
   "$TOOLING_IMAGE" \
-  /app/node_modules/.bin/prettier --write "**/*.{ts,js,json,md,yml,yaml,scss,css}"
+  /app/node_modules/.bin/prettier \
+    --ignore-path /workspace/.prettierignore \
+    --write "**/*.{ts,js,json,md,yml,yaml,scss,css}"
 echo "Formatting complete."

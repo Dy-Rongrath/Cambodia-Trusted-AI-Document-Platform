@@ -13,6 +13,36 @@ The project is currently in **pre-release development**. `0.x` versions represen
 
 ### Added
 
+- **PrismaModule (Phase 1 stub):** Added `apps/backend/src/prisma/prisma.module.ts`, `prisma.service.ts`, and `prisma.service.spec.ts`. Global `PrismaService` extends `PrismaClient` with the `PrismaPg` driver-adapter pattern (consistent with `DatabaseHealthService`) and implements `OnModuleInit`/`OnModuleDestroy` for clean lifecycle management. Phase 3 business modules inject this service instead of constructing their own clients.
+- **DEVELOPMENT.md §18 — CHANGELOG Update Policy:** Documented the mandatory CHANGELOG update requirement for all user-visible PRs, Keep a Changelog categories, and the release rename procedure.
+- **DEVELOPMENT.md — macOS `timeout` prerequisite:** Added `brew install coreutils` row to the Required Host Machine Tooling table and a callout note explaining the dependency for `./scripts/docker/keycloak.sh`.
+- **NestJS Phase 3 hardening stubs:** Added commented-out `ValidationPipe`, Helmet, CORS, and `setGlobalPrefix` stubs in `apps/backend/src/main.ts` with `TODO (Phase 3)` markers and a structured log line at startup.
+
+### Changed
+
+- **`DEVELOPMENT.md` — Cloud SQL section:** Updated to describe the new `stop` (suspend) vs `down` (destroy) action distinction and documented that `start` also activates the `web` profile for Caddy.
+- **`apps/backend/src/app.module.ts`:** Registered `PrismaModule` in `AppModule` imports so the global `PrismaService` is available application-wide.
+- **`apps/backend/prisma/schema.prisma`:** Added comment explaining why the `datasource db` block has no `url` field (driver-adapter pattern reads `DATABASE_URL` in application code).
+- **`.env.cloud-sql.example`:** Replaced the misleading "TLS is required by project policy" comment with a full explanation of why `sslmode=disable` is intentional and safe for the Cloud SQL Auth Proxy hop.
+- **`scripts/docker/cloud-sql.sh`:** `start` now also brings up Caddy via `--profile web` (consistent with the deploy workflow). `stop` now suspends containers without destroying them. New `down` action performs the full teardown. Usage string updated.
+- **`scripts/docker/stop.sh`:** Added `--profile web` to tear down Caddy alongside Keycloak when `stop.sh` is run.
+- **`scripts/docker/reset.sh`:** Added `--profile web` so `caddy_data` and `caddy_config` named volumes are removed during a full reset.
+- **`scripts/docker/db-check.sh`:** Clarified startup echo to indicate only `postgres` and `backend` are started (partial stack).
+- **`scripts/docker/npm.sh`:** Added a block comment explaining the anonymous `node_modules` volume pattern.
+
+### Fixed
+
+- **`infra/docker/compose.yaml` — Caddyfile volume path:** Corrected `./infra/docker/Caddyfile` to `./Caddyfile`. The path previously double-resolved to the non-existent path `infra/docker/infra/docker/Caddyfile` when `docker compose config` expanded it (confirmed via `docker compose --profile web config`).
+- **`scripts/docker/runtime-smoke.sh` — dead Trivy `--output` flag:** Removed `--format json --output /tmp/trivy-results.json` from the first Trivy `docker run`. The file was written inside the ephemeral container and silently discarded on exit.
+- **`scripts/docker/format.sh` — explicit `.prettierignore` path:** Added `--ignore-path /workspace/.prettierignore` to the Prettier invocation so exclusions are honoured regardless of working directory.
+- **`scripts/docker/keycloak.sh` — silent timeout:** Added an `|| { … }` failure handler that prints Keycloak container logs and exits non-zero when the 120-second health timeout expires (mirrors CI diagnostic pattern).
+
+### Security
+
+- **`deploy-dev.yml` — GCP GitHub Actions SHA pinning:** Pinned `google-github-actions/auth@v3.0.0` → `@7c6bc770dae815cd3e89ee6cdf493a5fab2cc093` and `setup-gcloud@v3.0.1` → `@aa5489c8933f4cc7a4f7d45035b3b1440c9c10db`. Mutable version tags on actions with `id-token:write` permission are a supply-chain risk.
+
+### Added
+
 - **Phase 1 Engineering Scaffold & Tooling:** Scaffolding NestJS backend (`apps/backend`), FastAPI AI service (`apps/ai-service`), standalone Angular frontend (`apps/frontend`), shared TypeScript types (`packages/shared-types`), root npm workspaces, multi-stage Dockerfiles, local Docker Compose environment (`compose.yaml`), POSIX helper scripts (`scripts/docker/`), and Docker-based GitHub Actions CI pipeline (`.github/workflows/ci.yml`).
 - **Prisma & Database Connectivity:** Initialized Prisma in NestJS backend with postgresql provider and `SELECT 1` connectivity script (`npm run db:check`).
 - **Dependency Inventory:** Created [docs/dependency-inventory.md](docs/dependency-inventory.md) auditing Node, Python, and container image dependencies, licenses, and ARM64 compatibility.

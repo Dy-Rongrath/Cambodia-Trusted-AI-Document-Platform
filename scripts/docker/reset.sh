@@ -13,5 +13,5 @@ if [ "${1:-}" != "--confirm" ]; then
 fi
 
 echo "Resetting Docker Compose stack and removing named volumes..."
-docker compose --profile auth down -v
+docker compose --profile auth --profile web down -v
 echo "Reset complete."

@@ -14,6 +14,9 @@ The developer environment is **Docker-first**. Language runtimes (Node.js 24, Py
 | **Docker Desktop** | Latest (Docker Engine 29+ / Compose v5+) | https://www.docker.com/products/docker-desktop/ | **Yes**          |
 | **Git**            | Recent                                   | https://git-scm.com/                            | **Yes**          |
 | **Codex CLI**      | Pinned config                            | OpenAI Codex CLI (when using AI assistance)     | Optional         |
+| **GNU coreutils**  | Any recent                               | `brew install coreutils` (macOS)                | macOS only       |
+
+> **macOS note:** `./scripts/docker/keycloak.sh` uses the `timeout` command, which is a GNU coreutils utility not bundled with macOS. Install it once with `brew install coreutils`. Docker Desktop and Git are sufficient for all other scripts.
 
 > **Host isolation rule:** Node.js, npm, Python, `uv`, NestJS CLI, Angular CLI, Prisma CLI, and project virtual environments must not be installed or created on the host for this project. Use only the Docker scripts below. Bind-mounted source files remain editable, while dependency directories and tool caches stay inside disposable containers or Docker volumes.
 
@@ -87,7 +90,11 @@ Local PostgreSQL remains the default and continues to use `./scripts/docker/star
    ./scripts/docker/cloud-sql.sh check
    ```
 
-The proxy image is pinned, runs as the host user rather than root, has no published host port, and mounts the credential file read-only. The backend-to-proxy URL uses `sslmode=disable` because that hop stays inside the local Docker network; the proxy independently encrypts and authenticates the remote Cloud SQL tunnel. Use `./scripts/docker/cloud-sql.sh stop` when finished. Starting the normal stack later continues to use the local PostgreSQL volume; the local database is not deleted or migrated by this workflow.
+The proxy image is pinned, runs as the host user rather than root, has no published host port, and mounts the credential file read-only. The backend-to-proxy URL uses `sslmode=disable` because that hop stays inside the local Docker network; the proxy independently encrypts and authenticates the remote Cloud SQL tunnel.
+
+`start` also brings up Caddy under the `web` profile so TLS-terminated development hostnames are available. Ensure the three DNS records point to the VM's reserved IP before using Caddy.
+
+Use `./scripts/docker/cloud-sql.sh stop` to suspend containers without removing them (fast restart). Use `./scripts/docker/cloud-sql.sh down` to fully tear down and remove containers. Starting the normal stack later continues to use the local PostgreSQL volume; the local database is not deleted or migrated by this workflow.
 
 ---
 
@@ -554,6 +561,24 @@ tool_timeout_sec = 30
 - **NEVER commit `.codex/config.toml` or any file containing GitHub PATs or secrets.**
 - All MCP tools in Stage 1 are read-only. Do not enable write parameters without approval.
 - See `MCP_SECURITY.md` for full governance rules.
+
+---
+
+## 18. CHANGELOG Update Policy
+
+Every pull request that introduces a user-visible change **must** update [CHANGELOG.md](../CHANGELOG.md) under the `[Unreleased]` section before merging. Use the [Keep a Changelog](https://keepachangelog.com/en/2.0.0/) categories:
+
+| Category  | When to use |
+|-----------|-------------|
+| `Added`   | New features, scripts, or documents |
+| `Changed` | Changes to existing behaviour or files |
+| `Fixed`   | Bug fixes |
+| `Removed` | Deleted features or files |
+| `Security`| Vulnerability fixes or security hardening |
+
+PRs that touch only comments, whitespace, or test fixtures are exempt. Reviewers must reject PRs that are missing a CHANGELOG entry when one is required.
+
+When a version is released, a maintainer renames `[Unreleased]` to the new version tag (e.g. `[0.2.0] — 2026-09-01`) and adds a fresh empty `[Unreleased]` section at the top.
 
 ---
 
