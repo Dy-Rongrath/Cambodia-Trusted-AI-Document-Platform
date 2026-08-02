@@ -70,7 +70,7 @@ jobs:
           echo "PASS: No Prisma migrations directory."
 
           echo "=== Checking for machine-specific absolute paths in tracked files ==="
-          if git ls-files | xargs grep -lI 'file:///Users/\|file:///home/\|/Users/[A-Za-z]' 2>/dev/null | grep -v '.md$' | grep -v 'DEVELOPMENT.md\|README.md'; then
+          if git ls-files | xargs -r grep -lI 'file:///Users/\|file:///home/\|/Users/[A-Za-z]' 2>/dev/null | grep -v '.md$' | grep -v 'DEVELOPMENT.md\|README.md'; then
             echo "WARN: Potential machine-specific path detected — review output above."
           fi
 
