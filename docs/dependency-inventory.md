@@ -135,10 +135,10 @@ Python version constraint: `>=3.12,<3.13` (bounded, matching `.python-version` =
 - **Secrets Check:** No API keys, credentials, tokens, or `.env` files are committed.
 - **Data Minimization:** No real personal, government, or institution-specific data is included.
 - **Verification Evidence:** All direct dependencies are pinned in workspace manifests and locked in `package-lock.json` and `uv.lock`.
-- **npm Audit Status:** 3 moderate development-only findings in Angular CLI 22.1.2 transitive tooling; production audit reports zero findings. See [docs/security/phase-1-dependency-audit.md](security/phase-1-dependency-audit.md).
+- **npm Audit Status:** No known findings in the full or production dependency graph after the reviewed Angular CLI-scoped MCP SDK 1.30.0 security override. See [docs/security/phase-1-dependency-audit.md](security/phase-1-dependency-audit.md).
 - **Python Audit Status:** No known CVEs reported by `pip-audit` at 2026-08-02 audit time.
 - **Container Audit Status:** Trivy blocks fixable High/Critical findings in all three final runtime images; scanner adoption and residual risks are documented in the [Trivy review](security/trivy-container-scanner-review.md).
 
-> [!WARNING]
-> The three remaining npm findings are upstream development-tool vulnerabilities. Do not expose the Angular
-> development server to untrusted networks; see the security audit document for classification.
+> [!NOTE]
+> The MCP SDK override affects Angular CLI development tooling only; it does not install, enable, or configure
+> an MCP server. Re-evaluate the override when Angular CLI adopts the patched SDK directly.

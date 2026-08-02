@@ -10,14 +10,14 @@
 
 ## Executive Summary
 
-| Ecosystem          | Full dependency graph | Runtime findings | Status                                                       |
-| ------------------ | --------------------: | ---------------: | ------------------------------------------------------------ |
-| npm (Node.js)      |            3 moderate |                0 | Runtime compliant; upstream development-tool findings remain |
-| Python (`uv.lock`) |               0 known |          0 known | Compliant at audit time                                      |
+| Ecosystem          | Full dependency graph | Runtime findings | Status                  |
+| ------------------ | --------------------: | ---------------: | ----------------------- |
+| npm (Node.js)      |               0 known |          0 known | Compliant at audit time |
+| Python (`uv.lock`) |               0 known |          0 known | Compliant at audit time |
 
 The previous Angular 19 lockfile baseline contained 57 findings. After upgrading to Angular 22.1.x and
-regenerating `package-lock.json`, no critical or high findings remain. The three remaining moderate findings
-are reachable only through the Angular CLI development toolchain and are absent from `npm audit --omit=dev`.
+applying the reviewed development-tool override described below, the full and production dependency graphs
+contain no known npm audit findings.
 
 ---
 
@@ -37,32 +37,29 @@ npm run audit:production
 | --------- | ---------: | ---------------: |
 | Critical  |          0 |                0 |
 | High      |          0 |                0 |
-| Moderate  |          3 |                0 |
+| Moderate  |          0 |                0 |
 | Low       |          0 |                0 |
-| **Total** |      **3** |            **0** |
+| **Total** |      **0** |            **0** |
 
-### Remaining finding classification
+### Resolved development-tool finding
 
-| Package                            | Severity | Direct/Transitive     | Scope            | Dependency path                                                    | Remediation status                                             |
-| ---------------------------------- | -------- | --------------------- | ---------------- | ------------------------------------------------------------------ | -------------------------------------------------------------- |
-| `@angular/cli` 22.1.2              | Moderate | Direct dev dependency | Development only | `@angular/cli` → `@modelcontextprotocol/sdk` → `@hono/node-server` | No patched Angular 22 release available at audit time          |
-| `@modelcontextprotocol/sdk` 1.29.0 | Moderate | Transitive            | Development only | Angular CLI tooling                                                | Await upstream Angular CLI dependency update                   |
-| `@hono/node-server` `<2.0.5`       | Moderate | Transitive            | Development only | Angular CLI MCP tooling                                            | Path traversal advisory affects Hono static serving on Windows |
+| Dependency path                                                    | Previous resolution  | Patched resolution  | Result                          |
+| ------------------------------------------------------------------ | -------------------- | ------------------- | ------------------------------- |
+| `@angular/cli` → `@modelcontextprotocol/sdk` → `@hono/node-server` | `1.29.0` → `1.19.17` | `1.30.0` → `2.0.12` | GHSA finding no longer reported |
 
 `npm audit` proposes Angular CLI 21.0.4 as the available resolution. That is a major downgrade and would
-break alignment with Angular 22.1.0/22.1.2, so it was not applied. The application does not import or expose
-these packages at runtime, and the production-only audit reports zero findings.
+break alignment with Angular 22.1.0/22.1.2, so it was not applied. Angular CLI remains pinned at 22.1.2.
 
-An upstream version check on 2026-08-02 confirmed that Angular CLI 22.1.2 remains the latest release. Although
-`@modelcontextprotocol/sdk` 1.30.0 and `@hono/node-server` 2.0.12 are available, Angular CLI pins MCP SDK
-1.29.0 exactly. Overriding that pin would be an untested MCP SDK change and requires the separate MCP approval
-and review process defined in `MCP_SECURITY.md`; it was not applied.
+An upstream version and release review on 2026-08-02 confirmed that Angular CLI 22.1.2 remains the latest
+release. MCP SDK 1.30.0 is the supported v1 security release that widens its Hono range specifically for
+GHSA-frvp-7c67-39w9. The root npm override is scoped to Angular CLI and pins MCP SDK 1.30.0; the lockfile then
+resolves Hono Node Server 2.0.12. Both packages retain the MIT licence and support the project's Node 24 ARM64
+container runtime.
 
 Static dependency tracing confirms that Angular CLI loads the MCP SDK through the separate `ng mcp` command.
-The platform build and application runtime do not execute that command. GHSA-frvp-7c67-39w9 additionally
-requires a Windows host serving static files through the affected Hono adapter; supported local development is
-Apple Silicon and the container runtime is Linux. The finding is therefore not exploitable in the approved
-platform paths, but remains tracked until Angular publishes a patched CLI dependency graph.
+The platform build and application runtime do not execute that command. No MCP server was installed, enabled,
+or configured by this remediation. A clean Docker `npm ci`, full-graph audit, production audit, Angular build,
+and test suite validate the overridden development-tool graph.
 
 ### Operational control
 
@@ -71,7 +68,7 @@ platform paths, but remains tracked until Angular publishes a patched CLI depend
   and receiving maintainer approval.
 - Keep `npm run audit:production` in the canonical local and GitHub Actions quality gates. It fails on high or
   critical production findings while the full dependency graph retains its separate critical-only CI check.
-- Re-run the audit when a newer Angular CLI 22 patch is published.
+- Re-evaluate and remove the override when Angular CLI directly adopts MCP SDK 1.30.0 or newer.
 - Do not use `npm audit fix --force`; it would silently downgrade the approved framework toolchain.
 
 ---
@@ -119,15 +116,16 @@ dependencies listed below.
 
 ## 3. Accepted Temporary Risks
 
-| Risk                                     | Severity | Reason unresolved                                                                  | Required next action                                                           | Owner approval                   |
-| ---------------------------------------- | -------- | ---------------------------------------------------------------------------------- | ------------------------------------------------------------------------------ | -------------------------------- |
-| Angular CLI transitive MCP/Hono findings | Moderate | No patched Angular CLI 22 release exists; npm recommends an incompatible downgrade | Upgrade to the first patched Angular CLI 22 release and re-run both npm audits | Track until upstream remediation |
+No dependency vulnerability is currently accepted in the audited npm or Python lockfiles. Audit databases
+change continuously, so this statement must be refreshed whenever either lockfile changes.
 
 ---
 
 ## 4. References
 
 - [npm audit documentation](https://docs.npmjs.com/cli/v11/commands/npm-audit)
+- [npm overrides documentation](https://docs.npmjs.com/cli/v11/configuring-npm/package-json/#overrides)
+- [MCP TypeScript SDK 1.29.0...1.30.0 comparison](https://github.com/modelcontextprotocol/typescript-sdk/compare/e12cbd7078db388152f6e839abdbe09ba01f3f32...2d889f2b329e46680ec9bdd565de4616c497825a)
 - [GHSA-frvp-7c67-39w9](https://github.com/advisories/GHSA-frvp-7c67-39w9)
 - [PyPA Advisory Database](https://github.com/pypa/advisory-database)
 - [pip-audit](https://github.com/pypa/pip-audit)

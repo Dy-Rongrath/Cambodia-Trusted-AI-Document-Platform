@@ -1,0 +1,16 @@
+# Image-only override used by CI/CD deployments.
+# The build definitions remain in compose.yaml for local development.
+services:
+  backend:
+    image: ${BACKEND_IMAGE:?Set BACKEND_IMAGE}
+    build: !reset null
+
+  ai-service:
+    image: ${AI_SERVICE_IMAGE:?Set AI_SERVICE_IMAGE}
+    build: !reset null
+
+  frontend:
+    image: ${FRONTEND_IMAGE:?Set FRONTEND_IMAGE}
+    build: !reset null
+    ports: !override
+      - '127.0.0.1:${FRONTEND_PORT:-4200}:8080'

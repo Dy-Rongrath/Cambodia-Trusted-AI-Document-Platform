@@ -1,0 +1,120 @@
+name: Deploy development VM
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths:
+      - 'apps/**'
+      - 'infra/**'
+      - 'packages/**'
+      - 'scripts/docker/**'
+      - 'compose.yaml'
+      - 'package-lock.json'
+      - '.github/workflows/deploy-dev.yml'
+
+permissions:
+  contents: read
+  id-token: write
+
+concurrency:
+  group: development-vm
+  cancel-in-progress: false
+
+jobs:
+  deploy:
+    name: Deploy to development VM
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    environment: development
+
+    env:
+      GCP_PROJECT_ID: ${{ vars.GCP_PROJECT_ID }}
+      GCP_WORKLOAD_IDENTITY_PROVIDER: ${{ vars.GCP_WORKLOAD_IDENTITY_PROVIDER }}
+      GCP_DEPLOYER_SERVICE_ACCOUNT: ${{ vars.GCP_DEPLOYER_SERVICE_ACCOUNT }}
+      AR_LOCATION: ${{ vars.AR_LOCATION }}
+      AR_REPOSITORY: ${{ vars.AR_REPOSITORY }}
+      GCE_VM_NAME: ${{ vars.GCE_VM_NAME }}
+      GCE_ZONE: ${{ vars.GCE_ZONE }}
+      DEPLOY_PATH: ${{ vars.DEPLOY_PATH }}
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+
+      - name: Validate deployment configuration
+        run: |
+          set -eu
+          for required in \
+            GCP_PROJECT_ID \
+            GCP_WORKLOAD_IDENTITY_PROVIDER \
+            GCP_DEPLOYER_SERVICE_ACCOUNT \
+            AR_LOCATION \
+            AR_REPOSITORY \
+            GCE_VM_NAME \
+            GCE_ZONE \
+            DEPLOY_PATH; do
+            if [ -z "${!required}" ]; then
+              echo "Missing GitHub Actions variable: $required" >&2
+              exit 1
+            fi
+          done
+
+      - name: Authenticate to Google Cloud with Workload Identity Federation
+        uses: google-github-actions/auth@v3.0.0
+        with:
+          project_id: ${{ env.GCP_PROJECT_ID }}
+          workload_identity_provider: ${{ env.GCP_WORKLOAD_IDENTITY_PROVIDER }}
+          service_account: ${{ env.GCP_DEPLOYER_SERVICE_ACCOUNT }}
+
+      - name: Set up Google Cloud CLI
+        uses: google-github-actions/setup-gcloud@v3.0.1
+        with:
+          version: '>= 416.0.0'
+          project_id: ${{ env.GCP_PROJECT_ID }}
+
+      - name: Authenticate Docker to Artifact Registry
+        run: gcloud auth configure-docker "${AR_LOCATION}-docker.pkg.dev" --quiet
+
+      - name: Build immutable runtime images
+        run: |
+          set -eu
+          IMAGE_PREFIX="${AR_LOCATION}-docker.pkg.dev/${GCP_PROJECT_ID}/${AR_REPOSITORY}"
+          docker build --target runtime -f apps/backend/Dockerfile -t "$IMAGE_PREFIX/backend:${GITHUB_SHA}" .
+          docker build --target runtime -f apps/frontend/Dockerfile -t "$IMAGE_PREFIX/frontend:${GITHUB_SHA}" .
+          docker build --target runtime -f apps/ai-service/Dockerfile -t "$IMAGE_PREFIX/ai-service:${GITHUB_SHA}" .
+          docker push "$IMAGE_PREFIX/backend:${GITHUB_SHA}"
+          docker push "$IMAGE_PREFIX/frontend:${GITHUB_SHA}"
+          docker push "$IMAGE_PREFIX/ai-service:${GITHUB_SHA}"
+
+      - name: Pull immutable images and deploy on the VM
+        run: |
+          set -eu
+          IMAGE_PREFIX="${AR_LOCATION}-docker.pkg.dev/${GCP_PROJECT_ID}/${AR_REPOSITORY}"
+          gcloud compute ssh "$GCE_VM_NAME" \
+            --project="$GCP_PROJECT_ID" \
+            --zone="$GCE_ZONE" \
+            --tunnel-through-iap \
+            --command="
+              set -eu
+              test -d '$DEPLOY_PATH/.git'
+              cd '$DEPLOY_PATH'
+              git fetch --prune origin
+              git checkout --force main
+              git reset --hard origin/main
+              gcloud auth configure-docker '${AR_LOCATION}-docker.pkg.dev' --quiet
+              export BACKEND_IMAGE='$IMAGE_PREFIX/backend:${GITHUB_SHA}'
+              export FRONTEND_IMAGE='$IMAGE_PREFIX/frontend:${GITHUB_SHA}'
+              export AI_SERVICE_IMAGE='$IMAGE_PREFIX/ai-service:${GITHUB_SHA}'
+              COMPOSE_FILES='-f compose.yaml -f infra/docker/compose.images.yaml'
+              if [ -f .env.cloud-sql ]; then
+                COMPOSE_FILES="$COMPOSE_FILES -f infra/docker/compose.cloud-sql.yaml"
+                docker compose --env-file .env.cloud-sql $COMPOSE_FILES pull
+                docker compose --env-file .env.cloud-sql $COMPOSE_FILES up -d --no-build cloud-sql-proxy backend ai-service frontend
+                docker compose --env-file .env.cloud-sql $COMPOSE_FILES exec -T backend npm run db:check --workspace=apps/backend
+              else
+                docker compose $COMPOSE_FILES pull
+                docker compose $COMPOSE_FILES up -d --no-build postgres backend ai-service frontend
+              fi
+              docker compose $COMPOSE_FILES ps
+            "

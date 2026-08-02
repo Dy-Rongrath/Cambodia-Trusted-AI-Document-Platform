@@ -30,6 +30,9 @@ kubeconfig
 mcp-server-config.json
 .cursor/mcp.json
 
+# GitHub Actions generated Google credentials
+gha-creds-*.json
+
 
 # =============================================================================
 # NODE.JS / NPM / PNPM
