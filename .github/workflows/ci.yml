@@ -37,8 +37,10 @@ jobs:
           echo "PASS: No committed .env secret files."
 
           echo "=== Checking for private key material in tracked files ==="
-          if git ls-files | xargs grep -lI 'BEGIN RSA PRIVATE KEY\|BEGIN EC PRIVATE KEY\|BEGIN OPENSSH PRIVATE KEY\|-----BEGIN PRIVATE KEY-----' 2>/dev/null | grep -v '\.md$'; then
+          PRIVATE_KEY_FILES=$(git ls-files | grep -v '^\.github/workflows/ci\.yml$' | xargs -r grep -lI 'BEGIN RSA PRIVATE KEY\|BEGIN EC PRIVATE KEY\|BEGIN OPENSSH PRIVATE KEY\|-----BEGIN PRIVATE KEY-----' 2>/dev/null || true)
+          if [ -n "$PRIVATE_KEY_FILES" ]; then
             echo "FAIL: Private key material detected in tracked files."
+            echo "$PRIVATE_KEY_FILES"
             exit 1
           fi
           echo "PASS: No private key material."
