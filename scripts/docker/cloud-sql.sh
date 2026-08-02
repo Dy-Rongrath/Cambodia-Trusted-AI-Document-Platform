@@ -31,6 +31,11 @@ compose() {
 case "$ACTION" in
   start)
     echo "Starting application services with the opt-in Cloud SQL connection..."
+    compose config --quiet
+    compose up -d cloud-sql-proxy backend ai-service frontend
+    ;;
+  start-web)
+    echo "Starting application services with the opt-in Cloud SQL connection..."
     echo "(Caddy TLS proxy started via 'web' profile — ensure DNS records point to this host.)"
     compose config --quiet
     compose --profile web up -d cloud-sql-proxy backend ai-service frontend caddy
@@ -56,7 +61,7 @@ case "$ACTION" in
     echo "Cloud SQL Compose configuration is valid."
     ;;
   *)
-    echo "Usage: $0 {start|stop|down|check|logs|config}" >&2
+    echo "Usage: $0 {start|start-web|stop|down|check|logs|config}" >&2
     exit 2
     ;;
 esac

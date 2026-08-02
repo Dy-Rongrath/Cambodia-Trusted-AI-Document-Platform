@@ -1,0 +1,15 @@
+services:
+  caddy:
+    ports: !override
+      - '80:80'
+      - '443:443'
+    volumes: !override
+      - ./Caddyfile.deployment:/etc/caddy/Caddyfile:ro
+      - ${CADDY_ORIGIN_CERT_FILE:?Set CADDY_ORIGIN_CERT_FILE}:/etc/caddy/certs/origin.pem:ro
+      - ${CADDY_ORIGIN_KEY_FILE:?Set CADDY_ORIGIN_KEY_FILE}:/etc/caddy/certs/origin.key:ro
+      - caddy_data:/data
+      - caddy_config:/config
+
+  frontend:
+    ports: !override []
+    develop: !override {}

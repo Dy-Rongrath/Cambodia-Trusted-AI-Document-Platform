@@ -1,0 +1,8 @@
+{
+    email {$TLS_ADMIN_EMAIL}
+}
+
+cambodia-trusted-ai-dev.dyrongrath.com {
+    tls /etc/caddy/certs/origin.pem /etc/caddy/certs/origin.key
+    reverse_proxy frontend:8080
+}

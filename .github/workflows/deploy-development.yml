@@ -1,0 +1,228 @@
+name: Deploy Development
+
+on:
+  workflow_dispatch:
+    inputs:
+      DEPLOY_SHA:
+        description: 'Full 40-character hexadecimal commit SHA to deploy'
+        required: true
+        type: string
+
+permissions:
+  contents: read
+
+concurrency:
+  group: deploy-dev
+  cancel-in-progress: false
+
+jobs:
+  # ---------------------------------------------------------------------------
+  # Job 1: Parallel Docker Image Build & Push with Layer Caching
+  # ---------------------------------------------------------------------------
+  build-images:
+    name: Build & Push (${{ matrix.service }})
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    environment: development
+
+    # OIDC permission is job-scoped
+    permissions:
+      contents: read
+      id-token: write
+      actions: read
+      checks: read
+
+    strategy:
+      matrix:
+        include:
+          - service: backend
+            dockerfile: apps/backend/Dockerfile
+          - service: frontend
+            dockerfile: apps/frontend/Dockerfile
+          - service: ai-service
+            dockerfile: apps/ai-service/Dockerfile
+
+    steps:
+      - name: Validate DEPLOY_SHA
+        run: |
+          case "${{ github.event.inputs.DEPLOY_SHA }}" in
+            (*[!0-9a-fA-F]*|'')
+              echo "DEPLOY_SHA must be a full 40-character hexadecimal commit SHA." >&2
+              exit 1
+              ;;
+          esac
+          if [ "${#${{ github.event.inputs.DEPLOY_SHA }}}" -ne 40 ]; then
+            echo "DEPLOY_SHA must contain exactly 40 characters." >&2
+            exit 1
+          fi
+
+      - name: Checkout repository
+        uses: actions/checkout@8e8c483db84b4bee98b60c0593521ed34d9990e8 # v6.0.1
+        with:
+          fetch-depth: 0
+
+      - name: Verify commit and fetch DEPLOY_SHA
+        run: |
+          git fetch origin main --no-tags
+          git fetch origin "${{ github.event.inputs.DEPLOY_SHA }}" --no-tags
+          git merge-base --is-ancestor "${{ github.event.inputs.DEPLOY_SHA }}" origin/main || {
+            echo "The requested commit is not reachable from main." >&2
+            exit 1
+          }
+          git checkout "${{ github.event.inputs.DEPLOY_SHA }}"
+
+      - name: Authenticate to Google Cloud with Workload Identity Federation
+        uses: google-github-actions/auth@7c6bc770dae815cd3e89ee6cdf493a5fab2cc093 # v3.0.0
+        with:
+          project_id: ${{ vars.GCP_PROJECT_ID }}
+          workload_identity_provider: ${{ vars.GCP_WORKLOAD_IDENTITY_PROVIDER }}
+          service_account: ${{ vars.GCP_DEPLOYER_SERVICE_ACCOUNT }}
+
+      - name: Set up Google Cloud CLI
+        uses: google-github-actions/setup-gcloud@aa5489c8933f4cc7a4f7d45035b3b1440c9c10db # v3.0.1
+        with:
+          version: '416.0.0'
+          project_id: ${{ vars.GCP_PROJECT_ID }}
+
+      - name: Authenticate Docker to Artifact Registry
+        run: gcloud auth configure-docker "${{ vars.AR_LOCATION }}-docker.pkg.dev" --quiet
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@6524bf65af31da8d45b59e8c27de4bd072b392f5 # v3.8.0
+
+      - name: Build and push runtime image with Buildx layer caching
+        uses: docker/build-push-action@ca877d9245402d1537745e0e356eab47c3520991 # v6.13.0
+        with:
+          context: .
+          file: ${{ matrix.dockerfile }}
+          target: runtime
+          push: true
+          tags: ${{ vars.AR_LOCATION }}-docker.pkg.dev/${{ vars.GCP_PROJECT_ID }}/${{ vars.AR_REPOSITORY }}/${{ matrix.service }}:${{ github.event.inputs.DEPLOY_SHA }}-${{ github.run_id }}
+          cache-from: type=gha,scope=${{ matrix.service }}
+          cache-to: type=gha,mode=max,scope=${{ matrix.service }}
+
+  # ---------------------------------------------------------------------------
+  # Job 2: Deploy to GCP Development VM via IAP SSH
+  # ---------------------------------------------------------------------------
+  deploy:
+    name: Deploy to Development VM
+    needs: build-images
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    environment: development
+
+    # OIDC permission is job-scoped
+    permissions:
+      contents: read
+      id-token: write
+      actions: read
+      checks: read
+
+    env:
+      GCP_PROJECT_ID: ${{ vars.GCP_PROJECT_ID }}
+      GCP_WORKLOAD_IDENTITY_PROVIDER: ${{ vars.GCP_WORKLOAD_IDENTITY_PROVIDER }}
+      GCP_DEPLOYER_SERVICE_ACCOUNT: ${{ vars.GCP_DEPLOYER_SERVICE_ACCOUNT }}
+      AR_LOCATION: ${{ vars.AR_LOCATION }}
+      AR_REPOSITORY: ${{ vars.AR_REPOSITORY }}
+      GCE_VM_NAME: ${{ vars.GCE_VM_NAME }}
+      GCE_ZONE: ${{ vars.GCE_ZONE }}
+      DEPLOY_PATH: ${{ vars.DEPLOY_PATH }}
+      DEPLOY_CERT_DIR: ${{ vars.DEPLOY_CERT_DIR }}
+      TLS_ADMIN_EMAIL: ${{ vars.TLS_ADMIN_EMAIL }}
+      CLOUDFLARE_ORIGIN_CERT: ${{ secrets.CLOUDFLARE_ORIGIN_CERT }}
+      CLOUDFLARE_ORIGIN_KEY: ${{ secrets.CLOUDFLARE_ORIGIN_KEY }}
+
+    steps:
+      - name: Authenticate to Google Cloud with Workload Identity Federation
+        uses: google-github-actions/auth@7c6bc770dae815cd3e89ee6cdf493a5fab2cc093 # v3.0.0
+        with:
+          project_id: ${{ env.GCP_PROJECT_ID }}
+          workload_identity_provider: ${{ env.GCP_WORKLOAD_IDENTITY_PROVIDER }}
+          service_account: ${{ env.GCP_DEPLOYER_SERVICE_ACCOUNT }}
+
+      - name: Set up Google Cloud CLI
+        uses: google-github-actions/setup-gcloud@aa5489c8933f4cc7a4f7d45035b3b1440c9c10db # v3.0.1
+        with:
+          version: '416.0.0'
+          project_id: ${{ env.GCP_PROJECT_ID }}
+
+      - name: Secure Certificate Transfer and Deployment
+        run: |
+          set -eu
+          
+          # 1. Write secrets to temporary files
+          umask 077
+          printf '%s' "$CLOUDFLARE_ORIGIN_CERT" > "$RUNNER_TEMP/origin.pem"
+          printf '%s' "$CLOUDFLARE_ORIGIN_KEY" > "$RUNNER_TEMP/origin.key"
+          
+          # 2. Transfer to VM temp directory
+          gcloud compute ssh "$GCE_VM_NAME" \
+            --project="$GCP_PROJECT_ID" \
+            --zone="$GCE_ZONE" \
+            --tunnel-through-iap \
+            --command="mkdir -p /tmp/trusted-ai-certs && chmod 700 /tmp/trusted-ai-certs"
+            
+          gcloud compute scp "$RUNNER_TEMP/origin.pem" "$RUNNER_TEMP/origin.key" "$GCE_VM_NAME:/tmp/trusted-ai-certs/" \
+            --project="$GCP_PROJECT_ID" \
+            --zone="$GCE_ZONE" \
+            --tunnel-through-iap
+            
+          # 3. Pull immutable images and deploy on the VM
+          IMAGE_PREFIX="${AR_LOCATION}-docker.pkg.dev/${GCP_PROJECT_ID}/${AR_REPOSITORY}"
+          REMOTE_SCRIPT=$(cat <<EOF
+          set -eu
+          test -d '$DEPLOY_PATH/.git'
+          cd '$DEPLOY_PATH'
+          
+          git fetch --prune origin
+          git checkout --force main
+          git fetch origin '${{ github.event.inputs.DEPLOY_SHA }}' --no-tags
+          git checkout '${{ github.event.inputs.DEPLOY_SHA }}'
+
+          # Atomically move certificates to external directory
+          mkdir -p '$DEPLOY_CERT_DIR'
+          chmod 700 '$DEPLOY_CERT_DIR'
+          mv /tmp/trusted-ai-certs/origin.pem /tmp/trusted-ai-certs/origin.key '$DEPLOY_CERT_DIR/'
+          chmod 600 '$DEPLOY_CERT_DIR/origin.key'
+          chmod 644 '$DEPLOY_CERT_DIR/origin.pem'
+          rmdir /tmp/trusted-ai-certs
+
+          gcloud auth configure-docker '${AR_LOCATION}-docker.pkg.dev' --quiet
+          
+          export BACKEND_IMAGE='$IMAGE_PREFIX/backend:${{ github.event.inputs.DEPLOY_SHA }}-${GITHUB_RUN_ID}'
+          export FRONTEND_IMAGE='$IMAGE_PREFIX/frontend:${{ github.event.inputs.DEPLOY_SHA }}-${GITHUB_RUN_ID}'
+          export AI_SERVICE_IMAGE='$IMAGE_PREFIX/ai-service:${{ github.event.inputs.DEPLOY_SHA }}-${GITHUB_RUN_ID}'
+          export TLS_ADMIN_EMAIL='$TLS_ADMIN_EMAIL'
+          export CADDY_ORIGIN_CERT_FILE='$DEPLOY_CERT_DIR/origin.pem'
+          export CADDY_ORIGIN_KEY_FILE='$DEPLOY_CERT_DIR/origin.key'
+          
+          COMPOSE_FILES='-f compose.yaml -f infra/docker/compose.images.yaml -f infra/docker/compose.deployment.yaml'
+          
+          if [ -f .env.cloud-sql ]; then
+            COMPOSE_FILES="\$COMPOSE_FILES -f infra/docker/compose.cloud-sql.yaml -f infra/docker/compose.deployment.yaml"
+            docker compose --env-file .env.cloud-sql \$COMPOSE_FILES pull
+            docker compose --env-file .env.cloud-sql \$COMPOSE_FILES up -d --no-build cloud-sql-proxy backend ai-service frontend caddy
+            docker compose --env-file .env.cloud-sql \$COMPOSE_FILES exec -T backend npm run db:check --workspace=apps/backend
+          else
+            docker compose \$COMPOSE_FILES pull
+            docker compose \$COMPOSE_FILES up -d --no-build postgres backend ai-service frontend caddy
+          fi
+          
+          docker compose \$COMPOSE_FILES ps
+          
+          echo "=== Cleaning up unused/dangling Docker images on VM ==="
+          docker image prune -af --filter "until=72h" || true
+          EOF
+          )
+          
+          REMOTE_SCRIPT_B64="\$(printf '%s' "\$REMOTE_SCRIPT" | base64 -w 0)"
+          gcloud compute ssh "$GCE_VM_NAME" \
+            --project="$GCP_PROJECT_ID" \
+            --zone="$GCE_ZONE" \
+            --tunnel-through-iap \
+            --command="echo '\$REMOTE_SCRIPT_B64' | base64 -d | bash"
+
+      - name: Cleanup temporary secrets
+        if: always()
+        run: |
+          rm -f "$RUNNER_TEMP/origin.pem" "$RUNNER_TEMP/origin.key"

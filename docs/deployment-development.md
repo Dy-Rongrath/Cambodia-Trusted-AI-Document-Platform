@@ -5,10 +5,9 @@ Engine VM. It is not a production deployment design.
 
 ## Deployment model
 
-GitHub Actions runs the unified CI/CD workflow in `.github/workflows/ci-cd.yml`.
-The `Phase 1 CI/CD` workflow validates quality gates on pull requests and pushes,
-and automatically builds immutable runtime images and deploys to the development VM
-upon push to `main`.
+GitHub Actions separates Continuous Integration (`.github/workflows/ci.yml`) from Continuous Deployment (`.github/workflows/deploy-development.yml`).
+The deployment workflow is strictly manually triggered and requires a valid 40-character commit SHA (`DEPLOY_SHA`) that has passed CI on `main`.
+The `Phase 1 CI` workflow validates quality gates on pull requests and pushes.
 
 The workflow deliberately does not create, upload, print, or store `.env` files.
 Runtime configuration remains on the VM and is ignored by Git. Do not add database

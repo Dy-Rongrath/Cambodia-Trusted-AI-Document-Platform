@@ -14,6 +14,8 @@ The project uses a **maintainer-led governance model**:
 - The project owner makes final decisions on product vision, architecture, security policy, and roadmap priorities.
 - Major technical and architectural decisions are recorded transparently using Architecture Decision Records ([docs/adr/](docs/adr/)).
 - All changes are submitted via Pull Requests and require maintainer review and approval before merging.
+- **Branch Protection:** The `main` branch requires successful CI checks, valid DCO sign-offs (`git commit -s`), and maintainer review. Direct pushes to `main` are restricted.
+- **CI/CD Separation:** Continuous Integration (CI) operates strictly with read-only permissions on PRs. Continuous Deployment (CD) operates separately and requires manual workflow dispatch with explicit image digest and commit SHA validation.
 - Security-sensitive changes require explicit human review — AI agents and automated tools cannot self-approve or merge changes ([AGENTS.md](AGENTS.md) Section 7).
 
 ---

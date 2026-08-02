@@ -138,6 +138,17 @@ Python version constraint: `>=3.12,<3.13` (bounded, matching `.python-version` =
 - **npm Audit Status:** No known findings in the full or production dependency graph after the reviewed Angular CLI-scoped MCP SDK 1.30.0 security override. See [docs/security/phase-1-dependency-audit.md](security/phase-1-dependency-audit.md).
 - **Python Audit Status:** No known CVEs reported by `pip-audit` at 2026-08-02 audit time.
 - **Container Audit Status:** Trivy blocks fixable High/Critical findings in all three final runtime images; scanner adoption and residual risks are documented in the [Trivy review](security/trivy-container-scanner-review.md).
+- **Digest Update Policy:** Image digests are strictly resolved using `docker buildx imagetools inspect` to ensure correct multi-platform index digests are pinned.
+
+## 6. GitHub Actions
+
+| Action | Version / SHA | Purpose |
+| --- | --- | --- |
+| `actions/checkout` | `8e8c483db84b4bee98b60c0593521ed34d9990e8` | Repository checkout |
+| `google-github-actions/auth` | `7c6bc770dae815cd3e89ee6cdf493a5fab2cc093` | GCP Workload Identity auth |
+| `google-github-actions/setup-gcloud` | `aa5489c8933f4cc7a4f7d45035b3b1440c9c10db` | gcloud CLI setup |
+| `docker/setup-buildx-action` | `6524bf65af31da8d45b59e8c27de4bd072b392f5` | Docker Buildx setup |
+| `docker/build-push-action` | `ca877d9245402d1537745e0e356eab47c3520991` | Docker image build & push |
 
 > [!NOTE]
 > The MCP SDK override affects Angular CLI development tooling only; it does not install, enable, or configure

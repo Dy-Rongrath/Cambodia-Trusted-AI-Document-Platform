@@ -123,14 +123,11 @@ services:
     container_name: trusted-ai-caddy
     restart: unless-stopped
     ports:
-      - '80:80'
-      - '443:443'
+      - '127.0.0.1:8080:8080'
     environment:
       TLS_ADMIN_EMAIL: ${TLS_ADMIN_EMAIL:-admin@dyrongrath.com}
     volumes:
-      - ./Caddyfile:/etc/caddy/Caddyfile:ro
-      - ./origin.pem:/etc/caddy/origin.pem:ro
-      - ./origin.key:/etc/caddy/origin.key:ro
+      - ./Caddyfile.local:/etc/caddy/Caddyfile:ro
       - caddy_data:/data
       - caddy_config:/config
     depends_on:

@@ -212,7 +212,7 @@ For every task:
 
 1. Read all relevant repository files before proposing changes.
 2. Explain current behaviour and what will change.
-3. Reference relevant files using markdown links with `file://` scheme.
+3. Reference relevant files using markdown links.
 4. Identify assumptions, unknowns, security, privacy, compatibility, and MCP risks.
 5. Propose the smallest safe change.
 6. State whether human approval is required.

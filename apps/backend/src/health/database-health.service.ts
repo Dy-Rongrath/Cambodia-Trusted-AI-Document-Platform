@@ -2,9 +2,11 @@ import { Inject, Injectable, Logger, OnModuleDestroy } from '@nestjs/common';
 import { PrismaPg } from '@prisma/adapter-pg';
 import { PrismaClient } from '@prisma/client';
 
+import { Pool } from 'pg';
+
 export const DATABASE_HEALTH_CLIENT = Symbol('DATABASE_HEALTH_CLIENT');
 
-export type DatabaseHealthClient = Pick<PrismaClient, '$queryRaw' | '$disconnect'>;
+export type DatabaseHealthClient = Pick<PrismaClient, '$queryRaw' | '$disconnect'> & { _pool?: Pool };
 
 export function createDatabaseHealthClient(): DatabaseHealthClient | null {
   const connectionString = process.env['DATABASE_URL'];
@@ -12,13 +14,17 @@ export function createDatabaseHealthClient(): DatabaseHealthClient | null {
     return null;
   }
 
-  const adapter = new PrismaPg({
+  const pool = new Pool({
     connectionString,
     connectionTimeoutMillis: 2_000,
     query_timeout: 2_000,
   });
 
-  return new PrismaClient({ adapter });
+  const adapter = new PrismaPg(pool);
+  const client = new PrismaClient({ adapter }) as DatabaseHealthClient;
+  client._pool = pool;
+
+  return client;
 }
 
 @Injectable()
@@ -53,5 +59,6 @@ export class DatabaseHealthService implements OnModuleDestroy {
 
   async onModuleDestroy(): Promise<void> {
     await this.client?.$disconnect();
+    await this.client?._pool?.end();
   }
 }

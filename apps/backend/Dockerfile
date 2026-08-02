@@ -51,8 +51,7 @@ RUN npm prune --omit=dev --workspace=apps/backend --workspace=packages/shared-ty
 # ---------------------------------------------------------------------------
 FROM base AS runtime
 ENV NODE_ENV=production
-RUN apk upgrade --no-cache \
-    && rm -r /usr/local/lib/node_modules/npm \
+RUN rm -r /usr/local/lib/node_modules/npm \
     && rm -f /usr/local/bin/npm /usr/local/bin/npx
 USER node
 COPY --chown=node:node --from=production-dependencies /app/node_modules ./node_modules

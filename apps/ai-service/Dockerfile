@@ -8,7 +8,6 @@ WORKDIR /app/apps/ai-service
 ENV PYTHONUNBUFFERED=1 \
     PYTHONDONTWRITEBYTECODE=1
 RUN apt-get update \
-    && DEBIAN_FRONTEND=noninteractive apt-get upgrade --yes \
     && rm -rf /var/lib/apt/lists/*
 
 # ---------------------------------------------------------------------------

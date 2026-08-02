@@ -1,4 +1,4 @@
-name: Phase 1 CI/CD
+name: Phase 1 CI
 
 on:
   workflow_dispatch:
@@ -9,10 +9,9 @@ on:
 
 permissions:
   contents: read
-  id-token: write
 
 concurrency:
-  group: ci-cd-${{ github.ref }}
+  group: ci-${{ github.ref }}
   cancel-in-progress: true
 
 jobs:
@@ -36,7 +35,7 @@ jobs:
         timeout-minutes: 2
         run: |
           echo "=== Checking for committed .env secret files (tracked-file scan) ==="
-          LEAKED=$(git ls-files | grep -E '^(\.env|\.env\.[^.]+)$' | grep -vE '(\.env\.example|\.example)$' || true)
+          LEAKED=$(git ls-files | grep -E '(^|/)\.env($|\.)' | grep -vE '(\.env\.example|\.example|\.env\.cloud-sql\.example)$' || true)
           if [ -n "$LEAKED" ]; then
             echo "FAIL: Tracked secret environment files detected:"
             echo "$LEAKED"
@@ -45,7 +44,7 @@ jobs:
           echo "PASS: No committed .env secret files."
 
           echo "=== Checking for private key material in tracked files ==="
-          PRIVATE_KEY_FILES=$(git ls-files | grep -v '^\.github/workflows/ci-cd\.yml$' | xargs -r grep -lI 'BEGIN RSA PRIVATE KEY\|BEGIN EC PRIVATE KEY\|BEGIN OPENSSH PRIVATE KEY\|-----BEGIN PRIVATE KEY-----' 2>/dev/null || true)
+          PRIVATE_KEY_FILES=$(git ls-files | grep -v '^\.github/workflows/ci\.yml$' | grep -v '^\.github/workflows/deploy-development\.yml$' | xargs -r grep -lI 'BEGIN RSA PRIVATE KEY\|BEGIN EC PRIVATE KEY\|BEGIN OPENSSH PRIVATE KEY\|-----BEGIN PRIVATE KEY-----' 2>/dev/null || true)
           if [ -n "$PRIVATE_KEY_FILES" ]; then
             echo "FAIL: Private key material detected in tracked files."
             echo "$PRIVATE_KEY_FILES"
@@ -85,8 +84,22 @@ jobs:
       - name: Validate Docker Compose configuration
         timeout-minutes: 2
         run: |
-          echo "=== Validating docker compose config syntax ==="
-          docker compose config
+          echo "=== Validating compose combinations ==="
+          
+          echo "-- Local default --"
+          docker compose config >/dev/null
+
+          echo "-- Local with Keycloak --"
+          docker compose --profile auth config >/dev/null
+
+          echo "-- Local optional web proxy --"
+          docker compose --profile web config >/dev/null
+
+          echo "-- Deployment with local PostgreSQL --"
+          docker compose -f compose.yaml -f infra/docker/compose.images.yaml -f infra/docker/compose.deployment.yaml config >/dev/null
+          
+          echo "-- Deployment with Cloud SQL --"
+          docker compose -f compose.yaml -f infra/docker/compose.images.yaml -f infra/docker/compose.cloud-sql.yaml -f infra/docker/compose.deployment.yaml config >/dev/null
 
           echo "=== Checking for privileged containers ==="
           if docker compose config | grep -E 'privileged:\s*true'; then
@@ -237,7 +250,7 @@ jobs:
       - name: Build, smoke-test, and scan production runtime images
         timeout-minutes: 10
         env:
-          RUNTIME_SCAN_IMAGE: docker.io/aquasec/trivy:0.72.0@sha256:cffe3f5161a47a6823fbd23d985795b3ed72a4c806da4c4df16266c02accdd6f
+          RUNTIME_SCAN_IMAGE: docker.io/aquasec/trivy:0.72.0@sha256:c6e969c5662a546ad5de4a73c2a6b7a7c627f86d916903e175aa623af5b97ada
         run: ./scripts/docker/runtime-smoke.sh
 
       - name: Start default services
@@ -331,170 +344,3 @@ jobs:
       - name: Clean up Compose services
         if: always()
         run: docker compose --profile auth down --remove-orphans
-
-  # ===========================================================================
-  # SECTION 2: CD DEPLOYMENT (Runs ONLY on push to main after CI passes)
-  # ===========================================================================
-
-  # ---------------------------------------------------------------------------
-  # Job 6: Parallel Docker Image Build & Push with Layer Caching
-  # ---------------------------------------------------------------------------
-  build-images:
-    name: Build & Push (${{ matrix.service }})
-    needs: integration-smoke-test
-    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
-    runs-on: ubuntu-latest
-    timeout-minutes: 20
-    environment: development
-
-    strategy:
-      matrix:
-        include:
-          - service: backend
-            dockerfile: apps/backend/Dockerfile
-          - service: frontend
-            dockerfile: apps/frontend/Dockerfile
-          - service: ai-service
-            dockerfile: apps/ai-service/Dockerfile
-
-    steps:
-      - name: Checkout repository
-        uses: actions/checkout@8e8c483db84b4bee98b60c0593521ed34d9990e8 # v6.0.1
-
-      - name: Authenticate to Google Cloud with Workload Identity Federation
-        uses: google-github-actions/auth@7c6bc770dae815cd3e89ee6cdf493a5fab2cc093 # v3.0.0
-        with:
-          project_id: ${{ vars.GCP_PROJECT_ID }}
-          workload_identity_provider: ${{ vars.GCP_WORKLOAD_IDENTITY_PROVIDER }}
-          service_account: ${{ vars.GCP_DEPLOYER_SERVICE_ACCOUNT }}
-
-      - name: Set up Google Cloud CLI
-        uses: google-github-actions/setup-gcloud@aa5489c8933f4cc7a4f7d45035b3b1440c9c10db # v3.0.1
-        with:
-          version: '>= 416.0.0'
-          project_id: ${{ vars.GCP_PROJECT_ID }}
-
-      - name: Authenticate Docker to Artifact Registry
-        run: gcloud auth configure-docker "${{ vars.AR_LOCATION }}-docker.pkg.dev" --quiet
-
-      - name: Set up Docker Buildx
-        uses: docker/setup-buildx-action@v3
-
-      - name: Build and push runtime image with Buildx layer caching
-        uses: docker/build-push-action@v6
-        with:
-          context: .
-          file: ${{ matrix.dockerfile }}
-          target: runtime
-          push: true
-          tags: ${{ vars.AR_LOCATION }}-docker.pkg.dev/${{ vars.GCP_PROJECT_ID }}/${{ vars.AR_REPOSITORY }}/${{ matrix.service }}:${{ github.sha }}-${{ github.run_id }}
-          cache-from: type=gha,scope=${{ matrix.service }}
-          cache-to: type=gha,mode=max,scope=${{ matrix.service }}
-
-  # ---------------------------------------------------------------------------
-  # Job 7: Deploy to GCP Development VM via IAP SSH
-  # ---------------------------------------------------------------------------
-  deploy:
-    name: Deploy to Development VM
-    needs: build-images
-    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
-    runs-on: ubuntu-latest
-    timeout-minutes: 15
-    environment: development
-
-    env:
-      GCP_PROJECT_ID: ${{ vars.GCP_PROJECT_ID }}
-      GCP_WORKLOAD_IDENTITY_PROVIDER: ${{ vars.GCP_WORKLOAD_IDENTITY_PROVIDER }}
-      GCP_DEPLOYER_SERVICE_ACCOUNT: ${{ vars.GCP_DEPLOYER_SERVICE_ACCOUNT }}
-      AR_LOCATION: ${{ vars.AR_LOCATION }}
-      AR_REPOSITORY: ${{ vars.AR_REPOSITORY }}
-      GCE_VM_NAME: ${{ vars.GCE_VM_NAME }}
-      GCE_ZONE: ${{ vars.GCE_ZONE }}
-      DEPLOY_PATH: ${{ vars.DEPLOY_PATH }}
-      TLS_ADMIN_EMAIL: ${{ vars.TLS_ADMIN_EMAIL }}
-      CLOUDFLARE_ORIGIN_CERT: ${{ secrets.CLOUDFLARE_ORIGIN_CERT }}
-      CLOUDFLARE_ORIGIN_KEY: ${{ secrets.CLOUDFLARE_ORIGIN_KEY }}
-
-    steps:
-      - name: Checkout repository
-        uses: actions/checkout@8e8c483db84b4bee98b60c0593521ed34d9990e8 # v6.0.1
-
-      - name: Validate deployment configuration
-        run: |
-          set -eu
-          for required in \
-            GCP_PROJECT_ID \
-            GCP_WORKLOAD_IDENTITY_PROVIDER \
-            GCP_DEPLOYER_SERVICE_ACCOUNT \
-            AR_LOCATION \
-            AR_REPOSITORY \
-            GCE_VM_NAME \
-            GCE_ZONE \
-            DEPLOY_PATH \
-            TLS_ADMIN_EMAIL \
-            CLOUDFLARE_ORIGIN_CERT \
-            CLOUDFLARE_ORIGIN_KEY; do
-            if [ -z "${!required}" ]; then
-              echo "Missing GitHub Actions variable: $required" >&2
-              exit 1
-            fi
-          done
-
-      - name: Authenticate to Google Cloud with Workload Identity Federation
-        uses: google-github-actions/auth@7c6bc770dae815cd3e89ee6cdf493a5fab2cc093 # v3.0.0
-        with:
-          project_id: ${{ env.GCP_PROJECT_ID }}
-          workload_identity_provider: ${{ env.GCP_WORKLOAD_IDENTITY_PROVIDER }}
-          service_account: ${{ env.GCP_DEPLOYER_SERVICE_ACCOUNT }}
-
-      - name: Set up Google Cloud CLI
-        uses: google-github-actions/setup-gcloud@aa5489c8933f4cc7a4f7d45035b3b1440c9c10db # v3.0.1
-        with:
-          version: '>= 416.0.0'
-          project_id: ${{ env.GCP_PROJECT_ID }}
-
-      - name: Pull immutable images and deploy on the VM
-        run: |
-          set -eu
-          CERT_B64=$(printf '%s' "$CLOUDFLARE_ORIGIN_CERT" | base64 -w 0)
-          KEY_B64=$(printf '%s' "$CLOUDFLARE_ORIGIN_KEY" | base64 -w 0)
-          IMAGE_PREFIX="${AR_LOCATION}-docker.pkg.dev/${GCP_PROJECT_ID}/${AR_REPOSITORY}"
-          REMOTE_SCRIPT=$(cat <<EOF
-          set -eu
-          test -d '$DEPLOY_PATH/.git'
-          cd '$DEPLOY_PATH'
-          git fetch --prune origin
-          git checkout --force main
-          git reset --hard origin/main
-
-          # Inject Cloudflare Certificates from GitHub Secrets
-          echo '$CERT_B64' | base64 -d > infra/docker/origin.pem
-          echo '$KEY_B64' | base64 -d > infra/docker/origin.key
-          chmod 600 infra/docker/origin.key
-
-          gcloud auth configure-docker '${AR_LOCATION}-docker.pkg.dev' --quiet
-          export BACKEND_IMAGE='$IMAGE_PREFIX/backend:${GITHUB_SHA}-${GITHUB_RUN_ID}'
-          export FRONTEND_IMAGE='$IMAGE_PREFIX/frontend:${GITHUB_SHA}-${GITHUB_RUN_ID}'
-          export AI_SERVICE_IMAGE='$IMAGE_PREFIX/ai-service:${GITHUB_SHA}-${GITHUB_RUN_ID}'
-          export TLS_ADMIN_EMAIL='$TLS_ADMIN_EMAIL'
-          COMPOSE_FILES='-f compose.yaml -f infra/docker/compose.images.yaml'
-          if [ -f .env.cloud-sql ]; then
-            COMPOSE_FILES="\$COMPOSE_FILES -f infra/docker/compose.cloud-sql.yaml"
-            docker compose --env-file .env.cloud-sql \$COMPOSE_FILES pull
-            docker compose --profile web --env-file .env.cloud-sql \$COMPOSE_FILES up -d --no-build cloud-sql-proxy backend ai-service frontend caddy
-            docker compose --env-file .env.cloud-sql \$COMPOSE_FILES exec -T backend npm run db:check --workspace=apps/backend
-          else
-            docker compose \$COMPOSE_FILES pull
-            docker compose --profile web \$COMPOSE_FILES up -d --no-build postgres backend ai-service frontend caddy
-          fi
-          docker compose --profile web \$COMPOSE_FILES ps
-          echo "=== Cleaning up unused/dangling Docker images on VM ==="
-          docker image prune -af --filter "until=72h" || true
-          EOF
-          )
-          REMOTE_SCRIPT_B64="$(printf '%s' "$REMOTE_SCRIPT" | base64 -w 0)"
-          gcloud compute ssh "$GCE_VM_NAME" \
-            --project="$GCP_PROJECT_ID" \
-            --zone="$GCE_ZONE" \
-            --tunnel-through-iap \
-            --command="echo '$REMOTE_SCRIPT_B64' | base64 -d | bash"
