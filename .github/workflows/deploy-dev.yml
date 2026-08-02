@@ -116,7 +116,7 @@ jobs:
           docker compose \$COMPOSE_FILES ps
           EOF
           )
-          REMOTE_SCRIPT_B64="$(printf '%s' "$REMOTE_SCRIPT" | base64 | tr -d '\\n')"
+          REMOTE_SCRIPT_B64="$(printf '%s' "$REMOTE_SCRIPT" | base64 -w 0)"
           gcloud compute ssh "$GCE_VM_NAME" \
             --project="$GCP_PROJECT_ID" \
             --zone="$GCE_ZONE" \
