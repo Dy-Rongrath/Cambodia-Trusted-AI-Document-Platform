@@ -91,30 +91,33 @@ jobs:
         run: |
           set -eu
           IMAGE_PREFIX="${AR_LOCATION}-docker.pkg.dev/${GCP_PROJECT_ID}/${AR_REPOSITORY}"
+          REMOTE_SCRIPT=$(cat <<EOF
+          set -eu
+          test -d '$DEPLOY_PATH/.git'
+          cd '$DEPLOY_PATH'
+          git fetch --prune origin
+          git checkout --force main
+          git reset --hard origin/main
+          gcloud auth configure-docker '${AR_LOCATION}-docker.pkg.dev' --quiet
+          export BACKEND_IMAGE='$IMAGE_PREFIX/backend:${GITHUB_SHA}'
+          export FRONTEND_IMAGE='$IMAGE_PREFIX/frontend:${GITHUB_SHA}'
+          export AI_SERVICE_IMAGE='$IMAGE_PREFIX/ai-service:${GITHUB_SHA}'
+          COMPOSE_FILES='-f compose.yaml -f infra/docker/compose.images.yaml'
+          if [ -f .env.cloud-sql ]; then
+            COMPOSE_FILES="\$COMPOSE_FILES -f infra/docker/compose.cloud-sql.yaml"
+            docker compose --env-file .env.cloud-sql \$COMPOSE_FILES pull
+            docker compose --env-file .env.cloud-sql \$COMPOSE_FILES up -d --no-build cloud-sql-proxy backend ai-service frontend
+            docker compose --env-file .env.cloud-sql \$COMPOSE_FILES exec -T backend npm run db:check --workspace=apps/backend
+          else
+            docker compose \$COMPOSE_FILES pull
+            docker compose \$COMPOSE_FILES up -d --no-build postgres backend ai-service frontend
+          fi
+          docker compose \$COMPOSE_FILES ps
+          EOF
+          )
+          REMOTE_SCRIPT_B64="$(printf '%s' "$REMOTE_SCRIPT" | base64 | tr -d '\\n')"
           gcloud compute ssh "$GCE_VM_NAME" \
             --project="$GCP_PROJECT_ID" \
             --zone="$GCE_ZONE" \
             --tunnel-through-iap \
-            --command="
-              set -eu
-              test -d '$DEPLOY_PATH/.git'
-              cd '$DEPLOY_PATH'
-              git fetch --prune origin
-              git checkout --force main
-              git reset --hard origin/main
-              gcloud auth configure-docker '${AR_LOCATION}-docker.pkg.dev' --quiet
-              export BACKEND_IMAGE='$IMAGE_PREFIX/backend:${GITHUB_SHA}'
-              export FRONTEND_IMAGE='$IMAGE_PREFIX/frontend:${GITHUB_SHA}'
-              export AI_SERVICE_IMAGE='$IMAGE_PREFIX/ai-service:${GITHUB_SHA}'
-              COMPOSE_FILES='-f compose.yaml -f infra/docker/compose.images.yaml'
-              if [ -f .env.cloud-sql ]; then
-                COMPOSE_FILES="\$COMPOSE_FILES -f infra/docker/compose.cloud-sql.yaml"
-                docker compose --env-file .env.cloud-sql \$COMPOSE_FILES pull
-                docker compose --env-file .env.cloud-sql \$COMPOSE_FILES up -d --no-build cloud-sql-proxy backend ai-service frontend
-                docker compose --env-file .env.cloud-sql \$COMPOSE_FILES exec -T backend npm run db:check --workspace=apps/backend
-              else
-                docker compose \$COMPOSE_FILES pull
-                docker compose \$COMPOSE_FILES up -d --no-build postgres backend ai-service frontend
-              fi
-              docker compose \$COMPOSE_FILES ps
-            "
+            --command="echo '$REMOTE_SCRIPT_B64' | base64 -d | bash"
