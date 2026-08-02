@@ -73,9 +73,11 @@ The legacy backend and AI-service `/health` endpoints remain available for backw
 
 ---
 
-### Optional Cloud SQL Development Connection
+### Cloud SQL Database Connection (Managed Target)
 
-Local PostgreSQL remains the default and continues to use `./scripts/docker/start.sh`. To run the backend against a Google Cloud SQL for PostgreSQL instance instead, use the opt-in Cloud SQL Auth Proxy profile:
+The managed database target is Google Cloud SQL for PostgreSQL 18.4. Whenever a `.env.cloud-sql` environment file is present in the repository root, standard Docker scripts (`./scripts/docker/start.sh`, `./scripts/docker/db-check.sh`, `./scripts/docker/stop.sh`) and the deployment workflow automatically prioritize Cloud SQL via the Cloud SQL Auth Proxy profile. When `.env.cloud-sql` is absent, `./scripts/docker/start.sh` falls back to the local `postgres:17.4-alpine` compatibility container.
+
+To configure and run Cloud SQL:
 
 1. Use a PostgreSQL 18 Cloud SQL instance. The approved managed target is PostgreSQL 18.4; the existing PostgreSQL 17.4 local environment remains available as a compatibility fallback and is not removed by this profile.
 2. Enable the Cloud SQL Admin API and grant the authenticating principal the least-privilege `Cloud SQL Client` role, scoped to the development instance where possible.
