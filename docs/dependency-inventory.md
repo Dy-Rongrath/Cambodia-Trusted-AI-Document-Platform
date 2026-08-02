@@ -142,13 +142,13 @@ Python version constraint: `>=3.12,<3.13` (bounded, matching `.python-version` =
 
 ## 6. GitHub Actions
 
-| Action | Version / SHA | Purpose |
-| --- | --- | --- |
-| `actions/checkout` | `8e8c483db84b4bee98b60c0593521ed34d9990e8` | Repository checkout |
-| `google-github-actions/auth` | `7c6bc770dae815cd3e89ee6cdf493a5fab2cc093` | GCP Workload Identity auth |
-| `google-github-actions/setup-gcloud` | `aa5489c8933f4cc7a4f7d45035b3b1440c9c10db` | gcloud CLI setup |
-| `docker/setup-buildx-action` | `6524bf65af31da8d45b59e8c27de4bd072b392f5` | Docker Buildx setup |
-| `docker/build-push-action` | `ca877d9245402d1537745e0e356eab47c3520991` | Docker image build & push |
+| Action                               | Version / SHA                              | Purpose                    |
+| ------------------------------------ | ------------------------------------------ | -------------------------- |
+| `actions/checkout`                   | `8e8c483db84b4bee98b60c0593521ed34d9990e8` | Repository checkout        |
+| `google-github-actions/auth`         | `7c6bc770dae815cd3e89ee6cdf493a5fab2cc093` | GCP Workload Identity auth |
+| `google-github-actions/setup-gcloud` | `aa5489c8933f4cc7a4f7d45035b3b1440c9c10db` | gcloud CLI setup           |
+| `docker/setup-buildx-action`         | `6524bf65af31da8d45b59e8c27de4bd072b392f5` | Docker Buildx setup        |
+| `docker/build-push-action`           | `ca877d9245402d1537745e0e356eab47c3520991` | Docker image build & push  |
 
 > [!NOTE]
 > The MCP SDK override affects Angular CLI development tooling only; it does not install, enable, or configure

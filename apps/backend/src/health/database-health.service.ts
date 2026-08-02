@@ -6,7 +6,9 @@ import { Pool } from 'pg';
 
 export const DATABASE_HEALTH_CLIENT = Symbol('DATABASE_HEALTH_CLIENT');
 
-export type DatabaseHealthClient = Pick<PrismaClient, '$queryRaw' | '$disconnect'> & { _pool?: Pool };
+export type DatabaseHealthClient = Pick<PrismaClient, '$queryRaw' | '$disconnect'> & {
+  _pool?: Pool;
+};
 
 export function createDatabaseHealthClient(): DatabaseHealthClient | null {
   const connectionString = process.env['DATABASE_URL'];

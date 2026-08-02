@@ -149,12 +149,12 @@ jobs:
       - name: Secure Certificate Transfer and Deployment
         run: |
           set -eu
-          
+
           # 1. Write secrets to temporary files
           umask 077
           printf '%s' "$CLOUDFLARE_ORIGIN_CERT" > "$RUNNER_TEMP/origin.pem"
           printf '%s' "$CLOUDFLARE_ORIGIN_KEY" > "$RUNNER_TEMP/origin.key"
-          
+
           # 2. Transfer to VM temp directory
           gcloud compute ssh "$GCE_VM_NAME" \
             --project="$GCP_PROJECT_ID" \
@@ -173,7 +173,7 @@ jobs:
           set -eu
           test -d '$DEPLOY_PATH/.git'
           cd '$DEPLOY_PATH'
-          
+
           git fetch --prune origin
           git checkout --force main
           git fetch origin '${{ github.event.inputs.DEPLOY_SHA }}' --no-tags
@@ -188,16 +188,16 @@ jobs:
           rmdir /tmp/trusted-ai-certs
 
           gcloud auth configure-docker '${AR_LOCATION}-docker.pkg.dev' --quiet
-          
+
           export BACKEND_IMAGE='$IMAGE_PREFIX/backend:${{ github.event.inputs.DEPLOY_SHA }}-${GITHUB_RUN_ID}'
           export FRONTEND_IMAGE='$IMAGE_PREFIX/frontend:${{ github.event.inputs.DEPLOY_SHA }}-${GITHUB_RUN_ID}'
           export AI_SERVICE_IMAGE='$IMAGE_PREFIX/ai-service:${{ github.event.inputs.DEPLOY_SHA }}-${GITHUB_RUN_ID}'
           export TLS_ADMIN_EMAIL='$TLS_ADMIN_EMAIL'
           export CADDY_ORIGIN_CERT_FILE='$DEPLOY_CERT_DIR/origin.pem'
           export CADDY_ORIGIN_KEY_FILE='$DEPLOY_CERT_DIR/origin.key'
-          
+
           COMPOSE_FILES='-f compose.yaml -f infra/docker/compose.images.yaml -f infra/docker/compose.deployment.yaml'
-          
+
           if [ -f .env.cloud-sql ]; then
             COMPOSE_FILES="\$COMPOSE_FILES -f infra/docker/compose.cloud-sql.yaml -f infra/docker/compose.deployment.yaml"
             docker compose --env-file .env.cloud-sql \$COMPOSE_FILES pull
@@ -207,14 +207,14 @@ jobs:
             docker compose \$COMPOSE_FILES pull
             docker compose \$COMPOSE_FILES up -d --no-build postgres backend ai-service frontend caddy
           fi
-          
+
           docker compose \$COMPOSE_FILES ps
-          
+
           echo "=== Cleaning up unused/dangling Docker images on VM ==="
           docker image prune -af --filter "until=72h" || true
           EOF
           )
-          
+
           REMOTE_SCRIPT_B64="\$(printf '%s' "\$REMOTE_SCRIPT" | base64 -w 0)"
           gcloud compute ssh "$GCE_VM_NAME" \
             --project="$GCP_PROJECT_ID" \
