@@ -99,7 +99,7 @@ jobs:
           FRONTEND_IMAGE=test BACKEND_IMAGE=test AI_SERVICE_IMAGE=test CADDY_ORIGIN_CERT_FILE=/test CADDY_ORIGIN_KEY_FILE=/test docker compose -f compose.yaml -f infra/docker/compose.images.yaml -f infra/docker/compose.deployment.yaml config >/dev/null
 
           echo "-- Deployment with Cloud SQL --"
-          FRONTEND_IMAGE=test BACKEND_IMAGE=test AI_SERVICE_IMAGE=test CADDY_ORIGIN_CERT_FILE=/test CADDY_ORIGIN_KEY_FILE=/test docker compose -f compose.yaml -f infra/docker/compose.images.yaml -f infra/docker/compose.cloud-sql.yaml -f infra/docker/compose.deployment.yaml config >/dev/null
+          FRONTEND_IMAGE=test BACKEND_IMAGE=test AI_SERVICE_IMAGE=test CADDY_ORIGIN_CERT_FILE=/test CADDY_ORIGIN_KEY_FILE=/test CLOUD_SQL_DATABASE_URL=test docker compose -f compose.yaml -f infra/docker/compose.images.yaml -f infra/docker/compose.cloud-sql.yaml -f infra/docker/compose.deployment.yaml config >/dev/null
 
           echo "=== Checking for privileged containers ==="
           if docker compose config | grep -E 'privileged:\s*true'; then
