@@ -3,13 +3,16 @@
 }
 
 cambodia-trusted-ai-dev.dyrongrath.com {
+    tls internal
     reverse_proxy frontend:8080
 }
 
 cambodia-trusted-ai-api.dyrongrath.com {
+    tls internal
     reverse_proxy backend:3000
 }
 
 cambodia-trusted-ai-ai.dyrongrath.com {
+    tls internal
     reverse_proxy ai-service:8000
 }
