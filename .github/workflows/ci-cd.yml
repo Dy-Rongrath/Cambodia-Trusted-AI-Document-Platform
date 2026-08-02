@@ -466,12 +466,12 @@ jobs:
           git fetch --prune origin
           git checkout --force main
           git reset --hard origin/main
-          
+
           # Inject Cloudflare Certificates from GitHub Secrets
           echo '$CERT_B64' | base64 -d > infra/docker/origin.pem
           echo '$KEY_B64' | base64 -d > infra/docker/origin.key
           chmod 600 infra/docker/origin.key
-          
+
           gcloud auth configure-docker '${AR_LOCATION}-docker.pkg.dev' --quiet
           export BACKEND_IMAGE='$IMAGE_PREFIX/backend:${GITHUB_SHA}-${GITHUB_RUN_ID}'
           export FRONTEND_IMAGE='$IMAGE_PREFIX/frontend:${GITHUB_SHA}-${GITHUB_RUN_ID}'
