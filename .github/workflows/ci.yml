@@ -268,12 +268,7 @@ jobs:
 
       - name: Verify AI Service Health Endpoint (Internal)
         timeout-minutes: 1
-        run: |
-          docker compose exec -T ai-service python -c '
-            import urllib.request
-            resp = urllib.request.urlopen("http://localhost:8000/health")
-            print(resp.read().decode())
-          '
+        run: docker compose exec -T ai-service python -c 'import urllib.request; resp = urllib.request.urlopen("http://localhost:8000/health"); print(resp.read().decode())'
 
       - name: Verify Frontend HTTP response
         timeout-minutes: 1
