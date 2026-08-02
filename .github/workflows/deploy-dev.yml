@@ -108,13 +108,13 @@ jobs:
               export AI_SERVICE_IMAGE='$IMAGE_PREFIX/ai-service:${GITHUB_SHA}'
               COMPOSE_FILES='-f compose.yaml -f infra/docker/compose.images.yaml'
               if [ -f .env.cloud-sql ]; then
-                COMPOSE_FILES="$COMPOSE_FILES -f infra/docker/compose.cloud-sql.yaml"
-                docker compose --env-file .env.cloud-sql $COMPOSE_FILES pull
-                docker compose --env-file .env.cloud-sql $COMPOSE_FILES up -d --no-build cloud-sql-proxy backend ai-service frontend
-                docker compose --env-file .env.cloud-sql $COMPOSE_FILES exec -T backend npm run db:check --workspace=apps/backend
+                COMPOSE_FILES="\$COMPOSE_FILES -f infra/docker/compose.cloud-sql.yaml"
+                docker compose --env-file .env.cloud-sql \$COMPOSE_FILES pull
+                docker compose --env-file .env.cloud-sql \$COMPOSE_FILES up -d --no-build cloud-sql-proxy backend ai-service frontend
+                docker compose --env-file .env.cloud-sql \$COMPOSE_FILES exec -T backend npm run db:check --workspace=apps/backend
               else
-                docker compose $COMPOSE_FILES pull
-                docker compose $COMPOSE_FILES up -d --no-build postgres backend ai-service frontend
+                docker compose \$COMPOSE_FILES pull
+                docker compose \$COMPOSE_FILES up -d --no-build postgres backend ai-service frontend
               fi
-              docker compose $COMPOSE_FILES ps
+              docker compose \$COMPOSE_FILES ps
             "
