@@ -5,29 +5,29 @@ description = "FastAPI AI service skeleton for Cambodia Trusted AI Document Plat
 readme = "README.md"
 requires-python = ">=3.12,<3.13"
 dependencies = [
-    "fastapi==0.115.8",
-    "uvicorn[standard]==0.34.0",
-    "pydantic==2.10.6",
+    "fastapi==0.141.1",
+    "uvicorn[standard]==0.52.1",
+    "pydantic==2.13.4",
 ]
 
 [project.optional-dependencies]
 dev = [
-    "pytest==8.3.4",
+    "pytest==9.1.1",
     "httpx==0.28.1",
-    "ruff==0.9.6",
-    "mypy==1.15.0",
+    "ruff==0.16.1",
+    "mypy==2.3.0",
 ]
 
 [dependency-groups]
 dev = [
-    "pytest==8.3.4",
+    "pytest==9.1.1",
     "httpx==0.28.1",
-    "ruff==0.9.6",
-    "mypy==1.15.0",
+    "ruff==0.16.1",
+    "mypy==2.3.0",
 ]
 
 [build-system]
-requires = ["hatchling"]
+requires = ["hatchling==1.31.0"]
 build-backend = "hatchling.build"
 
 [tool.hatch.build.targets.wheel]

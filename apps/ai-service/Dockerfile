@@ -12,7 +12,7 @@ ENV PYTHONUNBUFFERED=1 \
 # Development — install all deps (including dev) for hot-reload and testing
 # ---------------------------------------------------------------------------
 FROM base AS development
-COPY --from=ghcr.io/astral-sh/uv:0.5-python3.12-bookworm-slim /uv /bin/uv
+COPY --from=ghcr.io/astral-sh/uv:0.12.1 /uv /bin/uv
 COPY apps/ai-service/pyproject.toml apps/ai-service/uv.lock* apps/ai-service/.python-version apps/ai-service/README.md ./
 RUN uv sync --frozen --extra dev
 COPY apps/ai-service/src ./src
@@ -30,19 +30,24 @@ RUN uv run mypy src
 RUN uv run pytest
 
 # ---------------------------------------------------------------------------
-# Runtime — frozen production install, non-root user
-# Uses --frozen to ensure the lockfile is respected exactly.
-# USER nobody is replaced by a dedicated system user to avoid .venv
-# ownership conflicts (venv is built as root, then ownership is corrected).
+# Production dependencies — create the frozen virtual environment with uv.
+# ---------------------------------------------------------------------------
+FROM base AS production-dependencies
+COPY --from=ghcr.io/astral-sh/uv:0.12.1 /uv /bin/uv
+COPY apps/ai-service/pyproject.toml apps/ai-service/uv.lock* apps/ai-service/.python-version apps/ai-service/README.md ./
+RUN uv sync --frozen --no-dev
+
+# ---------------------------------------------------------------------------
+# Runtime — production virtual environment only, without uv build tooling.
 # ---------------------------------------------------------------------------
 FROM base AS runtime
-COPY --from=ghcr.io/astral-sh/uv:0.5-python3.12-bookworm-slim /uv /bin/uv
-# Create a dedicated non-root system user before installing dependencies
+ENV PATH="/app/apps/ai-service/.venv/bin:${PATH}" \
+    PYTHONPATH="/app/apps/ai-service/src"
 RUN groupadd -r aiuser && useradd -r -g aiuser -d /app/apps/ai-service aiuser
-COPY apps/ai-service/pyproject.toml apps/ai-service/uv.lock* apps/ai-service/.python-version apps/ai-service/README.md ./
-# Install only production deps with frozen resolution; chown .venv to app user
-RUN uv sync --frozen --no-dev && chown -R aiuser:aiuser .
+COPY --chown=aiuser:aiuser --from=production-dependencies /app/apps/ai-service/.venv ./.venv
 COPY --chown=aiuser:aiuser apps/ai-service/src ./src
 USER aiuser
 EXPOSE 8000
-CMD ["uv", "run", "uvicorn", "trusted_ai_service.main:app", "--host", "0.0.0.0", "--port", "8000"]
+HEALTHCHECK --interval=30s --timeout=5s --start-period=10s --retries=3 \
+  CMD python -c 'import urllib.request; urllib.request.urlopen("http://127.0.0.1:8000/health/ready", timeout=2)'
+CMD ["uvicorn", "trusted_ai_service.main:app", "--host", "0.0.0.0", "--port", "8000"]

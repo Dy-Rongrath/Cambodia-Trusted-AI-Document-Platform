@@ -17,4 +17,14 @@ class HealthResponse(BaseModel):
 
 @app.get("/health", response_model=HealthResponse)
 def get_health() -> dict[str, Any]:
+    return get_liveness()
+
+
+@app.get("/health/live", response_model=HealthResponse)
+def get_liveness() -> dict[str, Any]:
+    return {"status": "ok", "service": "ai-service"}
+
+
+@app.get("/health/ready", response_model=HealthResponse)
+def get_readiness() -> dict[str, Any]:
     return {"status": "ok", "service": "ai-service"}

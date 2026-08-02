@@ -69,17 +69,17 @@ See [ADR-0001](docs/adr/ADR-0001-monorepo-strategy.md). A modular monolith keeps
 
 ## 3. Module Responsibilities (NestJS Backend)
 
-| Module                 | Owns                                           | Responsibilities                                                                                                 |
-| ---------------------- | ---------------------------------------------- | ---------------------------------------------------------------------------------------------------------------- |
-| `AuthModule`           | JWT validation, session                        | Token verification, user context extraction, Keycloak integration.                                               |
-| `OrganisationModule`   | `organisations` table                          | Tenant management, organisation CRUD, tenant-context middleware.                                                 |
-| `UserModule`           | `users` table                                  | User profile management, role assignments within a tenant.                                                       |
-| `DocumentModule`       | `documents`, `document_files` tables           | Document upload, metadata storage, file-lifecycle management.                                                    |
-| `ClassificationModule` | `classification_results` table                 | Communicates with AI service, stores predictions, evaluates confidence, sets `REVIEW_REQUIRED` status. (Phase 6) |
-| `ReviewModule`         | `review_tasks`, `review_decisions` tables      | Human-review workflow management: queue, reviewer UI, decision submission, override metrics. (Phase 7)           |
-| `CredentialModule`     | `credentials`, `credential_revocations` tables | Credential issuance (SD-JWT VC), signing, revocation. (Phase 11)                                                 |
-| `AuditModule`          | `audit_events` table                           | Append-only audit event recording. Shared service used by all other modules.                                     |
-| `HealthModule`         | —                                              | `/health` endpoint for Docker and Kubernetes health checks.                                                      |
+| Module                 | Owns                                           | Responsibilities                                                                                                       |
+| ---------------------- | ---------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------- |
+| `AuthModule`           | JWT validation, session                        | Token verification, user context extraction, Keycloak integration.                                                     |
+| `OrganisationModule`   | `organisations` table                          | Tenant management, organisation CRUD, tenant-context middleware.                                                       |
+| `UserModule`           | `users` table                                  | User profile management, role assignments within a tenant.                                                             |
+| `DocumentModule`       | `documents`, `document_files` tables           | Document upload, metadata storage, file-lifecycle management.                                                          |
+| `ClassificationModule` | `classification_results` table                 | Communicates with AI service, stores predictions, evaluates confidence, sets `REVIEW_REQUIRED` status. (Phase 6)       |
+| `ReviewModule`         | `review_tasks`, `review_decisions` tables      | Human-review workflow management: queue, reviewer UI, decision submission, override metrics. (Phase 7)                 |
+| `CredentialModule`     | `credentials`, `credential_revocations` tables | Credential issuance (SD-JWT VC), signing, revocation. (Phase 11)                                                       |
+| `AuditModule`          | `audit_events` table                           | Append-only audit event recording. Shared service used by all other modules.                                           |
+| `HealthModule`         | —                                              | Backward-compatible `/health`, process liveness at `/health/live`, and PostgreSQL-backed readiness at `/health/ready`. |
 
 ### Module isolation rules
 
@@ -127,7 +127,7 @@ graph TB
     end
 
     subgraph "Internal Network — Data Layer"
-        PostgreSQL["PostgreSQL 17\n(Row-Level Security)"]
+        PostgreSQL["PostgreSQL 18\n(Row-Level Security)"]
         ObjectStorage["Object Storage\n(Encrypted at rest)"]
         MLflow["MLflow\n(Model Registry)"]
     end

@@ -28,12 +28,12 @@ CMD ["npm", "run", "start", "--workspace=apps/frontend", "--", "--host", "0.0.0.
 
 # ---------------------------------------------------------------------------
 # Test — Vitest unit tests run in Node.js (no browser required)
-# Angular 20 @angular/build:unit-test uses Vitest with jsdom emulation.
+# Angular @angular/build:unit-test uses Vitest with jsdom emulation.
 # No Chromium or Xvfb needed.
 # ---------------------------------------------------------------------------
 FROM development AS test
 ENV CI=true
-CMD ["npm", "run", "test", "--workspace=apps/frontend"]
+RUN npm run test --workspace=apps/frontend
 
 # ---------------------------------------------------------------------------
 # Build — production AOT compilation
@@ -42,10 +42,14 @@ FROM development AS build
 RUN npm run build --workspace=apps/frontend
 
 # ---------------------------------------------------------------------------
-# Runtime — Nginx serves only the pre-built static assets.
+# Runtime — non-root Nginx serves only the pre-built static assets.
 # No Angular CLI, no Node.js, no Chromium in the final image.
 # ---------------------------------------------------------------------------
 FROM nginx:1.27.5-alpine AS runtime
-COPY --from=build /app/apps/frontend/dist/frontend/browser /usr/share/nginx/html
-EXPOSE 80
+COPY apps/frontend/nginx.conf /etc/nginx/nginx.conf
+COPY --chown=nginx:nginx --from=build /app/apps/frontend/dist/frontend/browser /usr/share/nginx/html
+USER nginx
+EXPOSE 8080
+HEALTHCHECK --interval=30s --timeout=5s --start-period=5s --retries=3 \
+  CMD wget --no-verbose --tries=1 --spider http://127.0.0.1:8080/health/ready || exit 1
 CMD ["nginx", "-g", "daemon off;"]

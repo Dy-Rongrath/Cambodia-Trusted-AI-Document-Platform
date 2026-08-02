@@ -11,6 +11,6 @@
     "test": "echo \"No tests specified for shared-types\""
   },
   "devDependencies": {
-    "typescript": "5.7.3"
+    "typescript": "6.0.3"
   }
 }

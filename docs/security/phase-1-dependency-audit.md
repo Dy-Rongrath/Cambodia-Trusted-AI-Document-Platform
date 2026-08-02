@@ -1,174 +1,134 @@
 # Phase 1 Dependency Security Audit
 
-> **Status:** Active — updated as findings are remediated.
+> **Status:** Active — latest-stable dependency upgrade audited.
 > **Last updated:** 2026-08-02
 > **Classification:** Public project policy — must not contain secrets or restricted operational details.
-> **Audit tool:** `npm audit` (npm 11.x, Node.js 24.15.0)
-> **Audit scope:** Root npm workspace including `apps/backend`, `apps/frontend`, `packages/shared-types`
+> **Audit tools:** `npm audit` (npm 11.12.1) and `pip-audit` 2.10.1 (ephemeral execution through `uvx`)
+> **Audit scope:** npm workspaces and `apps/ai-service/uv.lock`
 
 ---
 
 ## Executive Summary
 
-| Ecosystem | Total findings (pre-remediation) | Runtime findings (`--omit=dev`) | After Angular 20 upgrade | Status |
-|---|---:|---:|---|---|
-| npm (Node.js) | 57 (Angular 19 lockfile) | Pending re-audit after Angular 20 | Expected significantly reduced | Pending final audit |
-| Python (`uv.lock`) | 0 known at audit time | 0 | No change | Compliant |
+| Ecosystem          | Full dependency graph | Runtime findings | Status                                                       |
+| ------------------ | --------------------: | ---------------: | ------------------------------------------------------------ |
+| npm (Node.js)      |            3 moderate |                0 | Runtime compliant; upstream development-tool findings remain |
+| Python (`uv.lock`) |               0 known |          0 known | Compliant at audit time                                      |
 
-> [!IMPORTANT]
-> The 57 npm findings were reported against the **Angular 19.1.8 lockfile** before the Angular 20 migration in
-> this branch. Many of those findings were transitive vulnerabilities through Angular's Webpack/Karma toolchain
-> (dev-only). After the Angular 20 migration removes Karma, Webpack, and associated build tools, the finding
-> count is expected to decrease substantially.
->
-> The final authoritative audit must be re-run after `npm install` regenerates the lockfile for Angular 20.
-> This document records the pre-migration baseline and will be updated once the final lockfile is produced.
+The previous Angular 19 lockfile baseline contained 57 findings. After upgrading to Angular 22.1.x and
+regenerating `package-lock.json`, no critical or high findings remain. The three remaining moderate findings
+are reachable only through the Angular CLI development toolchain and are absent from `npm audit --omit=dev`.
 
 ---
 
-## 1. npm Audit — Pre-Migration Baseline (Angular 19 Lockfile)
+## 1. npm Audit — Upgraded Lockfile
 
-### Command executed
+### Commands executed
 
 ```bash
-# Run inside clean Docker container against Angular 19 lockfile
-docker run --rm -v <repo>:/app -w /app node:24-alpine3.21 sh -c \
-  "npm ci && npm audit && npm audit --omit=dev && npm audit --json > /tmp/audit.json"
+npm audit --json
+npm audit --omit=dev --json
+npm run audit:production
 ```
 
-**Reported by prior CI run (Angular 19 baseline):** 57 vulnerabilities
+### Results
 
-| Severity | Count |
-|---|---:|
-| Critical | 1 |
-| High | 27 |
-| Moderate | 23 |
-| Low | 6 |
-| **Total** | **57** |
+| Severity  | Full graph | Production graph |
+| --------- | ---------: | ---------------: |
+| Critical  |          0 |                0 |
+| High      |          0 |                0 |
+| Moderate  |          3 |                0 |
+| Low       |          0 |                0 |
+| **Total** |      **3** |            **0** |
 
-### Finding Classification
+### Remaining finding classification
+
+| Package                            | Severity | Direct/Transitive     | Scope            | Dependency path                                                    | Remediation status                                             |
+| ---------------------------------- | -------- | --------------------- | ---------------- | ------------------------------------------------------------------ | -------------------------------------------------------------- |
+| `@angular/cli` 22.1.2              | Moderate | Direct dev dependency | Development only | `@angular/cli` → `@modelcontextprotocol/sdk` → `@hono/node-server` | No patched Angular 22 release available at audit time          |
+| `@modelcontextprotocol/sdk` 1.29.0 | Moderate | Transitive            | Development only | Angular CLI tooling                                                | Await upstream Angular CLI dependency update                   |
+| `@hono/node-server` `<2.0.5`       | Moderate | Transitive            | Development only | Angular CLI MCP tooling                                            | Path traversal advisory affects Hono static serving on Windows |
+
+`npm audit` proposes Angular CLI 21.0.4 as the available resolution. That is a major downgrade and would
+break alignment with Angular 22.1.0/22.1.2, so it was not applied. The application does not import or expose
+these packages at runtime, and the production-only audit reports zero findings.
+
+An upstream version check on 2026-08-02 confirmed that Angular CLI 22.1.2 remains the latest release. Although
+`@modelcontextprotocol/sdk` 1.30.0 and `@hono/node-server` 2.0.12 are available, Angular CLI pins MCP SDK
+1.29.0 exactly. Overriding that pin would be an untested MCP SDK change and requires the separate MCP approval
+and review process defined in `MCP_SECURITY.md`; it was not applied.
+
+Static dependency tracing confirms that Angular CLI loads the MCP SDK through the separate `ng mcp` command.
+The platform build and application runtime do not execute that command. GHSA-frvp-7c67-39w9 additionally
+requires a Windows host serving static files through the affected Hono adapter; supported local development is
+Apple Silicon and the container runtime is Linux. The finding is therefore not exploitable in the approved
+platform paths, but remains tracked until Angular publishes a patched CLI dependency graph.
+
+### Operational control
+
+- Do not expose `ng serve` or other development servers to untrusted networks.
+- Do not execute or configure the Angular CLI MCP server without completing the mandatory MCP server review
+  and receiving maintainer approval.
+- Keep `npm run audit:production` in the canonical local and GitHub Actions quality gates. It fails on high or
+  critical production findings while the full dependency graph retains its separate critical-only CI check.
+- Re-run the audit when a newer Angular CLI 22 patch is published.
+- Do not use `npm audit fix --force`; it would silently downgrade the approved framework toolchain.
+
+---
+
+## 2. Python Dependency Audit (`uv.lock`)
+
+### Production CI command
+
+```bash
+docker run --rm -v <repo>/apps/ai-service:/workspace -w /workspace \
+  --entrypoint sh ghcr.io/astral-sh/uv:0.12.1-python3.12-trixie-slim -c \
+  'uv export --frozen --no-dev --no-emit-project --format requirements-txt \
+     --output-file /tmp/requirements.txt >/dev/null && \
+   uvx pip-audit==2.10.1 --strict --progress-spinner off --require-hashes \
+     --disable-pip -r /tmp/requirements.txt'
+```
+
+The CI export excludes development groups and the unpublished local project, retains the lockfile hashes, and
+audits only pinned third-party production packages. `--disable-pip` prevents dependency re-resolution from
+drifting away from `uv.lock`, while `--strict` fails if dependency collection is incomplete.
+
+**Execution date:** 2026-08-02
+
+**Production CI result:** No known vulnerabilities found in the locked third-party runtime dependencies. The
+unpublished local package is deliberately excluded from the export rather than passed to the advisory scanner.
+
+**Most recent full-graph result:** No known vulnerabilities found in the locked runtime, development, or build
+dependencies listed below.
+
+| Direct package | Version   | Scope       | Result            |
+| -------------- | --------- | ----------- | ----------------- |
+| `fastapi`      | `0.141.1` | Runtime     | No known findings |
+| `uvicorn`      | `0.52.1`  | Runtime     | No known findings |
+| `pydantic`     | `2.13.4`  | Runtime     | No known findings |
+| `pytest`       | `9.1.1`   | Development | No known findings |
+| `httpx`        | `0.28.1`  | Development | No known findings |
+| `ruff`         | `0.16.1`  | Development | No known findings |
+| `mypy`         | `2.3.0`   | Development | No known findings |
+| `hatchling`    | `1.31.0`  | Build       | No known findings |
 
 > [!NOTE]
-> Without the full `npm audit --json` output from the Angular 19 lockfile, this table records classifications
-> based on the known Angular 19 + Karma toolchain vulnerability patterns. The definitive finding table will
-> be populated after the Angular 20 lockfile is generated and re-audited.
-
-| # | Package (affected) | Severity | Direct/Transitive | Runtime/Dev | Dependency path (likely) | Fix availability | Phase 1 exposure | Remediation decision |
-|---|---|---|---|---|---|---|---|---|
-| 1 | Critical finding (TBD) | Critical | Transitive | Dev | Via Karma/Angular 19 build toolchain | Resolved by Angular 20 upgrade | None — dev only | Angular 20 migration removes the vulnerable toolchain |
-| 2–27 | High findings (TBD) | High | Transitive | Dev | Via `@angular-devkit/build-angular` Webpack | Resolved by Angular 20 upgrade | None — dev only | Angular 20 migration removes `@angular-devkit/build-angular` |
-| 28–50 | Moderate findings (TBD) | Moderate | Transitive | Mixed | Via Angular 19 build toolchain | Angular 20 upgrade expected to resolve most | Minimal — primarily build-time | Angular 20 migration |
-| 51–57 | Low findings (TBD) | Low | Transitive | Dev | Various | Assessed post-migration | None | Reviewed after migration |
-
-> [!CAUTION]
-> The **critical finding** from the Angular 19 baseline is expected to be resolved by the Angular 20 migration
-> which removes the `@angular-devkit/build-angular` (Webpack-based) build toolchain entirely. However, this
-> must be **confirmed** by running `npm audit --omit=dev` after the Angular 20 lockfile is generated.
-> If any critical finding persists in the runtime dependency tree, it requires explicit owner review and
-> documented acceptance before Phase 1 can be marked complete (acceptance criterion 30).
-
-### Runtime vs Development Separation
-
-Running `npm audit --omit=dev` against the Angular 19 baseline confirmed that all or nearly all high/critical
-findings were in development-only dependencies (Karma, Webpack, Angular build tools). No high-severity
-vulnerabilities were found in the **runtime** NestJS or Angular production bundle dependencies.
-
-This separation is confirmed by:
-- `@nestjs/*` 10.x has no known high/critical findings
-- `@prisma/client` 6.3.1 has no known high/critical findings
-- `rxjs` 7.8.1 has no known high/critical findings
-
-### Post-Angular-20 Remediation Plan
-
-1. User runs `npm install` inside pinned Docker container after package.json update
-2. `npm audit && npm audit --omit=dev` are re-run
-3. This document is updated with the final finding count and per-package table
-4. Any remaining runtime findings are classified and either remediated or documented with owner approval
+> Vulnerability databases change continuously. Refresh both audits whenever either lockfile changes.
 
 ---
 
-## 2. npm Audit — Post-Angular-20 (Pending)
+## 3. Accepted Temporary Risks
 
-> **Status: Pending** — to be completed after the user runs `npm install` to regenerate `package-lock.json`
-> for the Angular 20 dependency graph.
-
-**Required action:**
-
-```bash
-# Run inside Docker to regenerate lockfile and re-audit:
-docker run --rm -v <repo>:/app -w /app node:24.15.0-alpine3.22 sh -c \
-  "npm install && npm audit && npm audit --omit=dev"
-```
-
-This section will be updated with:
-- Final finding count by severity
-- Per-package classification table
-- Runtime vs dev separation
-- Remediation status for each finding
+| Risk                                     | Severity | Reason unresolved                                                                  | Required next action                                                           | Owner approval                   |
+| ---------------------------------------- | -------- | ---------------------------------------------------------------------------------- | ------------------------------------------------------------------------------ | -------------------------------- |
+| Angular CLI transitive MCP/Hono findings | Moderate | No patched Angular CLI 22 release exists; npm recommends an incompatible downgrade | Upgrade to the first patched Angular CLI 22 release and re-run both npm audits | Track until upstream remediation |
 
 ---
 
-## 3. Python Dependency Audit (`uv.lock`)
-
-### Command executed
-
-```bash
-# Run inside AI service Docker container
-docker run --rm -v <repo>/apps/ai-service:/app -w /app \
-  ghcr.io/astral-sh/uv:0.5-python3.12-bookworm-slim sh -c \
-  "uv sync --frozen --extra dev && uvx pip-audit --requirement <(uv pip freeze) 2>&1"
-```
-
-**Alternative (if pip-audit unavailable):**
-
-```bash
-# Using uv's built-in audit capability (uv 0.12+)
-uvx pip-audit
-```
-
-**Execution date:** 2026-08-02 (pending — to be run after Docker is available)
-
-**Database:** PyPA Advisory Database (pypi.org/pypa/advisory-database)
-
-### Findings
-
-| Package | Version | Severity | CVE | Status |
-|---|---|---|---|---|
-| `fastapi` | `0.115.8` | — | None known | No findings |
-| `uvicorn` | `0.34.0` | — | None known | No findings |
-| `pydantic` | `2.10.6` | — | None known | No findings |
-| `pytest` | `8.3.4` | — | None known | No findings (dev only) |
-| `httpx` | `0.28.1` | — | None known | No findings (dev only) |
-| `ruff` | `0.9.6` | — | None known | No findings (dev only) |
-| `mypy` | `1.15.0` | — | None known | No findings (dev only) |
-
-**Baseline assessment:** No Python runtime CVEs were known at the time of Phase 1 lockfile generation.
-All Python packages are pinned in `uv.lock` at exact versions.
-
-> [!NOTE]
-> This audit must be refreshed each time `uv.lock` is updated. The advisory database is continuously updated.
-> "No known vulnerabilities at audit time" does not guarantee no future findings.
-
-### Limitations
-
-- `pip-audit` was not installed as a permanent project dependency (ephemeral use via `uvx` only).
-- The PyPA advisory database does not cover all possible vulnerability sources.
-- Python transitive dependencies should also be audited: `uv tree` shows the full dependency graph.
-
----
-
-## 4. Accepted Temporary Risks
-
-| Risk | Severity | Reason unresolved | Required next action | Owner approval |
-|---|---|---|---|---|
-| npm audit post-Angular-20 not yet executed | High | Package-lock.json not yet regenerated for Angular 20 | User runs `npm install` in Docker, re-audits, updates this document | Required before marking Phase 1 complete |
-| Critical Angular 19 finding resolution not confirmed | Critical | Awaiting Angular 20 lockfile | Confirm critical finding is removed by `npm audit --omit=dev` post-migration | Required |
-
----
-
-## 5. References
+## 4. References
 
 - [npm audit documentation](https://docs.npmjs.com/cli/v11/commands/npm-audit)
+- [GHSA-frvp-7c67-39w9](https://github.com/advisories/GHSA-frvp-7c67-39w9)
 - [PyPA Advisory Database](https://github.com/pypa/advisory-database)
 - [pip-audit](https://github.com/pypa/pip-audit)
 - [docs/dependency-inventory.md](../dependency-inventory.md)

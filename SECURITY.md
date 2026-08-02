@@ -44,8 +44,8 @@ Only synthetic, anonymised, pseudonymised, or explicitly approved datasets may b
 
 ## 3. Trust Boundaries
 
-| Boundary                      | Between                           | Control                                                                                                  |
-| ----------------------------- | --------------------------------- | -------------------------------------------------------------------------------------------------------- |
+| Boundary                     | Between                           | Control                                                                                                  |
+| ---------------------------- | --------------------------------- | -------------------------------------------------------------------------------------------------------- |
 | **External ↔ Reverse Proxy** | Public internet and the platform  | TLS termination, rate limiting, WAF (Phase 16).                                                          |
 | **Reverse Proxy ↔ Backend**  | DMZ and internal network          | Internal HTTP only. No direct external access to backend.                                                |
 | **Backend ↔ AI Service**     | Backend and AI inference          | Private Docker network. Internal API key authentication.                                                 |

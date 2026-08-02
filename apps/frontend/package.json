@@ -9,28 +9,28 @@
     "watch": "ng build --watch --configuration development",
     "test": "ng test --no-watch --no-progress",
     "lint": "eslint \"src/**/*.ts\"",
-    "typecheck": "tsc --noEmit"
+    "typecheck": "tsc --noEmit -p tsconfig.app.json && tsc --noEmit -p tsconfig.spec.json"
   },
   "dependencies": {
-    "@angular/animations": "20.0.5",
-    "@angular/common": "20.0.5",
-    "@angular/compiler": "20.0.5",
-    "@angular/core": "20.0.5",
-    "@angular/forms": "20.0.5",
-    "@angular/platform-browser": "20.0.5",
-    "@angular/router": "20.0.5",
+    "@angular/animations": "22.1.0",
+    "@angular/common": "22.1.0",
+    "@angular/compiler": "22.1.0",
+    "@angular/core": "22.1.0",
+    "@angular/forms": "22.1.0",
+    "@angular/platform-browser": "22.1.0",
+    "@angular/router": "22.1.0",
     "rxjs": "7.8.2",
     "tslib": "2.8.1",
-    "zone.js": "0.15.0"
+    "zone.js": "0.16.2"
   },
   "devDependencies": {
-    "@angular/build": "20.0.5",
-    "@angular/cli": "20.0.5",
-    "@angular/compiler-cli": "20.0.5",
-    "@types/node": "22.15.29",
-    "@vitest/coverage-v8": "^2.2.0",
-    "jsdom": "^25.0.1",
-    "typescript": "5.8.3",
-    "vitest": "^2.2.0"
+    "@angular/build": "22.1.2",
+    "@angular/cli": "22.1.2",
+    "@angular/compiler-cli": "22.1.0",
+    "@types/node": "26.1.2",
+    "@vitest/coverage-v8": "^4.1.10",
+    "jsdom": "^30.0.1",
+    "typescript": "6.0.3",
+    "vitest": "^4.1.10"
   }
 }

@@ -56,16 +56,50 @@ cp .env.example .env
 
 ---
 
+### Runtime Health Endpoints
+
+| Service          | Liveness       | Readiness       | Readiness dependency                                                      |
+| ---------------- | -------------- | --------------- | ------------------------------------------------------------------------- |
+| Backend          | `/health/live` | `/health/ready` | Executes `SELECT 1` against PostgreSQL; returns HTTP 503 when unavailable |
+| AI service       | `/health/live` | `/health/ready` | Process readiness; no external dependency in Phase 1                      |
+| Frontend runtime | `/health/live` | `/health/ready` | Non-root Nginx static-file runtime                                        |
+
+The legacy backend and AI-service `/health` endpoints remain available for backward compatibility. Production Docker images include health checks against their readiness endpoints.
+
+---
+
+### Optional Cloud SQL Development Connection
+
+Local PostgreSQL remains the default and continues to use `./scripts/docker/start.sh`. To run the backend against a Google Cloud SQL for PostgreSQL instance instead, use the opt-in Cloud SQL Auth Proxy profile:
+
+1. Use a PostgreSQL 18 Cloud SQL instance. The approved managed target is PostgreSQL 18.4; the existing PostgreSQL 17.4 local environment remains available as a compatibility fallback and is not removed by this profile.
+2. Enable the Cloud SQL Admin API and grant the authenticating principal the least-privilege `Cloud SQL Client` role, scoped to the development instance where possible.
+3. Create Application Default Credentials outside the repository. Do not relax the credential file's mode or copy it into this repository.
+4. Create a least-privilege database login and database for the application. Do not use the built-in `postgres` administrator account as the application user.
+5. Copy `.env.cloud-sql.example` to `.env.cloud-sql`, then set the instance connection name, absolute credential-file path, and URL-encoded `CLOUD_SQL_DATABASE_URL`.
+6. Start and verify the remote profile:
+
+   ```bash
+   ./scripts/docker/cloud-sql.sh config
+   ./scripts/docker/cloud-sql.sh start
+   ./scripts/docker/cloud-sql.sh check
+   ```
+
+The proxy image is pinned, runs as the host user rather than root, has no published host port, and mounts the credential file read-only. The backend-to-proxy URL uses `sslmode=disable` because that hop stays inside the local Docker network; the proxy independently encrypts and authenticates the remote Cloud SQL tunnel. Use `./scripts/docker/cloud-sql.sh stop` when finished. Starting the normal stack later continues to use the local PostgreSQL volume; the local database is not deleted or migrated by this workflow.
+
+---
+
 ## 2. Supported Runtime Versions
 
-| Runtime    | Required version         | How to pin                                             |
-| ---------- | ------------------------ | ------------------------------------------------------ |
-| Node.js    | 24.15.0                  | `.nvmrc` in repository root                            |
-| Python     | 3.12.x (latest patch)    | `pyenv local` in `apps/ai-service/`                    |
-| npm        | 11.x (bundled with Node) | —                                                      |
-| uv         | Latest stable            | Installed globally via the Astral install script       |
-| PostgreSQL | 17 (Docker image)        | `postgres:17-alpine` in `docker-compose.yml`           |
-| Keycloak   | 26 (Docker image)        | `quay.io/keycloak/keycloak:26` in `docker-compose.yml` |
+| Runtime                     | Required version         | How to pin                                             |
+| --------------------------- | ------------------------ | ------------------------------------------------------ |
+| Node.js                     | 24.15.0                  | `.nvmrc` in repository root                            |
+| Python                      | 3.12.x (latest patch)    | `pyenv local` in `apps/ai-service/`                    |
+| npm                         | 11.x (bundled with Node) | —                                                      |
+| uv                          | Latest stable            | Installed globally via the Astral install script       |
+| PostgreSQL (managed target) | 18.4                     | Google Cloud SQL development instance                  |
+| PostgreSQL (local fallback) | 17.4                     | `postgres:17.4-alpine` in `infra/docker/compose.yaml`  |
+| Keycloak                    | 26 (Docker image)        | `quay.io/keycloak/keycloak:26` in `docker-compose.yml` |
 
 **Caution:** The macOS system Python (`/usr/bin/python3`) is Apple's Xcode Python (3.9, EOL). Never use it for project code. Always use the Python installed by pyenv.
 

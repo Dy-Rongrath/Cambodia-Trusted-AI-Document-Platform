@@ -28,10 +28,10 @@ EXPOSE 3000
 CMD ["npm", "run", "dev", "--workspace=apps/backend"]
 
 # ---------------------------------------------------------------------------
-# Test — Jest unit tests (pass-through with no tests in Phase 1)
+# Test — execute Jest unit tests while building the test target
 # ---------------------------------------------------------------------------
 FROM development AS test
-CMD ["npm", "run", "test:ci", "--workspace=apps/backend"]
+RUN npm run test:ci --workspace=apps/backend
 
 # ---------------------------------------------------------------------------
 # Build — compile TypeScript to dist/
@@ -40,16 +40,24 @@ FROM development AS build
 RUN npm run build --workspace=apps/backend
 
 # ---------------------------------------------------------------------------
+# Production dependencies — remove build and test tooling after compilation
+# ---------------------------------------------------------------------------
+FROM build AS production-dependencies
+RUN npm prune --omit=dev --workspace=apps/backend --workspace=packages/shared-types
+
+# ---------------------------------------------------------------------------
 # Runtime — non-root production image. Includes only built output,
 # hoisted node_modules, and generated Prisma Client.
 # ---------------------------------------------------------------------------
 FROM base AS runtime
 ENV NODE_ENV=production
 USER node
-COPY --chown=node:node --from=build /app/node_modules ./node_modules
+COPY --chown=node:node --from=production-dependencies /app/node_modules ./node_modules
 COPY --chown=node:node --from=build /app/packages/shared-types ./packages/shared-types
 COPY --chown=node:node --from=build /app/apps/backend/dist ./apps/backend/dist
 COPY --chown=node:node --from=build /app/apps/backend/package.json ./apps/backend/package.json
 
 EXPOSE 3000
+HEALTHCHECK --interval=30s --timeout=5s --start-period=10s --retries=3 \
+  CMD wget --no-verbose --tries=1 --spider http://127.0.0.1:3000/health/ready || exit 1
 CMD ["node", "apps/backend/dist/main.js"]

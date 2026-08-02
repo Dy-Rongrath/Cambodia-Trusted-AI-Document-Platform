@@ -1,0 +1,34 @@
+services:
+  # Keep the local PostgreSQL service available in the base Compose file, but
+  # do not start it when this Cloud SQL override is selected.
+  postgres:
+    profiles:
+      - local-db
+
+  backend:
+    environment:
+      DATABASE_URL: ${CLOUD_SQL_DATABASE_URL:?Set CLOUD_SQL_DATABASE_URL in .env.cloud-sql}
+    depends_on: !override
+      cloud-sql-proxy:
+        condition: service_started
+
+  cloud-sql-proxy:
+    image: gcr.io/cloud-sql-connectors/cloud-sql-proxy:2.23.0
+    container_name: trusted-ai-cloud-sql-proxy
+    restart: unless-stopped
+    user: '${CLOUD_SQL_PROXY_UID:?Set by scripts/docker/cloud-sql.sh}:${CLOUD_SQL_PROXY_GID:?Set by scripts/docker/cloud-sql.sh}'
+    command:
+      - --address=0.0.0.0
+      - --port=5432
+      - --run-connection-test
+      - --credentials-file=/secrets/google/credentials.json
+      - ${CLOUD_SQL_INSTANCE_CONNECTION_NAME:?Set CLOUD_SQL_INSTANCE_CONNECTION_NAME in .env.cloud-sql}
+    volumes:
+      - type: bind
+        source: ${CLOUD_SQL_CREDENTIALS_FILE:?Set CLOUD_SQL_CREDENTIALS_FILE in .env.cloud-sql}
+        target: /secrets/google/credentials.json
+        read_only: true
+    # No host port is published. Only services on the private Compose network
+    # can reach the proxy listener.
+    networks:
+      - internal-net

@@ -5,7 +5,8 @@ from trusted_ai_service.main import app
 client = TestClient(app)
 
 
-def test_health_endpoint() -> None:
-    response = client.get("/health")
-    assert response.status_code == 200
-    assert response.json() == {"status": "ok", "service": "ai-service"}
+def test_health_endpoints() -> None:
+    for path in ("/health", "/health/live", "/health/ready"):
+        response = client.get(path)
+        assert response.status_code == 200
+        assert response.json() == {"status": "ok", "service": "ai-service"}

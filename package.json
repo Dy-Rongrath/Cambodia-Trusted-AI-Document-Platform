@@ -15,15 +15,17 @@
     "test": "npm run test --workspaces --if-present",
     "format": "prettier --write \"**/*.{ts,js,json,md,yml,yaml,scss,css}\"",
     "format:check": "prettier --check \"**/*.{ts,js,json,md,yml,yaml,scss,css}\"",
-    "ci": "npm run format:check && npm run lint && npm run typecheck && npm run test && npm run build"
+    "audit:production": "npm audit --omit=dev --audit-level=high",
+    "ci": "CI=true npm run ci:checks",
+    "ci:checks": "npm run audit:production && npm run format:check && npm run lint && npm run typecheck && npm run test && npm run build"
   },
   "devDependencies": {
-    "@eslint/js": "9.20.0",
-    "eslint": "9.20.0",
-    "eslint-config-prettier": "10.0.1",
-    "prettier": "3.5.1",
-    "typescript": "5.8.3",
-    "typescript-eslint": "8.24.0"
+    "@eslint/js": "10.0.1",
+    "eslint": "10.8.0",
+    "eslint-config-prettier": "10.1.8",
+    "prettier": "3.9.6",
+    "typescript": "6.0.3",
+    "typescript-eslint": "8.65.0"
   },
   "engines": {
     "node": ">=24.15.0 <25",

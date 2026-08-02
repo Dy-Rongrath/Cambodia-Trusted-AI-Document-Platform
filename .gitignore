@@ -49,6 +49,7 @@ out/
 .next/
 .nuxt/
 .cache/
+.angular/
 # Coverage
 coverage/
 .nyc_output/

@@ -58,7 +58,7 @@ This file (`AGENTS.md`) is the primary entry point and source of navigation for 
 - **Runtime:** Node.js 24.15.0 (pinned in `.nvmrc`)
 - **Language:** TypeScript (strict mode mandatory)
 - **Framework:** NestJS (latest stable)
-- **Database:** PostgreSQL 17
+- **Database:** PostgreSQL 18 (managed target); PostgreSQL 17 local compatibility environment retained during the approved transition
 - **ORM:** Prisma (latest stable)
 - **Authentication:** Keycloak 26 (OAuth 2.1, OIDC, WebAuthn/Passkeys)
 - **API:** REST with OpenAPI (no GraphQL unless explicitly approved)
@@ -264,3 +264,21 @@ After every approved task, produce a report containing:
 ---
 
 _All AI agents operating on this repository must strictly comply with this file._
+
+---
+
+## 11. Project-Local Skill Routing
+
+- Discover repository-specific skills only under `.agents/skills/`. Do not install or copy project skills into global skill directories.
+- Before using a matching skill, read its complete `SKILL.md` and only the referenced material needed for the task. Use the smallest matching set.
+- This `AGENTS.md`, the project security policies, ADRs, and human-approval boundaries override any conflicting skill instruction.
+- Match skills to implemented technology and the current roadmap phase; do not activate roadmap-only technology guidance speculatively.
+- Use `security-threat-model` only for an explicit threat-model or abuse-path request.
+- Use `security-best-practices` for explicit secure-coding implementation or security-review work. It does not authorize dependency, authentication, cryptography, infrastructure, or policy changes.
+- Use `systematic-debugging` for reproducible bugs, failed checks, performance regressions, or unexpected behaviour; establish evidence and root cause before changing code.
+- Use `verification-before-completion` before claiming an implementation or fix is complete.
+- Use `receiving-code-review` when evaluating and addressing concrete review feedback.
+- Use `multi-stage-dockerfile` only for Dockerfile or container-image optimization. Docker and infrastructure changes still require the approvals defined above.
+- Use `frontend-design` only for explicit new UI, material redesign, restyling, or UX-improvement requests. Preserve Angular conventions, existing product/design-system decisions, responsive behavior, keyboard access, reduced-motion preferences, and Khmer/English readability. It does not authorize backend contract changes or security-sensitive upload behavior.
+- Never let a skill automatically deploy, push, commit, apply migrations, rotate keys, alter identity-provider configuration, access credentials, or operate on production data.
+- Review provenance, pinned revisions, licenses, deferred candidates, and selection checks in `.agents/skills/SOURCES.md` and `.agents/skills/SELECTION_TESTS.md`.

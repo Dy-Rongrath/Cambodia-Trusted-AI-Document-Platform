@@ -1,4 +1,4 @@
-# ADR-0002 — PostgreSQL 17 as Primary Relational Database
+# ADR-0002 — PostgreSQL 18 as Primary Relational Database
 
 ## Status
 
@@ -6,11 +6,11 @@
 
 ## Decision Owner / Approved By
 
-Dy Rongrath, Project Owner — approved through review and merge of PR #1 on 2026-08-01.
+Dy Rongrath, Project Owner — PostgreSQL 17 baseline approved through review and merge of PR #1 on 2026-08-01; PostgreSQL 18 managed-target amendment explicitly approved on 2026-08-02.
 
 ## Date
 
-2026-08-01
+2026-08-02
 
 ## Context
 
@@ -27,9 +27,9 @@ The platform requires a relational database to store user data, organisation dat
 
 ## Decision
 
-We will use **PostgreSQL 17** as the primary relational database.
+We will use **PostgreSQL 18** as the primary relational database and managed-service target.
 
-PostgreSQL 17 is the current stable release (released September 2024) and will receive security fixes through at least 2029. It is available as a Docker image (`postgres:17-alpine`) and as a managed service on all major cloud providers.
+PostgreSQL 18 was released in September 2025 and is supported through November 2030. The approved managed development target is Google Cloud SQL for PostgreSQL 18.4. The existing `postgres:17.4-alpine` local environment remains available during the transition so local data is not deleted or made inaccessible. Until local and CI move to PostgreSQL 18, schema and SQL changes must remain compatible with PostgreSQL 17.
 
 Key PostgreSQL features used by this platform:
 
@@ -47,7 +47,7 @@ Key PostgreSQL features used by this platform:
 
 | Option            | Description                 | Why rejected or deferred                                                                                                                                                                   |
 | ----------------- | --------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| PostgreSQL 16     | Previous stable release     | Still supported, but 17 adds performance improvements relevant to JSON and vacuum operations. No reason to use an older version for a new project.                                         |
+| PostgreSQL 17     | Previous major release      | Retained temporarily for local and CI compatibility, but it is no longer the managed-service target.                                                                                       |
 | MySQL 8 / MariaDB | Popular relational database | Less robust JSON support. No native row-level security. pgvector not available. Community ecosystem for NestJS/Prisma favours PostgreSQL.                                                  |
 | SQLite            | Embedded database           | Not suitable for a multi-user, multi-service production system.                                                                                                                            |
 | MongoDB           | Document database           | Does not provide the relational integrity, row-level security, or transaction guarantees required. JSONB in PostgreSQL provides document flexibility without sacrificing these properties. |
@@ -73,7 +73,8 @@ Key PostgreSQL features used by this platform:
 
 ### Neutral consequences
 
-- The `postgres:17-alpine` Docker image is used for local development.
+- The `postgres:17.4-alpine` Docker image remains available for local compatibility while the managed target uses PostgreSQL 18.4.
+- Features introduced only in PostgreSQL 18 cannot be used until local and CI environments complete the coordinated major-version migration.
 - For production, a managed PostgreSQL service is recommended to reduce operational burden.
 
 ## Security Impact
@@ -94,14 +95,15 @@ PostgreSQL supports column-level encryption and encryption at rest (via filesyst
 
 ## Operational Impact
 
-- Local development: `postgres:17-alpine` in Docker Compose. Volume-mounted data directory.
-- CI: `postgres:17-alpine` service container in GitHub Actions.
-- Production: Managed PostgreSQL service (provider to be decided in Phase 14 infrastructure planning).
+- Local development: existing `postgres:17.4-alpine` Docker Compose service and volume retained as a compatibility environment.
+- Remote development: Google Cloud SQL for PostgreSQL 18.4 through the Cloud SQL Auth Proxy.
+- CI: PostgreSQL 17.4 through the existing Compose service until the coordinated major-version migration is separately approved and validated.
+- Production: PostgreSQL 18 managed service; final provider and topology remain subject to Phase 14 infrastructure planning.
 - Backups: Managed service point-in-time recovery. Local dev: manual `pg_dump` script.
 
 ## Migration Impact
 
-Migrating away from PostgreSQL would require rewriting all Prisma schema definitions, all RLS policies, and potentially replacing pgvector with a separate vector database. This is a high-cost migration. Only consider if a fundamental scaling or sovereignty requirement forces it.
+The managed target moves from PostgreSQL 17 to PostgreSQL 18 without changing database technology or application contracts. Existing PostgreSQL 17 local data is retained. A later local/CI upgrade requires a tested `pg_upgrade` or dump/restore workflow because PostgreSQL major-version data directories are not directly compatible.
 
 ## Review Conditions
 
