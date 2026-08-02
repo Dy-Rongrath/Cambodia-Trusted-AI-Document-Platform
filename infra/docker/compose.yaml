@@ -131,16 +131,15 @@ services:
       KC_HOSTNAME_STRICT: 'false'
       # Enable health endpoints on management port 9000
       KC_HEALTH_ENABLED: 'true'
-    # Healthcheck uses built-in /dev/tcp to probe the management port 9000
-    # (Keycloak image has no curl/wget — use bash TCP pseudo-device)
+    # Healthcheck uses Bash's /dev/tcp to probe the management port 9000.
+    # (Keycloak image has no curl/wget.)
     healthcheck:
       test:
         - 'CMD-SHELL'
         - >-
-          exec 3<>/dev/tcp/127.0.0.1/9000 &&
+          bash -c 'exec 3<>/dev/tcp/127.0.0.1/9000 &&
           printf 'GET /health/ready HTTP/1.1\r\nHost: localhost\r\nConnection: close\r\n\r\n' >&3 &&
-          grep -m 1 '"status":"UP"' <&3 &&
-          exec 3>&-
+          head -n 1 <&3 | grep -q "200"'
       interval: 10s
       timeout: 5s
       retries: 12
