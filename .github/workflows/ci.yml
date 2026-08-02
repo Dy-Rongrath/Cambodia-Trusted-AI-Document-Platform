@@ -223,8 +223,10 @@ jobs:
         timeout-minutes: 15
         run: docker compose build
 
-      - name: Build and smoke-test production runtime images
-        timeout-minutes: 15
+      - name: Build, smoke-test, and scan production runtime images
+        timeout-minutes: 20
+        env:
+          RUNTIME_SCAN_IMAGE: docker.io/aquasec/trivy:0.72.0@sha256:cffe3f5161a47a6823fbd23d985795b3ed72a4c806da4c4df16266c02accdd6f
         run: ./scripts/docker/runtime-smoke.sh
 
       # -----------------------------------------------------------------------

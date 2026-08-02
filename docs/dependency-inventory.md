@@ -17,15 +17,16 @@ For the full security audit findings and classification, see [docs/security/phas
 
 ## 2. Base Docker Images
 
-| Image                                         | Version / Tag          | Application / Layer                  | License            | Maintenance | ARM64 Support          | Phase 1 Justification                                         |
-| --------------------------------------------- | ---------------------- | ------------------------------------ | ------------------ | ----------- | ---------------------- | ------------------------------------------------------------- |
-| `node`                                        | `24.15.0-alpine3.22`   | Backend / Frontend build stage       | MIT / Alpine BSD   | Active LTS  | Native (`linux/arm64`) | Exact Node.js 24.15.0 LTS runtime base image                  |
-| `python`                                      | `3.12.9-slim-bookworm` | AI Service base image                | PSF / Debian       | Active      | Native (`linux/arm64`) | Python 3.12 target runtime for FastAPI                        |
-| `ghcr.io/astral-sh/uv`                        | `0.12.1`               | AI Service dependency manager        | Apache-2.0 / MIT   | Active      | Native (`linux/arm64`) | Pinned uv binary copied into the Python runtime image         |
-| `nginx`                                       | `1.27.5-alpine`        | Frontend runtime stage               | BSD-2-Clause       | Active      | Native (`linux/arm64`) | Lightweight static asset web server                           |
-| `postgres`                                    | `17.4-alpine`          | Database infrastructure service      | PostgreSQL License | Active      | Native (`linux/arm64`) | Primary relational database engine                            |
-| `quay.io/keycloak/keycloak`                   | `26.1.3`               | Identity infrastructure service      | Apache-2.0         | Active      | Native (`linux/arm64`) | OAuth 2.1 / OIDC identity provider container                  |
-| `gcr.io/cloud-sql-connectors/cloud-sql-proxy` | `2.23.0`               | Optional Cloud SQL development proxy | Apache-2.0         | Active      | Native (`linux/arm64`) | IAM-authorized TLS tunnel to a development Cloud SQL instance |
+| Image                                         | Version / Tag           | Application / Layer                  | License            | Maintenance | ARM64 Support          | Phase 1 Justification                                                                          |
+| --------------------------------------------- | ----------------------- | ------------------------------------ | ------------------ | ----------- | ---------------------- | ---------------------------------------------------------------------------------------------- |
+| `node`                                        | `24.15.0-alpine3.22`    | Backend / Frontend build stage       | MIT / Alpine BSD   | Active LTS  | Native (`linux/arm64`) | Exact Node.js 24.15.0 LTS runtime base image                                                   |
+| `python`                                      | `3.12.9-slim-bookworm`  | AI Service base image                | PSF / Debian       | Active      | Native (`linux/arm64`) | Python 3.12 target runtime for FastAPI                                                         |
+| `ghcr.io/astral-sh/uv`                        | `0.12.1`                | AI Service dependency manager        | Apache-2.0 / MIT   | Active      | Native (`linux/arm64`) | Pinned uv binary copied into the Python runtime image                                          |
+| `nginx`                                       | `1.27.5-alpine`         | Frontend runtime stage               | BSD-2-Clause       | Active      | Native (`linux/arm64`) | Lightweight static asset web server                                                            |
+| `postgres`                                    | `17.4-alpine`           | Database infrastructure service      | PostgreSQL License | Active      | Native (`linux/arm64`) | Primary relational database engine                                                             |
+| `quay.io/keycloak/keycloak`                   | `26.1.3`                | Identity infrastructure service      | Apache-2.0         | Active      | Native (`linux/arm64`) | OAuth 2.1 / OIDC identity provider container                                                   |
+| `gcr.io/cloud-sql-connectors/cloud-sql-proxy` | `2.23.0`                | Optional Cloud SQL development proxy | Apache-2.0         | Active      | Native (`linux/arm64`) | IAM-authorized TLS tunnel to a development Cloud SQL instance                                  |
+| `aquasec/trivy`                               | `0.72.0` + index digest | CI runtime-image vulnerability scan  | Apache-2.0         | Active      | Native (`linux/arm64`) | Pinned, development-only scanner; see the [review](security/trivy-container-scanner-review.md) |
 
 > [!NOTE]
 > Image digest pinning (SHA256 multi-platform index digests) is deferred pending `docker manifest inspect`
@@ -136,6 +137,7 @@ Python version constraint: `>=3.12,<3.13` (bounded, matching `.python-version` =
 - **Verification Evidence:** All direct dependencies are pinned in workspace manifests and locked in `package-lock.json` and `uv.lock`.
 - **npm Audit Status:** 3 moderate development-only findings in Angular CLI 22.1.2 transitive tooling; production audit reports zero findings. See [docs/security/phase-1-dependency-audit.md](security/phase-1-dependency-audit.md).
 - **Python Audit Status:** No known CVEs reported by `pip-audit` at 2026-08-02 audit time.
+- **Container Audit Status:** Trivy blocks fixable High/Critical findings in all three final runtime images; scanner adoption and residual risks are documented in the [Trivy review](security/trivy-container-scanner-review.md).
 
 > [!WARNING]
 > The three remaining npm findings are upstream development-tool vulnerabilities. Do not expose the Angular

@@ -55,9 +55,9 @@ This adds a `Signed-off-by: Your Name <your.email@example.com>` line certifying 
 Run local linters, type checks, and tests before opening a PR:
 
 ```bash
-npm run lint         # TypeScript/NestJS linting
-tsc --noEmit         # Type check
-uv run ruff check    # Python AI service linting
+./scripts/docker/lint.sh       # TypeScript and Python linting
+./scripts/docker/typecheck.sh  # TypeScript and Python type checking
+./scripts/docker/test.sh       # Backend, frontend, and AI-service tests
 ```
 
 ### Step 5: Submit a Pull Request

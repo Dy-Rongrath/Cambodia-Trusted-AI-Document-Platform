@@ -243,7 +243,7 @@ Additional security-specific logging requirements:
 | Python dependency audit  | Planned after Python dependencies exist |                              Phase 1 or 2 |
 | Gitleaks secret scanning | Planned                                 |                              Phase 1 or 2 |
 | Semgrep SAST             | Planned                                 |                                   Phase 2 |
-| Trivy container scanning | Planned after container images exist    |                                   Phase 2 |
+| Trivy container scanning | Active for all final runtime images     |                                   Phase 1 |
 | Syft/SBOM generation     | Planned                                 |                                  Phase 16 |
 | Cosign signing           | Planned                                 |                                  Phase 16 |
 | Automated DCO check      | Not configured                          | Future contributor-governance improvement |
@@ -258,7 +258,7 @@ _Note: Python dependency vulnerability auditing will be implemented using an app
 - No running containers as root. Use `USER nonroot` in Dockerfiles.
 - Read-only filesystem where possible. Only explicitly required write paths mounted.
 - No unnecessary tools installed in production images (no shell, curl, wget in production).
-- Trivy container-image scanning is planned after application container images are introduced in Phase 2 or later.
+- Trivy scans all final application runtime images in CI and blocks fixable High/Critical findings. The scanner is digest-pinned and receives read-only image archives without Docker-socket or repository access; see [docs/security/trivy-container-scanner-review.md](docs/security/trivy-container-scanner-review.md).
 - Cosign signing, release provenance, and production image verification are planned for Phase 16 production hardening.
 - All base image versions are pinned (e.g., `node:24.15.0-alpine3.20` — not `node:24-alpine`).
 
@@ -287,13 +287,13 @@ _Note: Python dependency vulnerability auditing will be implemented using an app
 - **Responsible Disclosure:** Real exploit details should remain confidential until a patch or mitigation is verified and released.
 - **Response Timeline:** Vulnerability reports are reviewed on a **best-effort basis**. Acknowledgement is targeted within 72 hours where feasible.
 
-### Vulnerability & Dependency Scanning Schedule (Planned Gates)
+### Vulnerability & Dependency Scanning Schedule
 
 | Activity                              | Planned Frequency                    | Target Phase / Owner                                                                      |
 | ------------------------------------- | ------------------------------------ | ----------------------------------------------------------------------------------------- |
 | `npm audit` / Python dependency audit | Planned for CI after manifests exist | Phase 1 / Phase 2 (Developer)                                                             |
 | Open-source licence check             | Every dependency addition            | Phase 1+ ([docs/open-source-dependency-policy.md](docs/open-source-dependency-policy.md)) |
-| Trivy container scan                  | Every image build (in CI)            | Phase 2+ (DevSecOps)                                                                      |
+| Trivy container scan                  | Every final runtime image build (CI) | Phase 1+ (DevSecOps)                                                                      |
 | Gitleaks secret scan                  | Every push (in CI)                   | Phase 1+ (Developer)                                                                      |
 | Semgrep SAST                          | Every push (in CI)                   | Phase 2+ (DevSecOps)                                                                      |
 | Dependency update review              | Weekly                               | Developer                                                                                 |

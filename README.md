@@ -43,6 +43,8 @@ The project may be called production-ready only after evidence exists for all 16
 
 The developer environment requires only **Docker Desktop**, **Git**, and **Codex CLI**. Runtimes (Node 24, Python 3.12, PostgreSQL 17, Keycloak 26) run entirely inside Docker containers.
 
+Do not run `npm install`, `uv sync`, `pip install`, or project Python commands directly on the host. The repository's Docker wrappers keep `node_modules`, `.venv`, bytecode, and tool caches out of the host workspace while Docker build layers and managed cache volumes accelerate repeated checks.
+
 ```bash
 # 1. Copy environment template
 cp .env.example .env

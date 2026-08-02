@@ -51,7 +51,7 @@ Update [dependency name] from [current version] to [target version].
 
 ## Rollback plan
 
-[Revert to the previous version by running `npm install <package>@<previous-version>` and committing the updated lock file.]
+[Revert to the previous version with `./scripts/docker/npm.sh install <package>@<previous-version> --workspace=<workspace>` and commit the updated manifest and lock file.]
 
 ## Approval requirements
 

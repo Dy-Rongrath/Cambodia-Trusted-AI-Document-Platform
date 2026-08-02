@@ -26,7 +26,7 @@ You are responsible for:
 
 ## Technology stack (AI service)
 
-- **Runtime:** Python 3.12 (pyenv managed).
+- **Runtime:** Python 3.12 in the pinned project Docker image; no host Python or pyenv environment.
 - **Dependency manager:** uv.
 - **Framework:** FastAPI (latest stable).
 - **ML:** PyTorch + Hugging Face Transformers.

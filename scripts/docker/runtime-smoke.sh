@@ -4,6 +4,7 @@ set -eu
 SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
 REPO_ROOT="$(cd "$SCRIPT_DIR/../.." && pwd)"
 SMOKE_SUFFIX="${RUNTIME_SMOKE_SUFFIX:-$$}"
+RUNTIME_SCAN_IMAGE="${RUNTIME_SCAN_IMAGE:-}"
 
 BACKEND_IMAGE="trusted-ai-backend:runtime-smoke-$SMOKE_SUFFIX"
 AI_IMAGE="trusted-ai-service:runtime-smoke-$SMOKE_SUFFIX"
@@ -14,11 +15,22 @@ BACKEND_CONTAINER="trusted-ai-backend-runtime-smoke-$SMOKE_SUFFIX"
 AI_CONTAINER="trusted-ai-service-runtime-smoke-$SMOKE_SUFFIX"
 FRONTEND_CONTAINER="trusted-ai-frontend-runtime-smoke-$SMOKE_SUFFIX"
 SMOKE_NETWORK="trusted-ai-runtime-smoke-$SMOKE_SUFFIX"
+SCAN_DIRECTORY=""
+TRIVY_CACHE_VOLUME=""
 
 cleanup() {
   docker rm --force "$POSTGRES_CONTAINER" "$BACKEND_CONTAINER" "$AI_CONTAINER" "$FRONTEND_CONTAINER" >/dev/null 2>&1 || true
   docker network rm "$SMOKE_NETWORK" >/dev/null 2>&1 || true
   docker image rm "$BACKEND_IMAGE" "$AI_IMAGE" "$FRONTEND_IMAGE" >/dev/null 2>&1 || true
+
+  if [ -n "$TRIVY_CACHE_VOLUME" ]; then
+    docker volume rm "$TRIVY_CACHE_VOLUME" >/dev/null 2>&1 || true
+  fi
+
+  if [ -n "$SCAN_DIRECTORY" ] && [ -d "$SCAN_DIRECTORY" ]; then
+    find "$SCAN_DIRECTORY" -type f -delete
+    rmdir "$SCAN_DIRECTORY"
+  fi
 }
 
 wait_for_command() {
@@ -36,6 +48,44 @@ wait_for_command() {
 
   echo "Runtime smoke check failed for $container_name." >&2
   docker logs "$container_name" >&2 || true
+  return 1
+}
+
+scan_runtime_image() {
+  image_name="$1"
+  archive_name="$2"
+
+  docker image save --output "$SCAN_DIRECTORY/$archive_name" "$image_name"
+  if docker run --rm \
+    --volume "$SCAN_DIRECTORY:/scan:ro" \
+    --volume "$TRIVY_CACHE_VOLUME:/root/.cache/trivy" \
+    "$RUNTIME_SCAN_IMAGE" image \
+    --input "/scan/$archive_name" \
+    --scanners vuln \
+    --severity HIGH,CRITICAL \
+    --ignore-unfixed \
+    --exit-code 1 \
+    --no-progress \
+    --skip-version-check \
+    --quiet \
+    --format json \
+    --output /tmp/trivy-results.json; then
+    echo "PASS: $image_name has no fixable High or Critical vulnerabilities."
+    return 0
+  fi
+
+  echo "Vulnerability gate failed for $image_name; reporting findings..." >&2
+  docker run --rm \
+    --volume "$SCAN_DIRECTORY:/scan:ro" \
+    --volume "$TRIVY_CACHE_VOLUME:/root/.cache/trivy" \
+    "$RUNTIME_SCAN_IMAGE" image \
+    --input "/scan/$archive_name" \
+    --scanners vuln \
+    --severity HIGH,CRITICAL \
+    --ignore-unfixed \
+    --exit-code 0 \
+    --no-progress \
+    --skip-version-check
   return 1
 }
 
@@ -84,5 +134,16 @@ echo "Confirming final images define runtime health checks..."
 for image in "$BACKEND_IMAGE" "$AI_IMAGE" "$FRONTEND_IMAGE"; do
   test "$(docker image inspect --format '{{if .Config.Healthcheck}}configured{{end}}' "$image")" = "configured"
 done
+
+if [ -n "$RUNTIME_SCAN_IMAGE" ]; then
+  echo "Scanning production runtime images for fixable High and Critical vulnerabilities..."
+  SCAN_DIRECTORY="$(mktemp -d "${TMPDIR:-/tmp}/trusted-ai-runtime-scan.XXXXXX")"
+  TRIVY_CACHE_VOLUME="trusted-ai-trivy-cache-$SMOKE_SUFFIX"
+  docker volume create "$TRIVY_CACHE_VOLUME" >/dev/null
+
+  scan_runtime_image "$BACKEND_IMAGE" backend.tar
+  scan_runtime_image "$AI_IMAGE" ai-service.tar
+  scan_runtime_image "$FRONTEND_IMAGE" frontend.tar
+fi
 
 echo "All production runtime smoke checks passed."

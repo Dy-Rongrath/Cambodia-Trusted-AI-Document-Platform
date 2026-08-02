@@ -78,6 +78,6 @@ cd apps/backend && npx prisma migrate dev --name <description>
 cd apps/backend && npx prisma generate
 
 # Run all tests after migration
-cd apps/backend && npm test
-cd apps/backend && npm run test:e2e
+./scripts/docker/npm.sh test --workspace=apps/backend
+./scripts/docker/npm.sh run test:e2e --workspace=apps/backend
 ```

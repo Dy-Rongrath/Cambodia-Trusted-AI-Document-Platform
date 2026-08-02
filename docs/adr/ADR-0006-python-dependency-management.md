@@ -91,7 +91,7 @@ No direct privacy impact from the choice of package manager.
 
 - Docker: The AI service Dockerfile installs uv and uses `uv sync --frozen` to install from the lock file. This is fast and reproducible.
 - CI: The uv binary is cached between runs. Dependency installation takes seconds rather than minutes.
-- Developer setup: `curl -LsSf https://astral.sh/uv/install.sh | sh` installs uv. Then `uv sync` from inside `apps/ai-service/` is sufficient to set up the complete environment.
+- Developer setup: `./scripts/docker/uv.sh` runs the pinned uv container with a disposable virtual-environment volume. Host installation of uv, Python, or a project `.venv` is not supported.
 
 ## Migration Impact
 

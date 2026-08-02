@@ -33,9 +33,9 @@ Targeted Phase: e.g. Phase 0, Phase 1
 
 Describe the commands and tests executed to verify the change (or N/A for documentation-only PRs):
 
-- [ ] Code formatting & linting (`npm run lint`, `uv run ruff check` — where applicable)
-- [ ] Type checking (`tsc --noEmit`, `uv run mypy` — where applicable)
-- [ ] Unit & integration tests (`npm test`, `uv run pytest` — where applicable)
+- [ ] Code formatting & linting (`./scripts/docker/lint.sh`)
+- [ ] Type checking (`./scripts/docker/typecheck.sh`)
+- [ ] Unit tests (`./scripts/docker/test.sh`)
 - [ ] Documentation links, formatting, and legal notices verified
 
 ---

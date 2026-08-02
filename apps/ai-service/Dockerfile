@@ -7,6 +7,9 @@ FROM python:3.12.9-slim-bookworm AS base
 WORKDIR /app/apps/ai-service
 ENV PYTHONUNBUFFERED=1 \
     PYTHONDONTWRITEBYTECODE=1
+RUN apt-get update \
+    && DEBIAN_FRONTEND=noninteractive apt-get upgrade --yes \
+    && rm -rf /var/lib/apt/lists/*
 
 # ---------------------------------------------------------------------------
 # Development — install all deps (including dev) for hot-reload and testing
@@ -21,11 +24,22 @@ EXPOSE 8000
 CMD ["uv", "run", "uvicorn", "trusted_ai_service.main:app", "--host", "0.0.0.0", "--port", "8000", "--reload"]
 
 # ---------------------------------------------------------------------------
-# Test — runs ruff, mypy, and pytest inside the dev environment
+# Lint — runs source-format and lint checks inside the dev environment
 # ---------------------------------------------------------------------------
-FROM development AS test
+FROM development AS lint
 RUN uv run ruff check .
 RUN uv run ruff format --check .
+
+# ---------------------------------------------------------------------------
+# Typecheck — checks static types independently from the lint target
+# ---------------------------------------------------------------------------
+FROM development AS typecheck
+RUN uv run mypy src
+
+# ---------------------------------------------------------------------------
+# Test — preserves the complete lint, typecheck, and test quality gate
+# ---------------------------------------------------------------------------
+FROM lint AS test
 RUN uv run mypy src
 RUN uv run pytest
 

@@ -67,7 +67,7 @@ This file (`AGENTS.md`) is the primary entry point and source of navigation for 
 
 ### AI/ML Service
 
-- **Runtime:** Python 3.12 (via pyenv)
+- **Runtime:** Python 3.12 in pinned Docker images (no host pyenv environment)
 - **Dependency manager:** uv
 - **Framework:** FastAPI (latest stable)
 - **ML framework:** PyTorch (latest stable)

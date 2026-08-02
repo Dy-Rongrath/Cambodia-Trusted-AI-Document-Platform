@@ -15,7 +15,9 @@ The developer environment is **Docker-first**. Language runtimes (Node.js 24, Py
 | **Git**            | Recent                                   | https://git-scm.com/                            | **Yes**          |
 | **Codex CLI**      | Pinned config                            | OpenAI Codex CLI (when using AI assistance)     | Optional         |
 
-> **Note:** Node.js, npm, Python, `uv`, NestJS CLI, Angular CLI, and Prisma CLI are **not required on the host**. Host-installed runtimes are documented only as an optional advanced fallback.
+> **Host isolation rule:** Node.js, npm, Python, `uv`, NestJS CLI, Angular CLI, Prisma CLI, and project virtual environments must not be installed or created on the host for this project. Use only the Docker scripts below. Bind-mounted source files remain editable, while dependency directories and tool caches stay inside disposable containers or Docker volumes.
+
+Lint and type-check scripts use lockfile-keyed Docker build layers, so unchanged dependencies are reused without creating host `node_modules` or `.venv` directories. The npm and uv wrappers keep download caches in Docker-managed named volumes. These caches consume Docker Desktop storage only and can be inspected or safely cleared with `./scripts/docker/cache.sh status` and `./scripts/docker/cache.sh clear --confirm`.
 
 ---
 
@@ -89,19 +91,19 @@ The proxy image is pinned, runs as the host user rather than root, has no publis
 
 ---
 
-## 2. Supported Runtime Versions
+## 2. Containerized Runtime Versions
 
-| Runtime                     | Required version         | How to pin                                             |
-| --------------------------- | ------------------------ | ------------------------------------------------------ |
-| Node.js                     | 24.15.0                  | `.nvmrc` in repository root                            |
-| Python                      | 3.12.x (latest patch)    | `pyenv local` in `apps/ai-service/`                    |
-| npm                         | 11.x (bundled with Node) | —                                                      |
-| uv                          | Latest stable            | Installed globally via the Astral install script       |
-| PostgreSQL (managed target) | 18.4                     | Google Cloud SQL development instance                  |
-| PostgreSQL (local fallback) | 17.4                     | `postgres:17.4-alpine` in `infra/docker/compose.yaml`  |
-| Keycloak                    | 26 (Docker image)        | `quay.io/keycloak/keycloak:26` in `docker-compose.yml` |
+| Runtime                     | Required version     | Container source                                      |
+| --------------------------- | -------------------- | ----------------------------------------------------- |
+| Node.js                     | 24.15.0              | `node:24.15.0-alpine3.22`                             |
+| Python                      | 3.12.9               | `python:3.12.9-slim-bookworm`                         |
+| npm                         | Bundled with Node 24 | Node development/build image                          |
+| uv                          | 0.12.1               | `ghcr.io/astral-sh/uv:0.12.1-python3.12-trixie-slim`  |
+| PostgreSQL (managed target) | 18.4                 | Google Cloud SQL development instance                 |
+| PostgreSQL (local fallback) | 17.4                 | `postgres:17.4-alpine` in `infra/docker/compose.yaml` |
+| Keycloak                    | 26.1.3               | `quay.io/keycloak/keycloak:26.1.3`                    |
 
-**Caution:** The macOS system Python (`/usr/bin/python3`) is Apple's Xcode Python (3.9, EOL). Never use it for project code. Always use the Python installed by pyenv.
+Host runtime versions are irrelevant to the supported workflow; Docker supplies every project runtime and CLI.
 
 ---
 
@@ -109,32 +111,31 @@ The proxy image is pinned, runs as the host user rather than root, has no publis
 
 ### Node.js (npm workspaces)
 
-- Run all npm commands from the **repository root** unless working on a specific workspace.
+- Run npm through `./scripts/docker/npm.sh`; it mounts source files, keeps `node_modules` in a disposable Docker volume, and reuses a Docker-managed download cache.
 - To add a dependency to a specific workspace:
   ```bash
-  npm install <package> --workspace=apps/backend
+  ./scripts/docker/npm.sh install <package> --workspace=apps/backend
   ```
 - To add a dev dependency:
   ```bash
-  npm install -D <package> --workspace=apps/backend
+  ./scripts/docker/npm.sh install --save-dev <package> --workspace=apps/backend
   ```
 - Always commit the updated `package-lock.json`.
 - **Do not add dependencies without reviewing licence, maintenance status, and known CVEs.**
 
 ### Python (uv)
 
-- Always work inside `apps/ai-service/` for Python operations.
+- Run uv through `./scripts/docker/uv.sh`; it sets `apps/ai-service/` as the container workspace, keeps `.venv` and bytecode off the host, and reuses a Docker-managed download cache.
 - To add a dependency:
   ```bash
-  cd apps/ai-service
-  uv add <package>
+  ./scripts/docker/uv.sh add <package>
   ```
 - To add a dev dependency:
   ```bash
-  uv add --dev <package>
+  ./scripts/docker/uv.sh add --dev <package>
   ```
 - Always commit the updated `uv.lock`.
-- Run `uv sync` after pulling changes that update `uv.lock`.
+- Rebuild the Docker images after pulling changes that update `uv.lock`: `./scripts/docker/build.sh`.
 
 ### Dependency approval
 
@@ -143,7 +144,7 @@ Adding a new dependency requires:
 1. Confirming no existing dependency provides the capability.
 2. Checking the licence (MIT, Apache 2.0, or BSD preferred).
 3. Checking the package's maintenance status.
-4. Running `npm audit` or `uv audit` after adding.
+4. Running the Dockerized dependency audit gates after adding (`./scripts/docker/npm.sh audit --omit=dev --audit-level=high` and the CI Python audit).
 5. Documenting the reason in the pull-request description.
 
 ---

@@ -57,9 +57,9 @@
 
 ```bash
 # Run after implementation to verify the change
-cd apps/backend && npm test
-cd apps/backend && npm run test:e2e
-cd apps/backend && npm run lint
+./scripts/docker/npm.sh test --workspace=apps/backend
+./scripts/docker/npm.sh run test:e2e --workspace=apps/backend
+./scripts/docker/lint.sh
 cd apps/backend && npx tsc --noEmit
 ```
 

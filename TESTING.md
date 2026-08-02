@@ -249,12 +249,12 @@ Every feature must be verifiable without a production environment. Tests are not
 - All protected endpoints return 401 without authentication.
 - All endpoints validate Content-Type on POST/PUT requests.
 
-**Planned CI security tooling (to be configured in CI as application manifests and pipelines are created):**
+**CI security tooling:**
 
 - Gitleaks: secret scanning on every commit (Planned Phase 1). Until CI is configured, manual checks are required.
 - Semgrep: SAST on every push (Planned Phase 2).
-- `npm audit` / `uv audit`: dependency vulnerability check on every push (Planned Phase 1/2).
-- Trivy: container image scan on every image build (Planned Phase 2).
+- `npm audit` / `pip-audit`: production dependency vulnerability checks on every push (Active Phase 1).
+- Trivy: fixable High/Critical vulnerability scan of every final runtime image (Active Phase 1).
 - OWASP ZAP: automated API scan on every release (Planned Phase 4).
 
 ---
@@ -345,7 +345,7 @@ The following quality gates are planned controls to be implemented incrementally
 | Secret scanning             | Gitleaks                 | Every push         | Phase 1            |
 | Dependency audit            | npm audit + uv audit     | Every push         | Phase 1 or Phase 2 |
 | SAST                        | Semgrep                  | Every push         | Phase 2 or later   |
-| Container scanning          | Trivy                    | Every image build  | Phase 2 or later   |
+| Container scanning          | Trivy                    | Every image build  | Phase 1 — active   |
 | End-to-end tests            | Playwright               | Every PR to main   | Phase 3–7 onward   |
 | AI evaluation               | pytest + MLflow          | Every model change | Phase 6 onward     |
 | Product-facing MCP tests    | OpenAPI / custom         | Every release      | Phase 15           |
@@ -398,30 +398,19 @@ apps/ai-service/
 
 ## 7. Running Tests Locally
 
-The following commands become valid only after Phase 1 scaffolding is merged.
+Tests run only in Docker. Host Node.js, npm, Python, uv, virtual environments, and package installation are not supported.
 
 ```bash
-# Backend unit tests
-cd apps/backend && npm test
+# All implemented backend, frontend, and AI-service test stages
+./scripts/docker/test.sh
 
-# Backend integration tests
-cd apps/backend && npm run test:e2e
-
-# Backend test coverage
-cd apps/backend && npm run test:cov
-
-# AI service tests
-cd apps/ai-service && uv run pytest
-
-# AI service tests with coverage
-cd apps/ai-service && uv run pytest --cov=. --cov-report=term-missing
-
-# Frontend tests
-cd apps/frontend && npm test
-
-# End-to-end tests (requires Docker Compose services running)
-cd apps/frontend && npm run e2e
+# Individual test stages
+docker build --target test -f apps/backend/Dockerfile .
+docker build --target test -f apps/frontend/Dockerfile .
+docker build --target test -f apps/ai-service/Dockerfile .
 ```
+
+Integration, coverage, and end-to-end commands will be added to these Docker entry points when those suites are implemented.
 
 ---
 
