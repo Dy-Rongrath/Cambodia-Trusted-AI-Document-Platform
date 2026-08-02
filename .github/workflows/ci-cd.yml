@@ -476,6 +476,8 @@ jobs:
             docker compose --profile web \$COMPOSE_FILES up -d --no-build postgres backend ai-service frontend caddy
           fi
           docker compose --profile web \$COMPOSE_FILES ps
+          echo "=== Cleaning up unused/dangling Docker images on VM ==="
+          docker image prune -af --filter "until=72h" || true
           EOF
           )
           REMOTE_SCRIPT_B64="$(printf '%s' "$REMOTE_SCRIPT" | base64 -w 0)"
