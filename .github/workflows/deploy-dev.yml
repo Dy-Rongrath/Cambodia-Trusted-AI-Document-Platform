@@ -80,12 +80,13 @@ jobs:
         run: |
           set -eu
           IMAGE_PREFIX="${AR_LOCATION}-docker.pkg.dev/${GCP_PROJECT_ID}/${AR_REPOSITORY}"
-          docker build --target runtime -f apps/backend/Dockerfile -t "$IMAGE_PREFIX/backend:${GITHUB_SHA}" .
-          docker build --target runtime -f apps/frontend/Dockerfile -t "$IMAGE_PREFIX/frontend:${GITHUB_SHA}" .
-          docker build --target runtime -f apps/ai-service/Dockerfile -t "$IMAGE_PREFIX/ai-service:${GITHUB_SHA}" .
-          docker push "$IMAGE_PREFIX/backend:${GITHUB_SHA}"
-          docker push "$IMAGE_PREFIX/frontend:${GITHUB_SHA}"
-          docker push "$IMAGE_PREFIX/ai-service:${GITHUB_SHA}"
+          IMAGE_TAG="${GITHUB_SHA}-${GITHUB_RUN_ID}"
+          docker build --target runtime -f apps/backend/Dockerfile -t "$IMAGE_PREFIX/backend:$IMAGE_TAG" .
+          docker build --target runtime -f apps/frontend/Dockerfile -t "$IMAGE_PREFIX/frontend:$IMAGE_TAG" .
+          docker build --target runtime -f apps/ai-service/Dockerfile -t "$IMAGE_PREFIX/ai-service:$IMAGE_TAG" .
+          docker push "$IMAGE_PREFIX/backend:$IMAGE_TAG"
+          docker push "$IMAGE_PREFIX/frontend:$IMAGE_TAG"
+          docker push "$IMAGE_PREFIX/ai-service:$IMAGE_TAG"
 
       - name: Pull immutable images and deploy on the VM
         run: |
@@ -99,9 +100,9 @@ jobs:
           git checkout --force main
           git reset --hard origin/main
           gcloud auth configure-docker '${AR_LOCATION}-docker.pkg.dev' --quiet
-          export BACKEND_IMAGE='$IMAGE_PREFIX/backend:${GITHUB_SHA}'
-          export FRONTEND_IMAGE='$IMAGE_PREFIX/frontend:${GITHUB_SHA}'
-          export AI_SERVICE_IMAGE='$IMAGE_PREFIX/ai-service:${GITHUB_SHA}'
+          export BACKEND_IMAGE='$IMAGE_PREFIX/backend:${GITHUB_SHA}-${GITHUB_RUN_ID}'
+          export FRONTEND_IMAGE='$IMAGE_PREFIX/frontend:${GITHUB_SHA}-${GITHUB_RUN_ID}'
+          export AI_SERVICE_IMAGE='$IMAGE_PREFIX/ai-service:${GITHUB_SHA}-${GITHUB_RUN_ID}'
           COMPOSE_FILES='-f compose.yaml -f infra/docker/compose.images.yaml'
           if [ -f .env.cloud-sql ]; then
             COMPOSE_FILES="\$COMPOSE_FILES -f infra/docker/compose.cloud-sql.yaml"
