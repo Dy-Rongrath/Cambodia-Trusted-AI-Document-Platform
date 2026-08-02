@@ -412,6 +412,8 @@ jobs:
       GCE_ZONE: ${{ vars.GCE_ZONE }}
       DEPLOY_PATH: ${{ vars.DEPLOY_PATH }}
       TLS_ADMIN_EMAIL: ${{ vars.TLS_ADMIN_EMAIL }}
+      CLOUDFLARE_ORIGIN_CERT: ${{ secrets.CLOUDFLARE_ORIGIN_CERT }}
+      CLOUDFLARE_ORIGIN_KEY: ${{ secrets.CLOUDFLARE_ORIGIN_KEY }}
 
     steps:
       - name: Checkout repository
@@ -429,7 +431,9 @@ jobs:
             GCE_VM_NAME \
             GCE_ZONE \
             DEPLOY_PATH \
-            TLS_ADMIN_EMAIL; do
+            TLS_ADMIN_EMAIL \
+            CLOUDFLARE_ORIGIN_CERT \
+            CLOUDFLARE_ORIGIN_KEY; do
             if [ -z "${!required}" ]; then
               echo "Missing GitHub Actions variable: $required" >&2
               exit 1
@@ -452,6 +456,8 @@ jobs:
       - name: Pull immutable images and deploy on the VM
         run: |
           set -eu
+          CERT_B64=$(printf '%s' "$CLOUDFLARE_ORIGIN_CERT" | base64 -w 0)
+          KEY_B64=$(printf '%s' "$CLOUDFLARE_ORIGIN_KEY" | base64 -w 0)
           IMAGE_PREFIX="${AR_LOCATION}-docker.pkg.dev/${GCP_PROJECT_ID}/${AR_REPOSITORY}"
           REMOTE_SCRIPT=$(cat <<EOF
           set -eu
@@ -460,6 +466,12 @@ jobs:
           git fetch --prune origin
           git checkout --force main
           git reset --hard origin/main
+          
+          # Inject Cloudflare Certificates from GitHub Secrets
+          echo '$CERT_B64' | base64 -d > infra/docker/origin.pem
+          echo '$KEY_B64' | base64 -d > infra/docker/origin.key
+          chmod 600 infra/docker/origin.key
+          
           gcloud auth configure-docker '${AR_LOCATION}-docker.pkg.dev' --quiet
           export BACKEND_IMAGE='$IMAGE_PREFIX/backend:${GITHUB_SHA}-${GITHUB_RUN_ID}'
           export FRONTEND_IMAGE='$IMAGE_PREFIX/frontend:${GITHUB_SHA}-${GITHUB_RUN_ID}'
