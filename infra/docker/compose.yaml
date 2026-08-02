@@ -116,6 +116,29 @@ services:
     networks:
       - internal-net
 
+  caddy:
+    profiles:
+      - web
+    image: caddy:2.10-alpine
+    container_name: trusted-ai-caddy
+    restart: unless-stopped
+    ports:
+      - '80:80'
+      - '443:443'
+    volumes:
+      - ./infra/docker/Caddyfile:/etc/caddy/Caddyfile:ro
+      - caddy_data:/data
+      - caddy_config:/config
+    depends_on:
+      backend:
+        condition: service_started
+      ai-service:
+        condition: service_started
+      frontend:
+        condition: service_started
+    networks:
+      - internal-net
+
   keycloak:
     profiles:
       - auth
@@ -153,4 +176,8 @@ networks:
 
 volumes:
   postgres_data:
+    driver: local
+  caddy_data:
+    driver: local
+  caddy_config:
     driver: local

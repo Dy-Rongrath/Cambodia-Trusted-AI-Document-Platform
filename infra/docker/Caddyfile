@@ -1,0 +1,15 @@
+{
+    email {$TLS_ADMIN_EMAIL}
+}
+
+cambodia-trusted-ai-dev.dyrongrath.com {
+    reverse_proxy frontend:4200
+}
+
+cambodia-trusted-ai-api.dyrongrath.com {
+    reverse_proxy backend:3000
+}
+
+cambodia-trusted-ai-ai.dyrongrath.com {
+    reverse_proxy ai-service:8000
+}

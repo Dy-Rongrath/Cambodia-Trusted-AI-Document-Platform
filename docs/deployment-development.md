@@ -42,6 +42,7 @@ A maintainer must configure these external resources before enabling the workflo
    | `GCE_VM_NAME`                    | `trusted-ai-platform-dev-20260802`                   |
    | `GCE_ZONE`                       | `asia-southeast1-b`                                  |
    | `DEPLOY_PATH`                    | `/home/USER/trusted-ai-platform`                     |
+   | `TLS_ADMIN_EMAIL`                | Email used for Let's Encrypt certificate notices    |
 
 Do not put any of these values in a repository `.env` file. The provider resource
 name uses the numeric Google Cloud project number, not the project ID.
@@ -117,9 +118,25 @@ For the Cloud SQL profile, use:
 ./scripts/docker/cloud-sql.sh check
 ```
 
-The current frontend and backend ports bind to `127.0.0.1`. Keep them private
-and use SSH port forwarding for development access. Do not open database or AI
-service ports to the internet.
+The frontend, backend, and AI service remain private Docker-network services.
+The optional `web` profile adds Caddy on ports 80 and 443. Caddy routes the
+three development hostnames to the internal services and obtains/renews
+Let's Encrypt certificates automatically. The deployment workflow injects
+`TLS_ADMIN_EMAIL` from the GitHub `development` Environment. For manual VM
+deployments, set the same variable in the VM's `.env` before enabling this
+profile. Do not open database, backend, or AI service ports directly to the
+internet.
+
+The development hostnames are:
+
+- `cambodia-trusted-ai-dev.dyrongrath.com` → frontend
+- `cambodia-trusted-ai-api.dyrongrath.com` → backend API
+- `cambodia-trusted-ai-ai.dyrongrath.com` → AI service
+
+All three DNS records must point to the VM's reserved external IP. Keep the
+Cloudflare records proxied after DNS propagation so Cloudflare provides the
+edge TLS layer as well as DDoS protection. Caddy still provides valid origin
+certificates for end-to-end HTTPS.
 
 ## CI/CD safety boundaries
 
