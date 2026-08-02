@@ -26,7 +26,7 @@ contain no known npm audit findings.
 ### Commands executed
 
 ```bash
-npm audit --json
+npm run audit:full
 npm audit --omit=dev --json
 npm run audit:production
 ```
@@ -66,8 +66,9 @@ and test suite validate the overridden development-tool graph.
 - Do not expose `ng serve` or other development servers to untrusted networks.
 - Do not execute or configure the Angular CLI MCP server without completing the mandatory MCP server review
   and receiving maintainer approval.
-- Keep `npm run audit:production` in the canonical local and GitHub Actions quality gates. It fails on high or
-  critical production findings while the full dependency graph retains its separate critical-only CI check.
+- Keep `npm run audit:full` and `npm run audit:production` in the canonical local and GitHub Actions quality
+  gates. The full graph fails on moderate, high, or critical findings; the production graph independently fails
+  on high or critical findings.
 - Re-evaluate and remove the override when Angular CLI directly adopts MCP SDK 1.30.0 or newer.
 - Do not use `npm audit fix --force`; it would silently downgrade the approved framework toolchain.
 

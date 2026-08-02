@@ -253,7 +253,8 @@ Every feature must be verifiable without a production environment. Tests are not
 
 - Gitleaks: secret scanning on every commit (Planned Phase 1). Until CI is configured, manual checks are required.
 - Semgrep: SAST on every push (Planned Phase 2).
-- `npm audit` / `pip-audit`: production dependency vulnerability checks on every push (Active Phase 1).
+- `npm audit`: full dependency graph fails on Moderate or higher and the production graph fails on High or higher on every push (Active Phase 1).
+- `pip-audit`: production Python dependency vulnerability checks on every push (Active Phase 1).
 - Trivy: fixable High/Critical vulnerability scan of every final runtime image (Active Phase 1).
 - OWASP ZAP: automated API scan on every release (Planned Phase 4).
 

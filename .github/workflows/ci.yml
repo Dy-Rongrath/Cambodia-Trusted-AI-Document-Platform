@@ -173,7 +173,7 @@ jobs:
             set -e
             npm ci
             echo '=== Full audit (all deps) ==='
-            npm audit --audit-level=critical
+            npm run audit:full
             echo '=== Runtime-only audit (omit dev) ==='
             npm run audit:production
           "

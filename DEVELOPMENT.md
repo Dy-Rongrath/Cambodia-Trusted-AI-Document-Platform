@@ -144,7 +144,7 @@ Adding a new dependency requires:
 1. Confirming no existing dependency provides the capability.
 2. Checking the licence (MIT, Apache 2.0, or BSD preferred).
 3. Checking the package's maintenance status.
-4. Running the Dockerized dependency audit gates after adding (`./scripts/docker/npm.sh audit --omit=dev --audit-level=high` and the CI Python audit).
+4. Running the Dockerized dependency audit gates after adding (`./scripts/docker/npm.sh run audit:full`, `./scripts/docker/npm.sh run audit:production`, and the CI Python audit).
 5. Documenting the reason in the pull-request description.
 
 ---
