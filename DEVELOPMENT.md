@@ -570,13 +570,13 @@ tool_timeout_sec = 30
 
 Every pull request that introduces a user-visible change **must** update [CHANGELOG.md](../CHANGELOG.md) under the `[Unreleased]` section before merging. Use the [Keep a Changelog](https://keepachangelog.com/en/2.0.0/) categories:
 
-| Category  | When to use |
-|-----------|-------------|
-| `Added`   | New features, scripts, or documents |
-| `Changed` | Changes to existing behaviour or files |
-| `Fixed`   | Bug fixes |
-| `Removed` | Deleted features or files |
-| `Security`| Vulnerability fixes or security hardening |
+| Category   | When to use                               |
+| ---------- | ----------------------------------------- |
+| `Added`    | New features, scripts, or documents       |
+| `Changed`  | Changes to existing behaviour or files    |
+| `Fixed`    | Bug fixes                                 |
+| `Removed`  | Deleted features or files                 |
+| `Security` | Vulnerability fixes or security hardening |
 
 PRs that touch only comments, whitespace, or test fixtures are exempt. Reviewers must reject PRs that are missing a CHANGELOG entry when one is required.
 

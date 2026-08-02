@@ -42,7 +42,7 @@ A maintainer must configure these external resources before enabling the workflo
    | `GCE_VM_NAME`                    | `trusted-ai-platform-dev-20260802`                   |
    | `GCE_ZONE`                       | `asia-southeast1-b`                                  |
    | `DEPLOY_PATH`                    | `/home/USER/trusted-ai-platform`                     |
-   | `TLS_ADMIN_EMAIL`                | Email used for Let's Encrypt certificate notices    |
+   | `TLS_ADMIN_EMAIL`                | Email used for Let's Encrypt certificate notices     |
 
 Do not put any of these values in a repository `.env` file. The provider resource
 name uses the numeric Google Cloud project number, not the project ID.
