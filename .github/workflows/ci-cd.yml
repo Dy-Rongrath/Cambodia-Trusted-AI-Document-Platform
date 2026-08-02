@@ -1,6 +1,7 @@
-name: Phase 1 CI
+name: Phase 1 CI/CD
 
 on:
+  workflow_dispatch:
   push:
     branches: [main, 'chore/**', 'feat/**', 'fix/**', 'docs/**']
   pull_request:
@@ -8,26 +9,33 @@ on:
 
 permissions:
   contents: read
+  id-token: write
+
+concurrency:
+  group: ci-cd-${{ github.ref }}
+  cancel-in-progress: true
 
 jobs:
-  validate:
-    name: Validate Phase 1 Scaffold
+  # ===========================================================================
+  # SECTION 1: CI QUALITY GATES (Run in parallel on all PRs and pushes)
+  # ===========================================================================
+
+  # ---------------------------------------------------------------------------
+  # Job 1: Repository Policy & Container Security Checks (~30s)
+  # ---------------------------------------------------------------------------
+  policy-and-security:
+    name: Repository Policy & Container Security
     runs-on: ubuntu-latest
-    timeout-minutes: 25
+    timeout-minutes: 5
 
     steps:
       - name: Checkout repository
         uses: actions/checkout@8e8c483db84b4bee98b60c0593521ed34d9990e8 # v6.0.1
 
-      # -----------------------------------------------------------------------
-      # §12 Repository policy — tracked-file checks using git ls-files
-      # -----------------------------------------------------------------------
       - name: Validate repository safety and policy compliance
         timeout-minutes: 2
         run: |
           echo "=== Checking for committed .env secret files (tracked-file scan) ==="
-          # Use git ls-files so nested files in subdirectories are caught.
-          # Allow only explicitly approved template files (.env.example, *.env.example).
           LEAKED=$(git ls-files | grep -E '^(\.env|\.env\.[^.]+)$' | grep -vE '(\.env\.example|\.example)$' || true)
           if [ -n "$LEAKED" ]; then
             echo "FAIL: Tracked secret environment files detected:"
@@ -37,7 +45,7 @@ jobs:
           echo "PASS: No committed .env secret files."
 
           echo "=== Checking for private key material in tracked files ==="
-          PRIVATE_KEY_FILES=$(git ls-files | grep -v '^\.github/workflows/ci\.yml$' | xargs -r grep -lI 'BEGIN RSA PRIVATE KEY\|BEGIN EC PRIVATE KEY\|BEGIN OPENSSH PRIVATE KEY\|-----BEGIN PRIVATE KEY-----' 2>/dev/null || true)
+          PRIVATE_KEY_FILES=$(git ls-files | grep -v '^\.github/workflows/ci-cd\.yml$' | xargs -r grep -lI 'BEGIN RSA PRIVATE KEY\|BEGIN EC PRIVATE KEY\|BEGIN OPENSSH PRIVATE KEY\|-----BEGIN PRIVATE KEY-----' 2>/dev/null || true)
           if [ -n "$PRIVATE_KEY_FILES" ]; then
             echo "FAIL: Private key material detected in tracked files."
             echo "$PRIVATE_KEY_FILES"
@@ -53,8 +61,6 @@ jobs:
           echo "PASS: No object-storage services."
 
           echo "=== Checking for any Prisma model declaration ==="
-          # Phase 1 must contain NO model blocks. This catches all model names,
-          # not only selected business model names.
           if grep -Eq '^[[:space:]]*model[[:space:]]+' apps/backend/prisma/schema.prisma; then
             echo "FAIL: Prisma model declaration found in Phase 1 schema."
             grep -En '^[[:space:]]*model[[:space:]]+' apps/backend/prisma/schema.prisma
@@ -76,9 +82,6 @@ jobs:
 
           echo "=== All repository policy checks passed. ==="
 
-      # -----------------------------------------------------------------------
-      # §13 Container security — check resolved Compose configuration
-      # -----------------------------------------------------------------------
       - name: Validate Docker Compose configuration
         timeout-minutes: 2
         run: |
@@ -114,7 +117,6 @@ jobs:
           echo "PASS: Backend port bound to 127.0.0.1."
 
           echo "=== Confirming PostgreSQL has no published host port ==="
-          # postgres must have no ports: section at all
           POSTGRES_PORTS=$(docker compose config --format json | python3 -c "import json,sys; cfg=json.load(sys.stdin); print(cfg.get('services',{}).get('postgres',{}).get('ports','none'))")
           if [ "$POSTGRES_PORTS" != "none" ] && [ "$POSTGRES_PORTS" != "[]" ]; then
             echo "FAIL: PostgreSQL has published host ports: $POSTGRES_PORTS"
@@ -132,11 +134,19 @@ jobs:
 
           echo "=== All container security checks passed. ==="
 
-      # -----------------------------------------------------------------------
-      # Node.js workspace quality gates — run in clean pinned Node container
-      # -----------------------------------------------------------------------
+  # ---------------------------------------------------------------------------
+  # Job 2: Node.js Workspaces Quality & Security Audit (~1.5m)
+  # ---------------------------------------------------------------------------
+  node-quality:
+    name: Node Workspaces & Audit
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@8e8c483db84b4bee98b60c0593521ed34d9990e8 # v6.0.1
+
       - name: Node Workspaces Quality Gates (Docker)
-        timeout-minutes: 10
         run: |
           docker run --rm -v ${{ github.workspace }}:/app -w /app node:24.15.0-alpine3.22 sh -c "
             set -e
@@ -147,16 +157,26 @@ jobs:
             npm run prisma:generate --workspace=apps/backend &&
             npm run typecheck &&
             npm run test:ci --workspace=apps/backend &&
-            npm run build --workspace=apps/backend
+            npm run build --workspace=apps/backend &&
+            echo '=== Full audit (all deps) ===' &&
+            npm run audit:full &&
+            echo '=== Runtime-only audit (omit dev) ===' &&
+            npm run audit:production
           "
 
-      # -----------------------------------------------------------------------
-      # Frontend tests — via the dedicated browser-capable Docker test stage.
-      # Angular @angular/build:unit-test uses Vitest (Node.js/jsdom).
-      # No Chromium required — tests are deterministic in any Node environment.
-      # -----------------------------------------------------------------------
+  # ---------------------------------------------------------------------------
+  # Job 3: Frontend Unit Tests (~1m)
+  # ---------------------------------------------------------------------------
+  frontend-tests:
+    name: Frontend Unit Tests
+    runs-on: ubuntu-latest
+    timeout-minutes: 8
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@8e8c483db84b4bee98b60c0593521ed34d9990e8 # v6.0.1
+
       - name: Frontend Tests (Docker test stage)
-        timeout-minutes: 8
         run: |
           docker build \
             --target test \
@@ -165,26 +185,19 @@ jobs:
             --progress=plain \
             .
 
-      # -----------------------------------------------------------------------
-      # npm vulnerability audit
-      # -----------------------------------------------------------------------
-      - name: npm Vulnerability Audit
-        timeout-minutes: 5
-        run: |
-          docker run --rm -v ${{ github.workspace }}:/app -w /app node:24.15.0-alpine3.22 sh -c "
-            set -e
-            npm ci
-            echo '=== Full audit (all deps) ==='
-            npm run audit:full
-            echo '=== Runtime-only audit (omit dev) ==='
-            npm run audit:production
-          "
+  # ---------------------------------------------------------------------------
+  # Job 4: AI Service Quality Gates & Audit (~1.5m)
+  # ---------------------------------------------------------------------------
+  ai-service-quality:
+    name: AI Service Quality & Audit
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
 
-      # -----------------------------------------------------------------------
-      # AI service quality gates
-      # -----------------------------------------------------------------------
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@8e8c483db84b4bee98b60c0593521ed34d9990e8 # v6.0.1
+
       - name: AI Service Quality Gates (Docker)
-        timeout-minutes: 8
         run: |
           docker run --rm -v ${{ github.workspace }}/apps/ai-service:/app -w /app ghcr.io/astral-sh/uv:0.12.1-python3.12-trixie-slim sh -c "
             set -e
@@ -192,25 +205,11 @@ jobs:
             uv run ruff check . &&
             uv run ruff format --check . &&
             uv run mypy src &&
-            uv run pytest
-          "
-
-      # -----------------------------------------------------------------------
-      # AI service lockfile consistency
-      # -----------------------------------------------------------------------
-      - name: AI Service Lockfile Consistency
-        timeout-minutes: 3
-        run: |
-          docker run --rm -v ${{ github.workspace }}/apps/ai-service:/app -w /app ghcr.io/astral-sh/uv:0.12.1-python3.12-trixie-slim sh -c "
+            uv run pytest &&
             uv lock --check
-            echo 'PASS: uv.lock is consistent with pyproject.toml'
           "
 
-      # -----------------------------------------------------------------------
-      # AI service production dependency vulnerability audit
-      # -----------------------------------------------------------------------
       - name: AI Service Production Dependency Audit
-        timeout-minutes: 5
         run: |
           docker run --rm -v ${{ github.workspace }}/apps/ai-service:/workspace -w /workspace --entrypoint sh ghcr.io/astral-sh/uv:0.12.1-python3.12-trixie-slim -c "
             set -e
@@ -218,22 +217,29 @@ jobs:
             uvx pip-audit==2.10.1 --strict --progress-spinner off --require-hashes --disable-pip -r /tmp/requirements.txt
           "
 
-      # -----------------------------------------------------------------------
-      # Build all Docker images
-      # -----------------------------------------------------------------------
+  # ---------------------------------------------------------------------------
+  # Job 5: Runtime Smoke Test & Stack Integration (~3m)
+  # ---------------------------------------------------------------------------
+  integration-smoke-test:
+    name: Integration & Runtime Smoke Test
+    needs: [policy-and-security, node-quality, frontend-tests, ai-service-quality]
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@8e8c483db84b4bee98b60c0593521ed34d9990e8 # v6.0.1
+
       - name: Build Docker images
-        timeout-minutes: 15
+        timeout-minutes: 10
         run: docker compose build
 
       - name: Build, smoke-test, and scan production runtime images
-        timeout-minutes: 20
+        timeout-minutes: 10
         env:
           RUNTIME_SCAN_IMAGE: docker.io/aquasec/trivy:0.72.0@sha256:cffe3f5161a47a6823fbd23d985795b3ed72a4c806da4c4df16266c02accdd6f
         run: ./scripts/docker/runtime-smoke.sh
 
-      # -----------------------------------------------------------------------
-      # Start default services and wait for health
-      # -----------------------------------------------------------------------
       - name: Start default services
         timeout-minutes: 3
         run: docker compose up -d
@@ -263,26 +269,18 @@ jobs:
           echo "Backend is healthy."
 
       - name: Verify Backend Health Endpoint
-        timeout-minutes: 1
         run: curl --fail http://127.0.0.1:3000/health
 
       - name: Verify AI Service Health Endpoint (Internal)
-        timeout-minutes: 1
         run: docker compose exec -T ai-service python -c 'import urllib.request; resp = urllib.request.urlopen("http://localhost:8000/health"); print(resp.read().decode())'
 
       - name: Verify Frontend HTTP response
-        timeout-minutes: 1
         run: curl --fail http://127.0.0.1:4200/
 
       - name: Run Backend Database Connectivity Check (SELECT 1)
-        timeout-minutes: 1
         run: docker compose exec -T backend npm run db:check --workspace=apps/backend
 
-      # -----------------------------------------------------------------------
-      # Confirm Keycloak absent from default stack
-      # -----------------------------------------------------------------------
       - name: Confirm Keycloak absent from default stack
-        timeout-minutes: 1
         run: |
           if docker ps --format '{{.Names}}' | grep -q trusted-ai-keycloak; then
             echo "FAIL: Keycloak container found running outside auth profile."
@@ -290,9 +288,6 @@ jobs:
           fi
           echo "PASS: Keycloak not running in default stack."
 
-      # -----------------------------------------------------------------------
-      # §14 Keycloak readiness validation — real HTTP health check
-      # -----------------------------------------------------------------------
       - name: Start Keycloak under auth profile
         timeout-minutes: 2
         run: docker compose --profile auth up -d keycloak
@@ -317,12 +312,8 @@ jobs:
           echo "PASS: Keycloak is ready."
 
       - name: Stop Keycloak
-        timeout-minutes: 1
         run: docker compose --profile auth stop keycloak
 
-      # -----------------------------------------------------------------------
-      # Cleanup — always runs even if previous steps fail
-      # -----------------------------------------------------------------------
       - name: Capture service logs on failure
         if: failure()
         run: |
@@ -340,3 +331,156 @@ jobs:
       - name: Clean up Compose services
         if: always()
         run: docker compose --profile auth down --remove-orphans
+
+  # ===========================================================================
+  # SECTION 2: CD DEPLOYMENT (Runs ONLY on push to main after CI passes)
+  # ===========================================================================
+
+  # ---------------------------------------------------------------------------
+  # Job 6: Parallel Docker Image Build & Push with Layer Caching
+  # ---------------------------------------------------------------------------
+  build-images:
+    name: Build & Push (${{ matrix.service }})
+    needs: integration-smoke-test
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    environment: development
+
+    strategy:
+      matrix:
+        include:
+          - service: backend
+            dockerfile: apps/backend/Dockerfile
+          - service: frontend
+            dockerfile: apps/frontend/Dockerfile
+          - service: ai-service
+            dockerfile: apps/ai-service/Dockerfile
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@8e8c483db84b4bee98b60c0593521ed34d9990e8 # v6.0.1
+
+      - name: Authenticate to Google Cloud with Workload Identity Federation
+        uses: google-github-actions/auth@7c6bc770dae815cd3e89ee6cdf493a5fab2cc093 # v3.0.0
+        with:
+          project_id: ${{ vars.GCP_PROJECT_ID }}
+          workload_identity_provider: ${{ vars.GCP_WORKLOAD_IDENTITY_PROVIDER }}
+          service_account: ${{ vars.GCP_DEPLOYER_SERVICE_ACCOUNT }}
+
+      - name: Set up Google Cloud CLI
+        uses: google-github-actions/setup-gcloud@aa5489c8933f4cc7a4f7d45035b3b1440c9c10db # v3.0.1
+        with:
+          version: '>= 416.0.0'
+          project_id: ${{ vars.GCP_PROJECT_ID }}
+
+      - name: Authenticate Docker to Artifact Registry
+        run: gcloud auth configure-docker "${{ vars.AR_LOCATION }}-docker.pkg.dev" --quiet
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@c160b97f0857ef59c07153673752e2a86cfecb73 # v3.10.0
+
+      - name: Build and push runtime image with Buildx layer caching
+        uses: docker/build-push-action@4f58ea79222b3b9dc2c8bbdd6debcef730109a75 # v6.9.0
+        with:
+          context: .
+          file: ${{ matrix.dockerfile }}
+          target: runtime
+          push: true
+          tags: ${{ vars.AR_LOCATION }}-docker.pkg.dev/${{ vars.GCP_PROJECT_ID }}/${{ vars.AR_REPOSITORY }}/${{ matrix.service }}:${{ github.sha }}-${{ github.run_id }}
+          cache-from: type=gha,scope=${{ matrix.service }}
+          cache-to: type=gha,mode=max,scope=${{ matrix.service }}
+
+  # ---------------------------------------------------------------------------
+  # Job 7: Deploy to GCP Development VM via IAP SSH
+  # ---------------------------------------------------------------------------
+  deploy:
+    name: Deploy to Development VM
+    needs: build-images
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    environment: development
+
+    env:
+      GCP_PROJECT_ID: ${{ vars.GCP_PROJECT_ID }}
+      GCP_WORKLOAD_IDENTITY_PROVIDER: ${{ vars.GCP_WORKLOAD_IDENTITY_PROVIDER }}
+      GCP_DEPLOYER_SERVICE_ACCOUNT: ${{ vars.GCP_DEPLOYER_SERVICE_ACCOUNT }}
+      AR_LOCATION: ${{ vars.AR_LOCATION }}
+      AR_REPOSITORY: ${{ vars.AR_REPOSITORY }}
+      GCE_VM_NAME: ${{ vars.GCE_VM_NAME }}
+      GCE_ZONE: ${{ vars.GCE_ZONE }}
+      DEPLOY_PATH: ${{ vars.DEPLOY_PATH }}
+      TLS_ADMIN_EMAIL: ${{ vars.TLS_ADMIN_EMAIL }}
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@8e8c483db84b4bee98b60c0593521ed34d9990e8 # v6.0.1
+
+      - name: Validate deployment configuration
+        run: |
+          set -eu
+          for required in \
+            GCP_PROJECT_ID \
+            GCP_WORKLOAD_IDENTITY_PROVIDER \
+            GCP_DEPLOYER_SERVICE_ACCOUNT \
+            AR_LOCATION \
+            AR_REPOSITORY \
+            GCE_VM_NAME \
+            GCE_ZONE \
+            DEPLOY_PATH \
+            TLS_ADMIN_EMAIL; do
+            if [ -z "${!required}" ]; then
+              echo "Missing GitHub Actions variable: $required" >&2
+              exit 1
+            fi
+          done
+
+      - name: Authenticate to Google Cloud with Workload Identity Federation
+        uses: google-github-actions/auth@7c6bc770dae815cd3e89ee6cdf493a5fab2cc093 # v3.0.0
+        with:
+          project_id: ${{ env.GCP_PROJECT_ID }}
+          workload_identity_provider: ${{ env.GCP_WORKLOAD_IDENTITY_PROVIDER }}
+          service_account: ${{ env.GCP_DEPLOYER_SERVICE_ACCOUNT }}
+
+      - name: Set up Google Cloud CLI
+        uses: google-github-actions/setup-gcloud@aa5489c8933f4cc7a4f7d45035b3b1440c9c10db # v3.0.1
+        with:
+          version: '>= 416.0.0'
+          project_id: ${{ env.GCP_PROJECT_ID }}
+
+      - name: Pull immutable images and deploy on the VM
+        run: |
+          set -eu
+          IMAGE_PREFIX="${AR_LOCATION}-docker.pkg.dev/${GCP_PROJECT_ID}/${AR_REPOSITORY}"
+          REMOTE_SCRIPT=$(cat <<EOF
+          set -eu
+          test -d '$DEPLOY_PATH/.git'
+          cd '$DEPLOY_PATH'
+          git fetch --prune origin
+          git checkout --force main
+          git reset --hard origin/main
+          gcloud auth configure-docker '${AR_LOCATION}-docker.pkg.dev' --quiet
+          export BACKEND_IMAGE='$IMAGE_PREFIX/backend:${GITHUB_SHA}-${GITHUB_RUN_ID}'
+          export FRONTEND_IMAGE='$IMAGE_PREFIX/frontend:${GITHUB_SHA}-${GITHUB_RUN_ID}'
+          export AI_SERVICE_IMAGE='$IMAGE_PREFIX/ai-service:${GITHUB_SHA}-${GITHUB_RUN_ID}'
+          export TLS_ADMIN_EMAIL='$TLS_ADMIN_EMAIL'
+          COMPOSE_FILES='-f compose.yaml -f infra/docker/compose.images.yaml'
+          if [ -f .env.cloud-sql ]; then
+            COMPOSE_FILES="\$COMPOSE_FILES -f infra/docker/compose.cloud-sql.yaml"
+            docker compose --env-file .env.cloud-sql \$COMPOSE_FILES pull
+            docker compose --profile web --env-file .env.cloud-sql \$COMPOSE_FILES up -d --no-build cloud-sql-proxy backend ai-service frontend caddy
+            docker compose --env-file .env.cloud-sql \$COMPOSE_FILES exec -T backend npm run db:check --workspace=apps/backend
+          else
+            docker compose \$COMPOSE_FILES pull
+            docker compose --profile web \$COMPOSE_FILES up -d --no-build postgres backend ai-service frontend caddy
+          fi
+          docker compose --profile web \$COMPOSE_FILES ps
+          EOF
+          )
+          REMOTE_SCRIPT_B64="$(printf '%s' "$REMOTE_SCRIPT" | base64 -w 0)"
+          gcloud compute ssh "$GCE_VM_NAME" \
+            --project="$GCP_PROJECT_ID" \
+            --zone="$GCE_ZONE" \
+            --tunnel-through-iap \
+            --command="echo '$REMOTE_SCRIPT_B64' | base64 -d | bash"

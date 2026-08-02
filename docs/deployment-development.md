@@ -5,11 +5,10 @@ Engine VM. It is not a production deployment design.
 
 ## Deployment model
 
-GitHub Actions already runs the repository CI workflow in `.github/workflows/ci.yml`.
-The optional `Deploy development VM` workflow runs after a push to `main` (or by
-manual dispatch), authenticates to Google Cloud with GitHub OIDC, builds immutable
-runtime images, pushes them to Artifact Registry, and connects to the VM through
-IAP to pull and run those images with Docker Compose.
+GitHub Actions runs the unified CI/CD workflow in `.github/workflows/ci-cd.yml`.
+The `Phase 1 CI/CD` workflow validates quality gates on pull requests and pushes,
+and automatically builds immutable runtime images and deploys to the development VM
+upon push to `main`.
 
 The workflow deliberately does not create, upload, print, or store `.env` files.
 Runtime configuration remains on the VM and is ignored by Git. Do not add database
