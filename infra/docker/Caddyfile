@@ -3,7 +3,7 @@
 }
 
 cambodia-trusted-ai-dev.dyrongrath.com {
-    reverse_proxy frontend:4200
+    reverse_proxy frontend:8080
 }
 
 cambodia-trusted-ai-api.dyrongrath.com {
