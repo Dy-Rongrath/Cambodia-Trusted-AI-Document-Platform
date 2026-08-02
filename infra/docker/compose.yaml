@@ -125,6 +125,8 @@ services:
     ports:
       - '80:80'
       - '443:443'
+    environment:
+      TLS_ADMIN_EMAIL: ${TLS_ADMIN_EMAIL:-admin@dyrongrath.com}
     volumes:
       - ./Caddyfile:/etc/caddy/Caddyfile:ro
       - caddy_data:/data
