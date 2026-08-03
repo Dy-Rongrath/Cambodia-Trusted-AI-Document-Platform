@@ -50,13 +50,13 @@ jobs:
     steps:
       - name: Validate TARGET_SHA
         run: |
-          case "${{ env.TARGET_SHA }}" in
+          case "$TARGET_SHA" in
             (*[!0-9a-fA-F]*|'')
               echo "TARGET_SHA must be a full 40-character hexadecimal commit SHA." >&2
               exit 1
               ;;
           esac
-          if [ "${#${{ env.TARGET_SHA }}}" -ne 40 ]; then
+          if [ "${#TARGET_SHA}" -ne 40 ]; then
             echo "TARGET_SHA must contain exactly 40 characters." >&2
             exit 1
           fi
