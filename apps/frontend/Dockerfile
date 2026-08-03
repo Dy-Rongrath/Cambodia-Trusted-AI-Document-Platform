@@ -4,6 +4,7 @@
 # Base — exact pinned Node.js 24.15.0 on Alpine 3.22
 # ---------------------------------------------------------------------------
 FROM node:24.15.0-alpine3.22 AS base
+RUN apk upgrade --no-cache
 WORKDIR /app
 
 # ---------------------------------------------------------------------------
@@ -46,6 +47,7 @@ RUN npm run build --workspace=apps/frontend
 # No Angular CLI, no Node.js, no Chromium in the final image.
 # ---------------------------------------------------------------------------
 FROM nginx:1.27.5-alpine AS runtime
+RUN apk upgrade --no-cache
 
 COPY apps/frontend/nginx.conf /etc/nginx/nginx.conf
 COPY --chown=nginx:nginx --from=build /app/apps/frontend/dist/frontend/browser /usr/share/nginx/html
