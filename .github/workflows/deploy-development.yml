@@ -157,9 +157,9 @@ jobs:
           umask 077
           printf '%s' "$CLOUDFLARE_ORIGIN_CERT" > "$RUNNER_TEMP/origin.pem"
           printf '%s' "$CLOUDFLARE_ORIGIN_KEY" > "$RUNNER_TEMP/origin.key"
-          
+
           FILES_TO_TRANSFER="$RUNNER_TEMP/origin.pem $RUNNER_TEMP/origin.key"
-          
+
           if [ -n "$CLOUD_SQL_DATABASE_URL" ] && [ -n "$CLOUD_SQL_INSTANCE_CONNECTION_NAME" ] && [ -n "$CLOUD_SQL_GCP_SA_KEY" ]; then
             echo "CLOUD_SQL_DATABASE_URL=$CLOUD_SQL_DATABASE_URL" > "$RUNNER_TEMP/.env.cloud-sql"
             echo "CLOUD_SQL_INSTANCE_CONNECTION_NAME=$CLOUD_SQL_INSTANCE_CONNECTION_NAME" >> "$RUNNER_TEMP/.env.cloud-sql"
@@ -200,14 +200,14 @@ jobs:
           mv /tmp/trusted-ai-certs/origin.pem /tmp/trusted-ai-certs/origin.key '$DEPLOY_CERT_DIR/'
           chmod 600 '$DEPLOY_CERT_DIR/origin.key'
           chmod 644 '$DEPLOY_CERT_DIR/origin.pem'
-          
+
           if [ -f /tmp/trusted-ai-certs/.env.cloud-sql ]; then
             mv /tmp/trusted-ai-certs/.env.cloud-sql '$DEPLOY_PATH/.env.cloud-sql'
             mv /tmp/trusted-ai-certs/gcp-sa-key.json '$DEPLOY_CERT_DIR/gcp-sa-key.json'
             chmod 600 '$DEPLOY_CERT_DIR/gcp-sa-key.json'
             chmod 600 '$DEPLOY_PATH/.env.cloud-sql'
           fi
-          
+
           rmdir /tmp/trusted-ai-certs
 
           gcloud auth configure-docker '${AR_LOCATION}-docker.pkg.dev' --quiet
