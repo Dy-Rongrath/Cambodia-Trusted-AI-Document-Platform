@@ -1,11 +1,13 @@
 name: Deploy Development
 
 on:
+  push:
+    branches: [main]
   workflow_dispatch:
     inputs:
       DEPLOY_SHA:
-        description: 'Full 40-character hexadecimal commit SHA to deploy'
-        required: true
+        description: 'Full 40-character hexadecimal commit SHA to deploy (leave blank for latest)'
+        required: false
         type: string
 
 permissions:
@@ -32,6 +34,9 @@ jobs:
       actions: read
       checks: read
 
+    env:
+      TARGET_SHA: ${{ github.event.inputs.DEPLOY_SHA || github.sha }}
+
     strategy:
       matrix:
         include:
@@ -43,16 +48,16 @@ jobs:
             dockerfile: apps/ai-service/Dockerfile
 
     steps:
-      - name: Validate DEPLOY_SHA
+      - name: Validate TARGET_SHA
         run: |
-          case "${{ github.event.inputs.DEPLOY_SHA }}" in
+          case "${{ env.TARGET_SHA }}" in
             (*[!0-9a-fA-F]*|'')
-              echo "DEPLOY_SHA must be a full 40-character hexadecimal commit SHA." >&2
+              echo "TARGET_SHA must be a full 40-character hexadecimal commit SHA." >&2
               exit 1
               ;;
           esac
-          if [ "${#${{ github.event.inputs.DEPLOY_SHA }}}" -ne 40 ]; then
-            echo "DEPLOY_SHA must contain exactly 40 characters." >&2
+          if [ "${#${{ env.TARGET_SHA }}}" -ne 40 ]; then
+            echo "TARGET_SHA must contain exactly 40 characters." >&2
             exit 1
           fi
 
@@ -61,15 +66,15 @@ jobs:
         with:
           fetch-depth: 0
 
-      - name: Verify commit and fetch DEPLOY_SHA
+      - name: Verify commit and fetch TARGET_SHA
         run: |
           git fetch origin main --no-tags
-          git fetch origin "${{ github.event.inputs.DEPLOY_SHA }}" --no-tags
-          git merge-base --is-ancestor "${{ github.event.inputs.DEPLOY_SHA }}" origin/main || {
+          git fetch origin "${{ env.TARGET_SHA }}" --no-tags
+          git merge-base --is-ancestor "${{ env.TARGET_SHA }}" origin/main || {
             echo "The requested commit is not reachable from main." >&2
             exit 1
           }
-          git checkout "${{ github.event.inputs.DEPLOY_SHA }}"
+          git checkout "${{ env.TARGET_SHA }}"
 
       - name: Authenticate to Google Cloud with Workload Identity Federation
         uses: google-github-actions/auth@7c6bc770dae815cd3e89ee6cdf493a5fab2cc093 # v3.0.0
@@ -97,7 +102,7 @@ jobs:
           file: ${{ matrix.dockerfile }}
           target: runtime
           push: true
-          tags: ${{ vars.AR_LOCATION }}-docker.pkg.dev/${{ vars.GCP_PROJECT_ID }}/${{ vars.AR_REPOSITORY }}/${{ matrix.service }}:${{ github.event.inputs.DEPLOY_SHA }}-${{ github.run_id }}
+          tags: ${{ vars.AR_LOCATION }}-docker.pkg.dev/${{ vars.GCP_PROJECT_ID }}/${{ vars.AR_REPOSITORY }}/${{ matrix.service }}:${{ env.TARGET_SHA }}-${{ github.run_id }}
           cache-from: type=gha,scope=${{ matrix.service }}
           cache-to: type=gha,mode=max,scope=${{ matrix.service }}
 
@@ -119,6 +124,7 @@ jobs:
       checks: read
 
     env:
+      TARGET_SHA: ${{ github.event.inputs.DEPLOY_SHA || github.sha }}
       GCP_PROJECT_ID: ${{ vars.GCP_PROJECT_ID }}
       GCP_WORKLOAD_IDENTITY_PROVIDER: ${{ vars.GCP_WORKLOAD_IDENTITY_PROVIDER }}
       GCP_DEPLOYER_SERVICE_ACCOUNT: ${{ vars.GCP_DEPLOYER_SERVICE_ACCOUNT }}
@@ -191,8 +197,8 @@ jobs:
 
           git fetch --prune origin
           git checkout --force main
-          git fetch origin '${{ github.event.inputs.DEPLOY_SHA }}' --no-tags
-          git checkout '${{ github.event.inputs.DEPLOY_SHA }}'
+          git fetch origin '${{ env.TARGET_SHA }}' --no-tags
+          git checkout '${{ env.TARGET_SHA }}'
 
           # Atomically move certificates to external directory
           mkdir -p '$DEPLOY_CERT_DIR'
@@ -212,9 +218,9 @@ jobs:
 
           gcloud auth configure-docker '${AR_LOCATION}-docker.pkg.dev' --quiet
 
-          export BACKEND_IMAGE='$IMAGE_PREFIX/backend:${{ github.event.inputs.DEPLOY_SHA }}-${GITHUB_RUN_ID}'
-          export FRONTEND_IMAGE='$IMAGE_PREFIX/frontend:${{ github.event.inputs.DEPLOY_SHA }}-${GITHUB_RUN_ID}'
-          export AI_SERVICE_IMAGE='$IMAGE_PREFIX/ai-service:${{ github.event.inputs.DEPLOY_SHA }}-${GITHUB_RUN_ID}'
+          export BACKEND_IMAGE='$IMAGE_PREFIX/backend:${{ env.TARGET_SHA }}-${GITHUB_RUN_ID}'
+          export FRONTEND_IMAGE='$IMAGE_PREFIX/frontend:${{ env.TARGET_SHA }}-${GITHUB_RUN_ID}'
+          export AI_SERVICE_IMAGE='$IMAGE_PREFIX/ai-service:${{ env.TARGET_SHA }}-${GITHUB_RUN_ID}'
           export TLS_ADMIN_EMAIL='$TLS_ADMIN_EMAIL'
           export CADDY_ORIGIN_CERT_FILE='$DEPLOY_CERT_DIR/origin.pem'
           export CADDY_ORIGIN_KEY_FILE='$DEPLOY_CERT_DIR/origin.key'
