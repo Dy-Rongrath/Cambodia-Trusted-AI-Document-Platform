@@ -131,6 +131,9 @@ jobs:
       TLS_ADMIN_EMAIL: ${{ vars.TLS_ADMIN_EMAIL }}
       CLOUDFLARE_ORIGIN_CERT: ${{ secrets.CLOUDFLARE_ORIGIN_CERT }}
       CLOUDFLARE_ORIGIN_KEY: ${{ secrets.CLOUDFLARE_ORIGIN_KEY }}
+      CLOUD_SQL_DATABASE_URL: ${{ secrets.CLOUD_SQL_DATABASE_URL }}
+      CLOUD_SQL_INSTANCE_CONNECTION_NAME: ${{ secrets.CLOUD_SQL_INSTANCE_CONNECTION_NAME }}
+      CLOUD_SQL_GCP_SA_KEY: ${{ secrets.CLOUD_SQL_GCP_SA_KEY }}
 
     steps:
       - name: Authenticate to Google Cloud with Workload Identity Federation
@@ -154,6 +157,17 @@ jobs:
           umask 077
           printf '%s' "$CLOUDFLARE_ORIGIN_CERT" > "$RUNNER_TEMP/origin.pem"
           printf '%s' "$CLOUDFLARE_ORIGIN_KEY" > "$RUNNER_TEMP/origin.key"
+          
+          FILES_TO_TRANSFER="$RUNNER_TEMP/origin.pem $RUNNER_TEMP/origin.key"
+          
+          if [ -n "$CLOUD_SQL_DATABASE_URL" ] && [ -n "$CLOUD_SQL_INSTANCE_CONNECTION_NAME" ] && [ -n "$CLOUD_SQL_GCP_SA_KEY" ]; then
+            echo "CLOUD_SQL_DATABASE_URL=$CLOUD_SQL_DATABASE_URL" > "$RUNNER_TEMP/.env.cloud-sql"
+            echo "CLOUD_SQL_INSTANCE_CONNECTION_NAME=$CLOUD_SQL_INSTANCE_CONNECTION_NAME" >> "$RUNNER_TEMP/.env.cloud-sql"
+            echo "CLOUD_SQL_CREDENTIALS_FILE=$DEPLOY_CERT_DIR/gcp-sa-key.json" >> "$RUNNER_TEMP/.env.cloud-sql"
+            printf '%s' "$CLOUD_SQL_GCP_SA_KEY" | base64 -d > "$RUNNER_TEMP/gcp-sa-key.json"
+            
+            FILES_TO_TRANSFER="$FILES_TO_TRANSFER $RUNNER_TEMP/.env.cloud-sql $RUNNER_TEMP/gcp-sa-key.json"
+          fi
 
           # 2. Transfer to VM temp directory
           gcloud compute ssh "$GCE_VM_NAME" \
@@ -162,7 +176,8 @@ jobs:
             --tunnel-through-iap \
             --command="mkdir -p /tmp/trusted-ai-certs && chmod 700 /tmp/trusted-ai-certs"
             
-          gcloud compute scp "$RUNNER_TEMP/origin.pem" "$RUNNER_TEMP/origin.key" "$GCE_VM_NAME:/tmp/trusted-ai-certs/" \
+          # shellcheck disable=SC2086
+          gcloud compute scp $FILES_TO_TRANSFER "$GCE_VM_NAME:/tmp/trusted-ai-certs/" \
             --project="$GCP_PROJECT_ID" \
             --zone="$GCE_ZONE" \
             --tunnel-through-iap
@@ -185,6 +200,14 @@ jobs:
           mv /tmp/trusted-ai-certs/origin.pem /tmp/trusted-ai-certs/origin.key '$DEPLOY_CERT_DIR/'
           chmod 600 '$DEPLOY_CERT_DIR/origin.key'
           chmod 644 '$DEPLOY_CERT_DIR/origin.pem'
+          
+          if [ -f /tmp/trusted-ai-certs/.env.cloud-sql ]; then
+            mv /tmp/trusted-ai-certs/.env.cloud-sql '$DEPLOY_PATH/.env.cloud-sql'
+            mv /tmp/trusted-ai-certs/gcp-sa-key.json '$DEPLOY_CERT_DIR/gcp-sa-key.json'
+            chmod 600 '$DEPLOY_CERT_DIR/gcp-sa-key.json'
+            chmod 600 '$DEPLOY_PATH/.env.cloud-sql'
+          fi
+          
           rmdir /tmp/trusted-ai-certs
 
           gcloud auth configure-docker '${AR_LOCATION}-docker.pkg.dev' --quiet
@@ -195,6 +218,8 @@ jobs:
           export TLS_ADMIN_EMAIL='$TLS_ADMIN_EMAIL'
           export CADDY_ORIGIN_CERT_FILE='$DEPLOY_CERT_DIR/origin.pem'
           export CADDY_ORIGIN_KEY_FILE='$DEPLOY_CERT_DIR/origin.key'
+          export CLOUD_SQL_PROXY_UID="\$(id -u)"
+          export CLOUD_SQL_PROXY_GID="\$(id -g)"
 
           COMPOSE_FILES='-f compose.yaml -f infra/docker/compose.images.yaml -f infra/docker/compose.deployment.yaml'
 
@@ -225,4 +250,4 @@ jobs:
       - name: Cleanup temporary secrets
         if: always()
         run: |
-          rm -f "$RUNNER_TEMP/origin.pem" "$RUNNER_TEMP/origin.key"
+          rm -f "$RUNNER_TEMP/origin.pem" "$RUNNER_TEMP/origin.key" "$RUNNER_TEMP/.env.cloud-sql" "$RUNNER_TEMP/gcp-sa-key.json"
